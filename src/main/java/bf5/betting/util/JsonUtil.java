@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author duyna5
+ * @author duynguyen
  */
 @Log4j2
 public class JsonUtil {

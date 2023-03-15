@@ -1,7 +1,7 @@
 package bf5.betting.constant;
 
 /**
- * @author duyna5
+ * @author duynguyen
  */
 public class Constant {
 

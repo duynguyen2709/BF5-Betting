@@ -1,5 +1,9 @@
 package bf5.betting.constant;
 
+import bf5.betting.exception.EntityNotFoundException;
+
+import java.util.stream.Stream;
+
 /**
  * @author duynguyen
  **/
@@ -10,4 +14,15 @@ public enum BetResult {
     DRAW,
     LOST,
     HALF_LOST
+    ;
+
+    public static BetResult fromValue(String value) {
+        return Stream.of(BetResult.values())
+                .filter(c -> c.name().equalsIgnoreCase(value))
+                .findFirst()
+                .orElseThrow(() -> EntityNotFoundException.builder()
+                        .clazz(BetResult.class)
+                        .id(value)
+                        .build());
+    }
 }

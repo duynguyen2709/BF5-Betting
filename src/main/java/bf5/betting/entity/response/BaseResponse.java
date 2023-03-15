@@ -9,14 +9,14 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * @author duyna5
+ * @author duynguyen
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class BaseResponse implements Serializable {
+public class BaseResponse<T> implements Serializable {
     public static final BaseResponse SUCCESS;
 
     static {
@@ -24,11 +24,21 @@ public class BaseResponse implements Serializable {
     }
 
     private String status;
+    private T data;
     private Integer code;
     private String message;
 
+    public static <T> BaseResponse<T> success(T data) {
+        return (BaseResponse<T>) BaseResponse.builder()
+                .status("success")
+                .code(200)
+                .data(data)
+                .build();
+    }
+
     public static BaseResponse failed(int statusCode, String message) {
-        return BaseResponse.builder().status("failed")
+        return BaseResponse.builder()
+                .status("failed")
                 .code(statusCode)
                 .message(message)
                 .build();

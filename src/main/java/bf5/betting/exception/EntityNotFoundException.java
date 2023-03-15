@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 /**
- * @author duyna5
+ * @author duynguyen
  */
 @AllArgsConstructor
 @Builder

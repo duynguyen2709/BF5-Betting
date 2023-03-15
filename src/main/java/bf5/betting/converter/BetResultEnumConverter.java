@@ -9,7 +9,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * @author duyna5
+ * @author duynguyen
  */
 @Converter(autoApply = true)
 public class BetResultEnumConverter implements AttributeConverter<BetResult, String> {

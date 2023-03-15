@@ -50,7 +50,7 @@ public class BetHistory {
     private Long actualProfit;
 
     public String getBetTime() {
-        return DateTimeUtil.timestampToString(this.matchTime);
+        return DateTimeUtil.timestampToString(this.betTime);
     }
 
     public String getMatchTime() {

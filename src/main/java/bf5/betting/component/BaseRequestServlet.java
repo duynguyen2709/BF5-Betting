@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
- * @author duyna5
+ * @author duynguyen
  */
 @Log4j2
 public class BaseRequestServlet extends DispatcherServlet {

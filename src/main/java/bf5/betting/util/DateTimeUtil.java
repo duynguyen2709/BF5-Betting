@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- * @author duyna5
+ * @author duynguyen
  */
 @Log4j2
 public class DateTimeUtil {

@@ -8,7 +8,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 
 /**
- * @author duyna5
+ * @author duynguyen
  */
 @Aspect
 @Component
@@ -20,7 +20,7 @@ public class TryCatchWrapAspect {
         try {
             return joinPoint.proceed();
         } catch (Throwable ex) {
-            log.error("[{}] args = {}, exception occurred: {}",
+            log.error("Method: {}\nArgs = {}\nException: {}",
                     joinPoint.getSignature(), JsonUtil.toJsonString(joinPoint.getArgs()), ex.getMessage(), ex);
             throw ex;
         }

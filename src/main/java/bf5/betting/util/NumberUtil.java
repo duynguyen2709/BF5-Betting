@@ -3,7 +3,7 @@ package bf5.betting.util;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * @author duyna5
+ * @author duynguyen
  */
 @Log4j2
 public class NumberUtil {
