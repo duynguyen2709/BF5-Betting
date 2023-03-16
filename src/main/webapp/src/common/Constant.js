@@ -1,17 +1,27 @@
 const API_URL = {
-  GET_BET_HISTORY: "/bets",
+  BetHistory: "/bets",
+  GET_PLAYERS: "/players",
 };
 
 const ROUTES = {
   // pages
   INDEX: { path: "/index.html" },
   BASE: { path: "/" },
-  DASHBOARD: { path: "/dashboard" },
+  ADMIN: { path: "/admin" },
 
   // errors
   NOT_FOUND: { path: "/404" },
 };
 
-const DEFAULT_ERROR_MESSAGE = "An error occurred. Try again later";
+const DEFAULT_ERROR_MESSAGE = "Hệ thống có lỗi. Vui lòng thử lại sau";
 
-export { API_URL, ROUTES, DEFAULT_ERROR_MESSAGE };
+const BET_RESULT = {
+  WIN: 'WIN',
+  HALF_WIN: 'HALF_WIN',
+  LOST: 'LOST',
+  HALF_LOST: 'HALF_LOST',
+  DRAW: 'DRAW',
+  NOT_FINISHED: 'NOT_FINISHED',
+}
+
+export { API_URL, BET_RESULT, ROUTES, DEFAULT_ERROR_MESSAGE };

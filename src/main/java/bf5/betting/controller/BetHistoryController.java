@@ -8,7 +8,9 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author duynguyen
@@ -23,14 +25,21 @@ public class BetHistoryController {
     @GetMapping("")
     public BaseResponse<List<BetHistory>> getAll(@RequestParam(name = "playerId", required = false) String playerId,
                                                  @RequestParam(name = "date", required = false) String date) {
-        if (StringUtils.isNotBlank(playerId) &&
-                StringUtils.isNotBlank(date))
-            return BaseResponse.success(betHistoryService.getByPlayerIdAndDate(playerId, date));
+        List<BetHistory> betHistoryList;
+        if (StringUtils.isNotBlank(playerId) && StringUtils.isNotBlank(date))
+            betHistoryList = betHistoryService.getByPlayerIdAndDate(playerId, date);
+        else if (StringUtils.isNotBlank(playerId))
+            betHistoryList = betHistoryService.getByPlayerId(playerId);
+        else
+            betHistoryList= betHistoryService.getAllBetHistory();
 
-        if (StringUtils.isNotBlank(playerId))
-            return BaseResponse.success(betHistoryService.getByPlayerId(playerId));
+        return BaseResponse.success(sortByBetTimeDesc(betHistoryList));
+    }
 
-        return BaseResponse.success(betHistoryService.getAllBetHistory());
+    private List<BetHistory> sortByBetTimeDesc(List<BetHistory> betHistoryList) {
+        return betHistoryList.stream()
+                .sorted((bet1, bet2) -> Long.compare(bet2.getBetTimeMs(), bet1.getBetTimeMs()))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
@@ -43,8 +52,8 @@ public class BetHistoryController {
         return BaseResponse.success(betHistoryService.createBet(request));
     }
 
-    @PutMapping("/{id}/result")
-    public BaseResponse<BetHistory> updateResult(@PathVariable("id") int betId, @RequestBody BetHistoryUpdateResultRequest request) {
+    @PutMapping("/{betId}/result")
+    public BaseResponse<BetHistory> updateResult(@PathVariable("betId") int betId, @RequestBody BetHistoryUpdateResultRequest request) {
         request.setBetId(betId);
         return BaseResponse.success(betHistoryService.updateBetResult(request));
     }

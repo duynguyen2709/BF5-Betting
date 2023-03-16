@@ -1,4 +1,4 @@
-import { Tag } from 'antd';
+import {Tag} from 'antd';
 
 const BetResultTag = ({result}) => {
   switch (result) {
@@ -13,7 +13,7 @@ const BetResultTag = ({result}) => {
       case "DRAW":
           return <Tag color="processing">Hoà</Tag>
       default:
-          return <Tag color="warning">Chưa Bắt Đầu</Tag>
+          return <Tag color="warning">Chưa Hoàn Tất</Tag>
   }
 }
 

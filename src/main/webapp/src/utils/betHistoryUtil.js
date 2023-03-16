@@ -1,3 +1,5 @@
+import {BET_RESULT} from "../common/Constant";
+
 const parseBetEvent = (betHistory) => {
     const {event, firstHalfOnly} = betHistory;
     const parsedEvent = event
@@ -9,8 +11,31 @@ const parseBetEvent = (betHistory) => {
         .replace("2X", `${betHistory.secondTeam} (+0.5)`)
         .replace("Total Over", "Tài")
         .replace("Total Under", "Xỉu")
-    const firstHalfText = firstHalfOnly ? 'Hiệp 1 - ' : ''
+    const firstHalfText = firstHalfOnly ? 'Hiệp 1: ' : ''
     return `${firstHalfText}${parsedEvent}`
 }
 
-export {parseBetEvent}
+const filterBetResult = (betHistoryList, resultToFilter) => {
+    return betHistoryList.filter(ele => resultToFilter.includes(ele.result))
+}
+
+const resultToText = (result) => {
+    switch (result) {
+        case BET_RESULT.NOT_FINISHED:
+            return `Chưa Hoàn Tất`
+        case BET_RESULT.WIN:
+            return `Thắng`
+        case BET_RESULT.HALF_WIN:
+            return `Thắng Nửa Tiền`
+        case BET_RESULT.LOST:
+            return `Thua`
+        case BET_RESULT.HALF_LOST:
+            return `Thua Nửa Tiền`
+        case BET_RESULT.DRAW:
+            return `Hoà`
+        default:
+            return result
+    }
+}
+
+export {filterBetResult, parseBetEvent, resultToText}

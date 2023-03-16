@@ -57,6 +57,10 @@ public class BetHistory {
         return DateTimeUtil.timestampToString(this.betTime);
     }
 
+    public long getBetTimeMs() {
+        return this.betTime.getTime();
+    }
+
     public String getMatchTime() {
         return DateTimeUtil.timestampToString(this.matchTime);
     }

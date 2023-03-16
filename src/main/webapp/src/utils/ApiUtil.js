@@ -1,6 +1,6 @@
 import Axios from "axios";
-import { message } from "antd";
-import { DEFAULT_ERROR_MESSAGE } from "../common/Constant";
+import {message} from "antd";
+import {DEFAULT_ERROR_MESSAGE} from "../common/Constant";
 
 const axiosClient = Axios.create({
   baseURL: `${process.env.REACT_APP_BACKEND_API_URL}`,

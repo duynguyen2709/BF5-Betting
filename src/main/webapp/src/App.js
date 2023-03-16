@@ -1,15 +1,11 @@
 import "antd/dist/antd.min.css";
-import {
-  BrowserRouter as Router,
-  Navigate,
-  Route,
-  Routes,
-} from "react-router-dom";
-import { ROUTES } from "./common/Constant";
+import {BrowserRouter as Router, Navigate, Route, Routes,} from "react-router-dom";
+import {ROUTES} from "./common/Constant";
 import React from "react";
 import MainLayout from "./layout/MainLayout";
-import DashboardPage from "./pages/dashboard/DashboardPage";
-import NotFound from "./pages/errors/NotFound";
+import HistoryPage from "./pages/HistoryPage";
+import AdminPage from "./pages/AdminPage";
+import NotFound from "./pages/ErrorPage/NotFound";
 
 const App = () => {
   return (
@@ -21,7 +17,11 @@ const App = () => {
         />
         <Route
           path={ROUTES.BASE.path}
-          element={<MainLayout component={<DashboardPage/>} />}
+          element={<MainLayout component={<HistoryPage/>} />}
+        />
+        <Route
+          path={ROUTES.ADMIN.path}
+          element={<MainLayout component={<AdminPage/>} />}
         />
         <Route path="*" element={<NotFound />} />
       </Routes>

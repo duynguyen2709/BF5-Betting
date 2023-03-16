@@ -1,6 +1,7 @@
 .card-bet-history {
   margin: 0.5rem;
   border-radius: 0.5rem;
+  border-color: #d7d7d7;;
 
   .ant-card-head {
     padding: 0.5rem 1rem 0.25rem;
@@ -15,10 +16,15 @@
         font-size: 13px;
       }
 
+      .bet-history-match-time {
+        font-weight: 300;
+        font-size: 12px;
+      }
+
       .team-data {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: space-around;
         align-items: center;
 
         .team-name {

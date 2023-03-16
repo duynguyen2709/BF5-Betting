@@ -21,7 +21,7 @@ public class TryCatchWrapAspect {
             return joinPoint.proceed();
         } catch (Throwable ex) {
             log.error("Method: {}\nArgs = {}\nException: {}",
-                    joinPoint.getSignature(), JsonUtil.toJsonString(joinPoint.getArgs()), ex.getMessage(), ex);
+                    joinPoint.getSignature(), JsonUtil.toJsonString(joinPoint.getArgs()), ex.getMessage());
             throw ex;
         }
     }

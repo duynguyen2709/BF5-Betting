@@ -22,7 +22,10 @@ const BetHistoryDetailRow = ({left, right}) => {
 
 const BetHistoryCardTitle = ({data}) => {
     return <>
-        <p className={"bet-history-tournament-name"}>{data.tournamentName}</p>
+        <Row justify={"space-between"}>
+            <p className={"bet-history-tournament-name"}>{data.tournamentName}</p>
+            <p className={"bet-history-match-time"}>{data.matchTime}</p>
+        </Row>
         <Row>
             <Col span={11} className={"team-data"}>
                 {data.firstTeamLogoUrl && <img alt={"first-team-logo"} src={data.firstTeamLogoUrl} className={"team-logo"} /> }

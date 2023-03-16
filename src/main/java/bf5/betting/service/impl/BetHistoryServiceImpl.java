@@ -68,6 +68,11 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @Override
     @TryCatchWrap
     public BetHistory updateBetResult(BetHistoryUpdateResultRequest request) {
+        BetResult betResult = BetResult.fromValue(request.getResult());
+        if (betResult == BetResult.NOT_FINISHED) {
+            throw new IllegalArgumentException("Result NOT_FINISHED Invalid");
+        }
+
         return betHistoryRepository.findById(request.getBetId())
                 .map(entity -> withTeamDataWrapper(updateProfit(entity, request.getResult())))
                 .orElseThrow(() ->

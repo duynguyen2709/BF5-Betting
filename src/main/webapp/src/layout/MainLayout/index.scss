@@ -1,3 +1,11 @@
 .main-layout {
-  padding: 0.5rem;
+  min-height: 100vh;
+
+  .main-header {
+    padding: 0 1.5rem;
+  }
+
+  .main-content {
+    padding: 0.5rem;
+  }
 }
