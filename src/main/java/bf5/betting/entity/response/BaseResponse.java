@@ -24,8 +24,8 @@ public class BaseResponse<T> implements Serializable {
     }
 
     private String status;
-    private T data;
     private Integer code;
+    private T data;
     private String message;
 
     public static <T> BaseResponse<T> success(T data) {

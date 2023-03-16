@@ -13,6 +13,8 @@ import java.util.Objects;
 @Log4j2
 public class DateTimeUtil {
 
+    public static final String MYSQL_DATE_ONLY_FORMAT = "yyyy-MM-dd";
+
     private static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
     public static String now() {
@@ -27,6 +29,16 @@ public class DateTimeUtil {
 
     public static Timestamp stringToTimestamp(String timestampStr) {
         return stringToTimestamp(timestampStr, "dd/MM/yyyy HH:mm");
+    }
+
+    public static Date stringToDate(String dateStr, String format) {
+        try {
+            SimpleDateFormat dateTimeFormatter = new SimpleDateFormat(format);
+            return dateTimeFormatter.parse(dateStr);
+        } catch (Exception ex) {
+            log.error("[stringToDate] raw = {}, format = {}, ex = {}", dateStr, format, ex.getMessage(), ex);
+            return null;
+        }
     }
 
     public static Timestamp stringToTimestamp(String timestampStr, String format) {

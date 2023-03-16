@@ -7,10 +7,12 @@ import bf5.betting.entity.request.BetHistoryUpdateResultRequest;
 import bf5.betting.exception.EntityNotFoundException;
 import bf5.betting.repository.BetHistoryRepository;
 import bf5.betting.service.BetHistoryService;
+import bf5.betting.util.DateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -31,7 +33,29 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
     @Override
     @TryCatchWrap
-    public BetHistory updateResult(BetHistoryUpdateResultRequest request) {
+    public List<BetHistory> getByPlayerId(String playerId) {
+        return betHistoryRepository.findByPlayerId(playerId);
+    }
+
+    @Override
+    public List<BetHistory> getByPlayerIdAndDate(String playerId, String dateStr) {
+        Date date = DateTimeUtil.stringToDate(dateStr, DateTimeUtil.MYSQL_DATE_ONLY_FORMAT);
+        return betHistoryRepository.findByPlayerIdAndBetTime(playerId, date);
+    }
+
+    @Override
+    public BetHistory getByBetId(int betId) {
+        return betHistoryRepository.findById(betId)
+                .orElseThrow(() ->
+                        EntityNotFoundException.builder()
+                                .clazz(BetHistory.class)
+                                .id(betId)
+                                .build());
+    }
+
+    @Override
+    @TryCatchWrap
+    public BetHistory updateBetResult(BetHistoryUpdateResultRequest request) {
         return betHistoryRepository.findById(request.getBetId())
                 .map(entity -> updateProfit(entity, request.getResult()))
                 .orElseThrow(() ->

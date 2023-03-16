@@ -37,6 +37,8 @@ public class BetHistory {
     @Column
     private String event;
     @Column
+    private Boolean firstHalfOnly;
+    @Column
     private String score;
     @Column
     private long betAmount;

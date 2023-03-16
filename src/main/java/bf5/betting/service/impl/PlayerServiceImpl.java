@@ -8,7 +8,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import javax.annotation.PostConstruct;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author duynguyen
@@ -20,9 +23,20 @@ public class PlayerServiceImpl implements PlayerService {
 
     private final PlayerRepository playerRepository;
 
+    private Map<String, Player> playerCacheMap;
+
+    @PostConstruct
+    void init() {
+        this.playerCacheMap = playerRepository.findAll()
+                .stream()
+                .collect(Collectors.toMap(Player::getPlayerId, Function.identity()));
+
+        log.info("Load PlayerCache Done");
+    }
+
     @Override
     @TryCatchWrap
-    public List<Player> getAllPlayer() {
-        return playerRepository.findAll();
+    public Map<String, Player> getAllPlayer() {
+        return this.playerCacheMap;
     }
 }

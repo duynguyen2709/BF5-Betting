@@ -11,5 +11,8 @@ import java.util.List;
 public interface BetHistoryService {
 
     List<BetHistory> getAllBetHistory();
-    BetHistory updateResult(BetHistoryUpdateResultRequest request);
+    List<BetHistory> getByPlayerId(String playerId);
+    List<BetHistory> getByPlayerIdAndDate(String playerId, String date);
+    BetHistory getByBetId(int betId);
+    BetHistory updateBetResult(BetHistoryUpdateResultRequest request);
 }
