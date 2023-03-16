@@ -38,6 +38,11 @@ public class BetHistoryController {
         return BaseResponse.success(betHistoryService.getByBetId(betId));
     }
 
+    @PostMapping("")
+    public BaseResponse<BetHistory> create(@RequestBody BetHistory request) {
+        return BaseResponse.success(betHistoryService.createBet(request));
+    }
+
     @PutMapping("/{id}/result")
     public BaseResponse<BetHistory> updateResult(@PathVariable("id") int betId, @RequestBody BetHistoryUpdateResultRequest request) {
         request.setBetId(betId);

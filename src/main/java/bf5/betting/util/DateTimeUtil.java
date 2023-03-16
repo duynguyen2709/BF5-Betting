@@ -17,6 +17,10 @@ public class DateTimeUtil {
 
     private static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
+    public static Timestamp currentTimestamp() {
+        return new Timestamp(System.currentTimeMillis());
+    }
+
     public static String now() {
         return timestampToString(new Timestamp(System.currentTimeMillis()));
     }

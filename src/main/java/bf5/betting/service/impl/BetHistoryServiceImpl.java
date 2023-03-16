@@ -44,6 +44,14 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     }
 
     @Override
+    public BetHistory createBet(BetHistory entity) {
+        entity.setResult(BetResult.NOT_FINISHED);
+        entity.setBetTime(DateTimeUtil.currentTimestamp());
+        entity.setPotentialProfit((long) (entity.getBetAmount() * entity.getRatio()));
+        return betHistoryRepository.save(entity);
+    }
+
+    @Override
     public BetHistory getByBetId(int betId) {
         return betHistoryRepository.findById(betId)
                 .orElseThrow(() ->
