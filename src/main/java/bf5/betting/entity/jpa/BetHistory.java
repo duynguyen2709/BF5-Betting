@@ -30,8 +30,10 @@ public class BetHistory {
     private Timestamp matchTime;
     @Column
     private String firstTeam;
+    private transient String firstTeamLogoUrl;
     @Column
     private String secondTeam;
+    private transient String secondTeamLogoUrl;
     @Column
     private String tournamentName;
     @Column

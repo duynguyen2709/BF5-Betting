@@ -7,6 +7,7 @@ import bf5.betting.entity.request.BetHistoryUpdateResultRequest;
 import bf5.betting.exception.EntityNotFoundException;
 import bf5.betting.repository.BetHistoryRepository;
 import bf5.betting.service.BetHistoryService;
+import bf5.betting.service.TeamDataService;
 import bf5.betting.util.DateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author duynguyen
@@ -24,23 +26,24 @@ import java.util.List;
 public class BetHistoryServiceImpl implements BetHistoryService {
 
     private final BetHistoryRepository betHistoryRepository;
+    private final TeamDataService teamDataService;
 
     @Override
     @TryCatchWrap
     public List<BetHistory> getAllBetHistory() {
-        return betHistoryRepository.findAll();
+        return withTeamDataWrapper(betHistoryRepository.findAll());
     }
 
     @Override
     @TryCatchWrap
     public List<BetHistory> getByPlayerId(String playerId) {
-        return betHistoryRepository.findByPlayerId(playerId);
+        return withTeamDataWrapper(betHistoryRepository.findByPlayerId(playerId));
     }
 
     @Override
     public List<BetHistory> getByPlayerIdAndDate(String playerId, String dateStr) {
         Date date = DateTimeUtil.stringToDate(dateStr, DateTimeUtil.MYSQL_DATE_ONLY_FORMAT);
-        return betHistoryRepository.findByPlayerIdAndBetTime(playerId, date);
+        return withTeamDataWrapper(betHistoryRepository.findByPlayerIdAndBetTime(playerId, date));
     }
 
     @Override
@@ -48,12 +51,13 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         entity.setResult(BetResult.NOT_FINISHED);
         entity.setBetTime(DateTimeUtil.currentTimestamp());
         entity.setPotentialProfit((long) (entity.getBetAmount() * entity.getRatio()));
-        return betHistoryRepository.save(entity);
+        return withTeamDataWrapper(betHistoryRepository.save(entity));
     }
 
     @Override
     public BetHistory getByBetId(int betId) {
         return betHistoryRepository.findById(betId)
+                .map(this::withTeamDataWrapper)
                 .orElseThrow(() ->
                         EntityNotFoundException.builder()
                                 .clazz(BetHistory.class)
@@ -65,7 +69,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @TryCatchWrap
     public BetHistory updateBetResult(BetHistoryUpdateResultRequest request) {
         return betHistoryRepository.findById(request.getBetId())
-                .map(entity -> updateProfit(entity, request.getResult()))
+                .map(entity -> withTeamDataWrapper(updateProfit(entity, request.getResult())))
                 .orElseThrow(() ->
                         EntityNotFoundException.builder()
                                 .clazz(BetHistory.class)
@@ -94,5 +98,15 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         betHistoryEntity.setActualProfit(actualProfit);
         betHistoryEntity.setResult(betResult);
         return betHistoryRepository.save(betHistoryEntity);
+    }
+
+    private List<BetHistory> withTeamDataWrapper(List<BetHistory> betHistoryList) {
+        return betHistoryList.stream().map(this::withTeamDataWrapper).collect(Collectors.toList());
+    }
+
+    private BetHistory withTeamDataWrapper(BetHistory betHistory) {
+        betHistory.setFirstTeamLogoUrl(teamDataService.getTeamLogoUrl(betHistory.getFirstTeam()));
+        betHistory.setSecondTeamLogoUrl(teamDataService.getTeamLogoUrl(betHistory.getSecondTeam()));
+        return betHistory;
     }
 }

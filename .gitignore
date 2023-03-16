@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+/src/main/webapp/node_modules/
+/src/main/webapp/build
+
+**/.DS_Store
