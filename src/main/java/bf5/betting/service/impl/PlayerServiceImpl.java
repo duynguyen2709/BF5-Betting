@@ -39,4 +39,12 @@ public class PlayerServiceImpl implements PlayerService {
     public Map<String, Player> getAllPlayer() {
         return this.playerCacheMap;
     }
+
+    @Override
+    @TryCatchWrap
+    public Player updatePlayerData(Player player) {
+        Player newPlayer = this.playerRepository.save(player);
+        this.playerCacheMap.replace(player.getPlayerId(), newPlayer);
+        return newPlayer;
+    }
 }

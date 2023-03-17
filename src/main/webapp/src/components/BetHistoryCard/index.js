@@ -6,7 +6,7 @@ import BetResultTag from "../BetResultTag";
 import './index.scss'
 
 const BetHistoryDetailText = ({text, isRightColumn = false}) => {
-    return <p className={"bet-history-detail-text"} style={isRightColumn ? {float: 'right', fontWeight: 500} : null}>{text}</p>
+    return <p className={"bet-history-detail-text"} style={isRightColumn ? {float: 'right', textAlign: 'right', fontWeight: 500} : null}>{text}</p>
 }
 
 const BetHistoryDetailRow = ({left, right}) => {

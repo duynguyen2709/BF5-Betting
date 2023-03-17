@@ -39,7 +39,8 @@ const BetHistoryStatistic = ({data}) => {
     const totalUnfinished = filterBetResult(data, [BET_RESULT.NOT_FINISHED]).length
     const totalBetAmount = data.map(ele => ele.betAmount).reduce((prev, next) => prev + next)
     const totalPotentialProfit = data.map(ele => ele.potentialProfit).reduce((prev, next) => prev + next)
-    const winRate = Math.round(totalWin * 100 / data.length)
+    const totalWithoutDraw = data.length - totalDraw
+    const winRate = totalWithoutDraw > 0 ? Math.round(totalWin * 100 / totalWithoutDraw) : undefined
     const potentialWinning = totalUnfinished === data.length
     const hasAtLeastOneResult = totalUnfinished < data.length
 
@@ -56,7 +57,7 @@ const BetHistoryStatistic = ({data}) => {
             (<>
                 <Divider/>
                 <StatisticDetailRow left={`Kết Quả:`} right={calculateProfit(data)}/>
-                <StatisticDetailRow left={`Tỉ Lệ Thắng:`} right={`${winRate}%`}/>
+                {winRate !== undefined ? <StatisticDetailRow left={`Tỉ Lệ Thắng:`} right={`${winRate}%`}/> : null}
             </>)
         }
     </div>

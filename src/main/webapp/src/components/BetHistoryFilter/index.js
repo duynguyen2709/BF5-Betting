@@ -1,4 +1,4 @@
-import React, {useContext, useEffect} from 'react'
+import React, {useContext} from 'react'
 import {Button, DatePicker, Form, Row, Select} from 'antd';
 import moment from 'moment';
 import PlayersContext from "../../common/PlayersContext";
@@ -19,19 +19,14 @@ const BetHistoryFilter = ({onSubmit}) => {
     const {players} = playerContext
     const playerList = Object.values(players)
 
-    useEffect(() => {
-        form.setFieldsValue({
-            playerId: playerList.length > 0 ? playerList[0].playerId : null
-        });
-    }, [form, playerList])
-
     return (
         <Form
             form={form}
             onFinish={onSubmit}
             className={"bet-history-filter-form"}
             initialValues={{
-                date: moment().subtract(1, 'day')
+                date: moment().subtract(1, 'day'),
+                playerId: playerList.length > 0 ? playerList[0].playerId : null
             }}>
             <Form.Item
                 name="playerId"

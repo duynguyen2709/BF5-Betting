@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react'
-import {Avatar, Button, Col, message, Row, Table} from 'antd';
+import {Avatar, Button, Card, Col, message, Row, Table} from 'antd';
 import PlayersContext from "../../common/PlayersContext";
 import BetResultTag from "../../components/BetResultTag";
 import ModalUpdateBetResult from "../../components/ModalUpdateBetResult";
@@ -8,13 +8,14 @@ import {getAllBetHistory} from "../../apis/BetHistoryApi";
 import './index.scss'
 import {parseBetEvent} from "../../utils/betHistoryUtil";
 import {BET_RESULT} from "../../common/Constant";
+import PlayerCard from "../../components/PlayerCard";
 
 const AdminPage = () => {
     const [betHistory, setBetHistory] = useState([])
     const [modalUpdateOpen, setModalUpdateOpen] = useState(false)
     const [currentUpdateBet, setCurrentUpdateBet] = useState()
     const playerContext = useContext(PlayersContext)
-    const {players} = playerContext
+    const {players, fetchPlayersData} = playerContext
 
     useEffect(() => {
         getAllBetHistory().then(data => setBetHistory(data))
@@ -26,7 +27,8 @@ const AdminPage = () => {
         setCurrentUpdateBet(null)
         setModalUpdateOpen(false)
         getAllBetHistory().then(data => setBetHistory(data))
-    })
+        fetchPlayersData()
+    }, [fetchPlayersData])
 
     const handleCloseModal = useCallback(() => {
         setCurrentUpdateBet(null)
@@ -42,7 +44,7 @@ const AdminPage = () => {
         {
             title: 'Người Cược',
             key: 'player',
-            width: 200,
+            width: 150,
             render: (_, record) => {
                 const betOwner = players[record.playerId]
                 return <Row style={{alignItems: 'center'}}>
@@ -57,7 +59,7 @@ const AdminPage = () => {
             width: 450,
             render: (_, record) => {
                 return <Row>
-                    <Col span={10} className={"team-data"}>
+                    <Col span={11} className={"team-data"}>
                         {record.firstTeamLogoUrl &&
                             <img alt={"first-team-logo"} src={record.firstTeamLogoUrl} className={"team-logo"}/>}
                         <b className={"team-name"}>{record.firstTeam}</b>
@@ -65,7 +67,7 @@ const AdminPage = () => {
                     <Col span={1} className={"team-data"}>
                         <h1 className={"team-data-divider"}>:</h1>
                     </Col>
-                    <Col offset={1} span={10} className={"team-data"}>
+                    <Col span={11} className={"team-data"}>
                         {record.secondTeamLogoUrl &&
                             <img alt={"second-team-logo"} src={record.secondTeamLogoUrl} className={"team-logo"}/>}
                         <b className={"team-name"}>{record.secondTeam}</b>
@@ -76,6 +78,7 @@ const AdminPage = () => {
         {
             title: 'Loại Cược',
             key: 'event',
+            width: 250,
             render: (_, record) => (parseBetEvent(record))
         },
         {
@@ -98,7 +101,7 @@ const AdminPage = () => {
         {
             title: 'Trạng Thái',
             key: 'result',
-            render: (_, record) => <BetResultTag result={record.result} />
+            render: (_, record) => <BetResultTag result={record.result}/>
         },
         {
             title: 'Thời Gian Cược',
@@ -125,10 +128,29 @@ const AdminPage = () => {
                                                   isOpen={modalUpdateOpen}
                                                   onUpdateSuccess={handleUpdateSuccess}
                                                   onClose={handleCloseModal}/>}
+
+        <Card className={"card-player-list-wrapper"}>
+            <Row>
+                {Object.values(players).map(player =>
+                    <Col span={6}>
+                        <PlayerCard key={player.playerId} data={player}/>
+                    </Col>)
+                }
+            </Row>
+        </Card>
         <Table size="middle"
+               className="table-bet-history"
                bordered
                columns={columns}
                dataSource={betHistory}
+               pagination={{
+                   pageSize: 10,
+                   showSizeChanger: false,
+                   showTotal: (total) => `Tổng: ${total} cược`
+               }}
+               scroll={{
+                   y: 480
+               }}
         />
     </div>)
 }

@@ -10,4 +10,5 @@ import java.util.Map;
 public interface PlayerService {
 
     Map<String, Player> getAllPlayer();
+    Player updatePlayerData(Player player);
 }

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {Layout} from 'antd';
 import {getAllPlayers} from "../../apis/PlayerApi";
 import PlayersContext from "../../common/PlayersContext";
@@ -8,13 +8,20 @@ const {Header, Content} = Layout;
 
 const MainLayout = ({component}) => {
     const [players, setPlayers] = useState({})
-    useEffect(() => {
+
+    const fetchPlayersData = useCallback(() => {
+        setPlayers([])
         getAllPlayers().then(data => setPlayers(data))
     }, [])
 
+    useEffect(() => {
+        fetchPlayersData()
+    }, [fetchPlayersData])
+
     return (
         <PlayersContext.Provider value={{
-            players
+            players,
+            fetchPlayersData
         }}>
             <Layout className="main-layout">
                 <Header className="main-header">

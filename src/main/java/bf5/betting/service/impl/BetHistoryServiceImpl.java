@@ -3,15 +3,18 @@ package bf5.betting.service.impl;
 import bf5.betting.annotation.TryCatchWrap;
 import bf5.betting.constant.BetResult;
 import bf5.betting.entity.jpa.BetHistory;
+import bf5.betting.entity.jpa.Player;
 import bf5.betting.entity.request.BetHistoryUpdateResultRequest;
 import bf5.betting.exception.EntityNotFoundException;
 import bf5.betting.repository.BetHistoryRepository;
 import bf5.betting.service.BetHistoryService;
+import bf5.betting.service.PlayerService;
 import bf5.betting.service.TeamDataService;
 import bf5.betting.util.DateTimeUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -27,6 +30,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
     private final BetHistoryRepository betHistoryRepository;
     private final TeamDataService teamDataService;
+    private final PlayerService playerService;
 
     @Override
     @TryCatchWrap
@@ -67,6 +71,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
     @Override
     @TryCatchWrap
+    @Transactional
     public BetHistory updateBetResult(BetHistoryUpdateResultRequest request) {
         BetResult betResult = BetResult.fromValue(request.getResult());
         if (betResult == BetResult.NOT_FINISHED) {
@@ -102,7 +107,17 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
         betHistoryEntity.setActualProfit(actualProfit);
         betHistoryEntity.setResult(betResult);
-        return betHistoryRepository.save(betHistoryEntity);
+        BetHistory newBetHistory = betHistoryRepository.save(betHistoryEntity);
+
+        updatePlayerProfit(newBetHistory);
+        return newBetHistory;
+    }
+
+    private void updatePlayerProfit(BetHistory newBetHistory) {
+        Player player = playerService.getAllPlayer().get(newBetHistory.getPlayerId());
+        long newTotalProfit = player.getTotalProfit() + newBetHistory.getActualProfit();
+        player.setTotalProfit(newTotalProfit);
+        playerService.updatePlayerData(player);
     }
 
     private List<BetHistory> withTeamDataWrapper(List<BetHistory> betHistoryList) {
