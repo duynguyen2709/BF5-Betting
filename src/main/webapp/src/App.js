@@ -17,11 +17,11 @@ const App = () => {
         />
         <Route
           path={ROUTES.BASE.path}
-          element={<MainLayout component={<HistoryPage/>} />}
+          element={<HistoryPage/>}
         />
         <Route
           path={ROUTES.ADMIN.path}
-          element={<MainLayout component={<AdminPage/>} />}
+          element={<AdminPage/>}
         />
         <Route path="*" element={<NotFound />} />
       </Routes>
@@ -29,4 +29,8 @@ const App = () => {
   );
 };
 
-export default App;
+const AppWrapper = () => {
+  return <MainLayout component={<App />} />
+}
+
+export default AppWrapper;

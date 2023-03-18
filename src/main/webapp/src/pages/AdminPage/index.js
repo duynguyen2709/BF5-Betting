@@ -1,20 +1,16 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react'
-import {Avatar, Button, Card, Col, message, Row, Table} from 'antd';
+import {Avatar, Button, Card, Col, message, Row, Table, Tabs} from 'antd';
 import PlayersContext from "../../common/PlayersContext";
 import BetResultTag from "../../components/BetResultTag";
-import ModalUpdateBetResult from "../../components/ModalUpdateBetResult";
+import UpdateBetResultModal from "../../components/UpdateBetResultModal";
 import {getAllBetHistory} from "../../apis/BetHistoryApi";
 
 import './index.scss'
 import {parseBetEvent} from "../../utils/betHistoryUtil";
 import {BET_RESULT} from "../../common/Constant";
 import PlayerCard from "../../components/PlayerCard";
-
-const MoneyTextCell = ({value}) => {
-    if (value > 0) return <span style={{  color: 'green' }}>{value.toLocaleString()}đ</span>
-    if (value < 0) return <span style={{  color: 'red' }}>{value.toLocaleString()}</span>
-    return `${value.toLocaleString()}đ`
-}
+import RawBetInfoCard from "../../components/RawBetInfoCard";
+import MoneyTextCell from "../../components/MoneyTextCell";
 
 const AdminPage = () => {
     const [betHistory, setBetHistory] = useState([])
@@ -36,6 +32,13 @@ const AdminPage = () => {
         fetchPlayersData()
     }, [fetchPlayersData])
 
+    const handleRawBetActionSuccess = useCallback(() => {
+        message.success('Cập nhật cược thành công')
+        setBetHistory([])
+        getAllBetHistory().then(data => setBetHistory(data))
+        fetchPlayersData()
+    }, [fetchPlayersData])
+
     const handleCloseModal = useCallback(() => {
         setCurrentUpdateBet(null)
         setModalUpdateOpen(false)
@@ -53,6 +56,9 @@ const AdminPage = () => {
             width: 150,
             render: (_, record) => {
                 const betOwner = players[record.playerId]
+                if (!betOwner) {
+                    return null
+                }
                 return <Row style={{alignItems: 'center'}}>
                     <Avatar size={32} src={betOwner.avatarUrl} style={{marginRight: 8, marginLeft: 8}}/>
                     <p style={{marginBottom: 0}}>{betOwner.playerName}</p>
@@ -155,7 +161,7 @@ const AdminPage = () => {
     ];
 
     return (<div className={"admin-table-wrapper"}>
-        {modalUpdateOpen && <ModalUpdateBetResult data={currentUpdateBet}
+        {modalUpdateOpen && <UpdateBetResultModal data={currentUpdateBet}
                                                   isOpen={modalUpdateOpen}
                                                   onUpdateSuccess={handleUpdateSuccess}
                                                   onClose={handleCloseModal}/>}
@@ -169,18 +175,35 @@ const AdminPage = () => {
                 }
             </Row>
         </Card>
-        <Table size="middle"
-               className="table-bet-history"
-               rowKey="id"
-               bordered
-               columns={columns}
-               dataSource={betHistory}
-               pagination={{
-                   pageSize: 10,
-                   showSizeChanger: false,
-                   showTotal: (total) => `Tổng: ${total} cược`
-               }}
-        />
+
+        <Card>
+            <Tabs
+                type={"card"}
+                items={[
+                    {
+                        label: `Danh Sách Cược`,
+                        key: '1',
+                        children: <Table size="middle"
+                                         className="table-bet-history"
+                                         rowKey="id"
+                                         bordered
+                                         columns={columns}
+                                         dataSource={betHistory}
+                                         pagination={{
+                                             pageSize: 10,
+                                             showSizeChanger: false,
+                                             showTotal: (total) => `Tổng: ${total} cược`
+                                         }}
+                        />,
+                    },
+                    {
+                        label: `Dữ Liệu Gốc`,
+                        key: '2',
+                        children: <RawBetInfoCard onSuccessAction={handleRawBetActionSuccess}/>,
+                    },
+                ]}
+            />
+        </Card>
     </div>)
 }
 

@@ -39,4 +39,11 @@ public class TeamDataServiceImpl implements TeamDataService {
         TeamData team = this.teamDataCacheMap.get(teamName);
         return Objects.isNull(team) ? null : team.getLogoUrl();
     }
+
+    @Override
+    public TeamData insert(TeamData teamData) {
+        TeamData result = this.teamDataRepository.save(teamData);
+        this.teamDataCacheMap.put(result.getTeamName(), result);
+        return teamData;
+    }
 }

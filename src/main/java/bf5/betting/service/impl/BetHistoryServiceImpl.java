@@ -4,6 +4,7 @@ import bf5.betting.annotation.TryCatchWrap;
 import bf5.betting.constant.BetResult;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.Player;
+import bf5.betting.entity.jpa.TeamData;
 import bf5.betting.entity.request.BetHistoryUpdateResultRequest;
 import bf5.betting.exception.EntityNotFoundException;
 import bf5.betting.repository.BetHistoryRepository;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -51,22 +53,21 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     }
 
     @Override
+    @TryCatchWrap
+    @Transactional
     public BetHistory createBet(BetHistory entity) {
-        entity.setResult(BetResult.NOT_FINISHED);
-        entity.setBetTime(DateTimeUtil.currentTimestamp());
-        entity.setPotentialProfit((long) (entity.getBetAmount() * entity.getRatio()));
-        return withTeamDataWrapper(betHistoryRepository.save(entity));
+        BetHistory result = betHistoryRepository.save(entity);
+        insertTeamDataIfNotAvailable(entity);
+        return result;
     }
 
-    @Override
-    public BetHistory getByBetId(int betId) {
-        return betHistoryRepository.findById(betId)
-                .map(this::withTeamDataWrapper)
-                .orElseThrow(() ->
-                        EntityNotFoundException.builder()
-                                .clazz(BetHistory.class)
-                                .id(betId)
-                                .build());
+    private void insertTeamDataIfNotAvailable(BetHistory entity) {
+        if (Objects.isNull(teamDataService.getTeamLogoUrl(entity.getFirstTeam()))) {
+            teamDataService.insert(new TeamData(entity.getFirstTeam(), entity.getFirstTeamLogoUrl()));
+        }
+        if (Objects.isNull(teamDataService.getTeamLogoUrl(entity.getSecondTeam()))) {
+            teamDataService.insert(new TeamData(entity.getSecondTeam(), entity.getSecondTeamLogoUrl()));
+        }
     }
 
     @Override

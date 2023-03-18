@@ -18,7 +18,5 @@ public interface BetHistoryService {
 
     BetHistory createBet(BetHistory entity);
 
-    BetHistory getByBetId(int betId);
-
     BetHistory updateBetResult(BetHistoryUpdateResultRequest request);
 }

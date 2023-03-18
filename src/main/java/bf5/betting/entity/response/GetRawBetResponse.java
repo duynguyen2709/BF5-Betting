@@ -31,7 +31,7 @@ public class GetRawBetResponse implements Serializable {
     public static class RawBetEntity implements Serializable {
         private long id; // betID
         private long date; // date * 1000 = betTime
-        private float coef; // ratio
+        private double coef; // ratio
         private int status;
         private long sum; // betAmount
         @JsonProperty("win_sum")
@@ -53,7 +53,7 @@ public class GetRawBetResponse implements Serializable {
         private String champName; // tournamentName
         @JsonProperty("period_name")
         private String periodName; // periodName == '1 Half' => firstHalfOnly = true
-        private float coef;
+        private double coef;
         private String score;
         @JsonProperty("is_finished")
         private Boolean isFinished;

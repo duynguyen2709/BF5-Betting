@@ -4,6 +4,7 @@ import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.request.BetHistoryUpdateResultRequest;
 import bf5.betting.entity.response.BaseResponse;
 import bf5.betting.service.BetHistoryService;
+import bf5.betting.service.RawBetService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class BetHistoryController {
 
+    private final RawBetService rawBetService;
     private final BetHistoryService betHistoryService;
 
     @GetMapping("")
@@ -41,9 +43,12 @@ public class BetHistoryController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/{id}")
-    public BaseResponse<BetHistory> getById(@PathVariable("id") int betId) {
-        return BaseResponse.success(betHistoryService.getByBetId(betId));
+
+    @GetMapping("/raw")
+    BaseResponse<List<BetHistory>> getRawBetInfo(@RequestParam("sessionToken") String sessionToken,
+                                                 @RequestParam("startDate") String startDate,
+                                                 @RequestParam("endDate") String endDate) {
+        return BaseResponse.success(rawBetService.getAllBetWithConvert(sessionToken, startDate, endDate));
     }
 
     @PostMapping("")

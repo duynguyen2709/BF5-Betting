@@ -20,8 +20,7 @@ import java.sql.Timestamp;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BetHistory {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
     @Column
     private String playerId;
     @Column
@@ -45,7 +44,7 @@ public class BetHistory {
     @Column
     private long betAmount;
     @Column
-    private float ratio;
+    private double ratio;
     @Column
     private long potentialProfit;
     @Column
@@ -57,11 +56,27 @@ public class BetHistory {
         return DateTimeUtil.timestampToString(this.betTime);
     }
 
+    public void setBetTime(String timeStr) {
+        this.betTime = DateTimeUtil.stringToTimestamp(timeStr);
+    }
+
+    public void setBetTimeWithTimestamp(Timestamp time) {
+        this.betTime = time;
+    }
+
     public long getBetTimeMs() {
         return this.betTime.getTime();
     }
 
     public String getMatchTime() {
         return DateTimeUtil.timestampToString(this.matchTime);
+    }
+
+    public void setMatchTime(String timeStr) {
+        this.matchTime = DateTimeUtil.stringToTimestamp(timeStr);
+    }
+
+    public void setMatchTimeWithTimestamp(Timestamp time) {
+        this.matchTime = time;
     }
 }
