@@ -11,9 +11,14 @@ import java.util.List;
 public interface BetHistoryService {
 
     List<BetHistory> getAllBetHistory();
+
     List<BetHistory> getByPlayerId(String playerId);
+
     List<BetHistory> getByPlayerIdAndDate(String playerId, String date);
+
     BetHistory createBet(BetHistory entity);
+
     BetHistory getByBetId(int betId);
+
     BetHistory updateBetResult(BetHistoryUpdateResultRequest request);
 }

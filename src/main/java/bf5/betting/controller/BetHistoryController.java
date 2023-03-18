@@ -8,7 +8,6 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,7 +30,7 @@ public class BetHistoryController {
         else if (StringUtils.isNotBlank(playerId))
             betHistoryList = betHistoryService.getByPlayerId(playerId);
         else
-            betHistoryList= betHistoryService.getAllBetHistory();
+            betHistoryList = betHistoryService.getAllBetHistory();
 
         return BaseResponse.success(sortByBetTimeDesc(betHistoryList));
     }

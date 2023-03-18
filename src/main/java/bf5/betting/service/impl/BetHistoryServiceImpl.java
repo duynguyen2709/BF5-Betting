@@ -46,7 +46,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
     @Override
     public List<BetHistory> getByPlayerIdAndDate(String playerId, String dateStr) {
-        Date date = DateTimeUtil.stringToDate(dateStr, DateTimeUtil.MYSQL_DATE_ONLY_FORMAT);
+        Date date = DateTimeUtil.stringToDate(dateStr, DateTimeUtil.SYSTEM_DATE_ONLY_FORMAT);
         return withTeamDataWrapper(betHistoryRepository.findByPlayerIdAndBetTime(playerId, date));
     }
 

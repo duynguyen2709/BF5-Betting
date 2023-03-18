@@ -13,8 +13,7 @@ public enum BetResult {
     HALF_WIN,
     DRAW,
     LOST,
-    HALF_LOST
-    ;
+    HALF_LOST;
 
     public static BetResult fromValue(String value) {
         return Stream.of(BetResult.values())

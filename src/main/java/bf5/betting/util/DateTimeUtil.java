@@ -4,6 +4,10 @@ import lombok.extern.log4j.Log4j2;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
 
@@ -13,7 +17,7 @@ import java.util.Objects;
 @Log4j2
 public class DateTimeUtil {
 
-    public static final String MYSQL_DATE_ONLY_FORMAT = "yyyy-MM-dd";
+    public static final String SYSTEM_DATE_ONLY_FORMAT = "yyyy-MM-dd";
 
     private static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 
@@ -56,4 +60,15 @@ public class DateTimeUtil {
         }
     }
 
+    public static long getStartOfDateTimestamp(String dateStr, String format) {
+        LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(format));
+        LocalDateTime startOfDay = localDate.atStartOfDay();
+        return Timestamp.valueOf(startOfDay).getTime();
+    }
+
+    public static long getEndOfDateTimestamp(String dateStr, String format) {
+        LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(format));
+        LocalDateTime endOfDay = localDate.atTime(LocalTime.MAX);
+        return Timestamp.valueOf(endOfDay).getTime();
+    }
 }
