@@ -3,12 +3,11 @@ import {Col, Modal, Row, Select} from "antd";
 import {updateBetResult} from "../../apis/BetHistoryApi";
 import './index.scss'
 import {BET_RESULT} from "../../common/Constant";
-import {resultToText} from "../../utils/betHistoryUtil";
 
 const {Option} = Select
 
 const ModalUpdateBetResult = ({data, isOpen, onUpdateSuccess, onClose}) => {
-    const [result, setResult] = useState(BET_RESULT.WIN)
+    const [result, setResult] = useState(BET_RESULT.Win.result)
 
     const handleChangeResult = useCallback((value) => {
         setResult(value)
@@ -39,8 +38,8 @@ const ModalUpdateBetResult = ({data, isOpen, onUpdateSuccess, onClose}) => {
                         onChange={handleChangeResult}
                         style={{width: '100%'}}>
                     {Object.values(BET_RESULT)
-                        .filter(res => res !== BET_RESULT.NOT_FINISHED)
-                        .map(ele => <Option key={ele} value={ele}>{resultToText(ele)}</Option>)}
+                        .filter(res => res !== BET_RESULT.Unfinished.result)
+                        .map(ele => <Option key={ele.result} value={ele.result}>{ele.text}</Option>)}
                 </Select>
             </Col>
         </Row>

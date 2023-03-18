@@ -16,26 +16,8 @@ const parseBetEvent = (betHistory) => {
 }
 
 const filterBetResult = (betHistoryList, resultToFilter) => {
-    return betHistoryList.filter(ele => resultToFilter.includes(ele.result))
+    const results = resultToFilter.map(ele => ele.result)
+    return betHistoryList.filter(ele => results.includes(ele.result))
 }
 
-const resultToText = (result) => {
-    switch (result) {
-        case BET_RESULT.NOT_FINISHED:
-            return `Chưa Hoàn Tất`
-        case BET_RESULT.WIN:
-            return `Thắng`
-        case BET_RESULT.HALF_WIN:
-            return `Thắng Nửa Tiền`
-        case BET_RESULT.LOST:
-            return `Thua`
-        case BET_RESULT.HALF_LOST:
-            return `Thua Nửa Tiền`
-        case BET_RESULT.DRAW:
-            return `Hoà`
-        default:
-            return result
-    }
-}
-
-export {filterBetResult, parseBetEvent, resultToText}
+export {filterBetResult, parseBetEvent}

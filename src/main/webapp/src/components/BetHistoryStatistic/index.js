@@ -33,10 +33,10 @@ const calculateProfit = (data) => {
 }
 
 const BetHistoryStatistic = ({data}) => {
-    const totalWin = filterBetResult(data, [BET_RESULT.WIN, BET_RESULT.HALF_WIN]).length
-    const totalDraw = filterBetResult(data, [BET_RESULT.DRAW]).length
-    const totalLost = filterBetResult(data, [BET_RESULT.LOST, BET_RESULT.HALF_LOST]).length
-    const totalUnfinished = filterBetResult(data, [BET_RESULT.NOT_FINISHED]).length
+    const totalWin = filterBetResult(data, [BET_RESULT.Win, BET_RESULT.HalfWin]).length
+    const totalDraw = filterBetResult(data, [BET_RESULT.Draw]).length
+    const totalLost = filterBetResult(data, [BET_RESULT.Lost, BET_RESULT.HalfLost]).length
+    const totalUnfinished = filterBetResult(data, [BET_RESULT.Unfinished]).length
     const totalBetAmount = data.map(ele => ele.betAmount).reduce((prev, next) => prev + next)
     const totalPotentialProfit = data.map(ele => ele.potentialProfit).reduce((prev, next) => prev + next)
     const totalWithoutDraw = data.length - totalDraw

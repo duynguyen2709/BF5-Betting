@@ -10,6 +10,12 @@ import {parseBetEvent} from "../../utils/betHistoryUtil";
 import {BET_RESULT} from "../../common/Constant";
 import PlayerCard from "../../components/PlayerCard";
 
+const MoneyTextCell = ({value}) => {
+    if (value > 0) return <span style={{  color: 'green' }}>{value.toLocaleString()}đ</span>
+    if (value < 0) return <span style={{  color: 'red' }}>{value.toLocaleString()}</span>
+    return `${value.toLocaleString()}đ`
+}
+
 const AdminPage = () => {
     const [betHistory, setBetHistory] = useState([])
     const [modalUpdateOpen, setModalUpdateOpen] = useState(false)
@@ -51,12 +57,19 @@ const AdminPage = () => {
                     <Avatar size={32} src={betOwner.avatarUrl} style={{marginRight: 8, marginLeft: 8}}/>
                     <p style={{marginBottom: 0}}>{betOwner.playerName}</p>
                 </Row>
-            }
+            },
+            filters: Object.values(players).map(ele => ({
+                key: ele.playerId, text: ele.playerName, value: ele.playerName
+            })),
+            onFilter: (value, record) => {
+                const betOwner = players[record.playerId]
+                return betOwner.playerName.includes(value)
+            },
         },
         {
             title: 'Trận Đấu',
             key: 'match',
-            width: 450,
+            width: 500,
             render: (_, record) => {
                 return <Row>
                     <Col span={11} className={"team-data"}>
@@ -78,41 +91,59 @@ const AdminPage = () => {
         {
             title: 'Loại Cược',
             key: 'event',
-            width: 250,
             render: (_, record) => (parseBetEvent(record))
         },
         {
             title: 'Tiền Cược',
-            key: 'betAmount',
-            render: (_, record) => (`${record.betAmount.toLocaleString()}đ`)
+            children: [
+                {
+                    title: 'Tiền Gốc',
+                    key: 'betAmount',
+                    width: 100,
+                    render: (_, record) => (`${record.betAmount.toLocaleString()}đ`)
+                },
+                {
+                    title: 'Tỉ Lệ',
+                    key: 'ratio',
+                    dataIndex: 'ratio',
+                    width: 80,
+                },
+                {
+                    title: 'Lợi Nhuận',
+                    key: 'actualProfit',
+                    width: 100,
+                    render: (_, record) => {
+                        return record.actualProfit && <MoneyTextCell value={record.actualProfit} />
+                    }
+                },
+            ]
         },
-        {
-            title: 'Tỉ Lệ',
-            key: 'ratio',
-            dataIndex: 'ratio'
-        },
-        {
-            title: 'Lợi Nhuận',
-            key: 'actualProfit',
-            render: (_, record) => {
-                return record.actualProfit && `${record.actualProfit.toLocaleString()}đ`
-            }
-        },
+
         {
             title: 'Trạng Thái',
             key: 'result',
-            render: (_, record) => <BetResultTag result={record.result}/>
+            width: 150,
+            render: (_, record) => <BetResultTag result={record.result}/>,
+            filters: Object.values(BET_RESULT).map(ele => ({
+                key: ele.result, text: ele.text, value: ele.text
+            })),
+            onFilter: (value, record) => {
+                const currentBetResult = Object.values(BET_RESULT).find(ele => ele.result === record.result)
+                return currentBetResult?.text === value
+            },
         },
         {
             title: 'Thời Gian Cược',
             key: 'betTime',
-            dataIndex: 'betTime'
+            dataIndex: 'betTime',
+            width: 150,
         },
         {
             title: 'Hành Động',
             key: 'action',
+            width: 120,
             render: (_, record) => {
-                if (record.result !== BET_RESULT.NOT_FINISHED) {
+                if (record.result !== BET_RESULT.Unfinished.result) {
                     return null
                 }
                 return <Button type="primary"
@@ -140,6 +171,7 @@ const AdminPage = () => {
         </Card>
         <Table size="middle"
                className="table-bet-history"
+               rowKey="id"
                bordered
                columns={columns}
                dataSource={betHistory}
@@ -147,9 +179,6 @@ const AdminPage = () => {
                    pageSize: 10,
                    showSizeChanger: false,
                    showTotal: (total) => `Tổng: ${total} cược`
-               }}
-               scroll={{
-                   y: 480
                }}
         />
     </div>)

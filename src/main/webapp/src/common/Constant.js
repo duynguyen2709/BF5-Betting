@@ -16,12 +16,30 @@ const ROUTES = {
 const DEFAULT_ERROR_MESSAGE = "Hệ thống có lỗi. Vui lòng thử lại sau";
 
 const BET_RESULT = {
-  WIN: 'WIN',
-  HALF_WIN: 'HALF_WIN',
-  LOST: 'LOST',
-  HALF_LOST: 'HALF_LOST',
-  DRAW: 'DRAW',
-  NOT_FINISHED: 'NOT_FINISHED',
+  Win: {
+    result: 'WIN',
+    text: 'Thắng',
+  },
+  HalfWin: {
+    result: 'HALF_WIN',
+    text: 'Thắng Nửa Tiền',
+  },
+  Lost: {
+    result: 'LOST',
+    text: 'Thua',
+  },
+  HalfLost: {
+    result: 'HALF_LOST',
+    text: 'Thua Nửa Tiền',
+  },
+  Draw: {
+    result: 'DRAW',
+    text: 'Hoà',
+  },
+  Unfinished: {
+    result: 'NOT_FINISHED',
+    text: 'Chưa Hoàn Tất',
+  },
 }
 
 export { API_URL, BET_RESULT, ROUTES, DEFAULT_ERROR_MESSAGE };
