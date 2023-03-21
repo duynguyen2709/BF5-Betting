@@ -2,9 +2,11 @@ package bf5.betting.service.impl;
 
 import bf5.betting.annotation.TryCatchWrap;
 import bf5.betting.constant.BetResult;
+import bf5.betting.constant.RawBetStatus;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.request.GetRawBetRequest;
 import bf5.betting.entity.response.GetRawBetResponse;
+import bf5.betting.service.BetHistoryService;
 import bf5.betting.service.RawBetService;
 import bf5.betting.util.BetUtil;
 import bf5.betting.util.DateTimeUtil;
@@ -18,7 +20,9 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +34,8 @@ import java.util.stream.Collectors;
 public class RawBetServiceImpl implements RawBetService {
 
     private static final String API_URL = "https://1x88.net/api/internal/v1/betHistory/getBetHistoryList";
+
+    private final BetHistoryService betHistoryService;
 
     @SneakyThrows
     @Override
@@ -99,28 +105,45 @@ public class RawBetServiceImpl implements RawBetService {
     }
 
     private List<BetHistory> convertRawBetToEntity(List<GetRawBetResponse.RawBetEntity> bets) {
+        Map<Long, BetHistory> allBetHistories = betHistoryService.getAllBetHistory()
+                .stream()
+                .collect(Collectors.toMap(BetHistory::getId, Function.identity()));
+
         return bets.stream()
                 .map(bet -> {
                     GetRawBetResponse.RawBetEvent event = bet.getEvents().get(0);
                     boolean isFinished = bet.getStatus() != 1;
-                    BetHistory betHistory = new BetHistory();
-                    betHistory.setId(bet.getId());
-                    betHistory.setBetTimeWithTimestamp(new Timestamp(bet.getDate() * 1000));
-                    betHistory.setBetAmount(bet.getSum());
-                    betHistory.setRatio(event.getCoef());
-                    betHistory.setPotentialProfit((long) (bet.getSum() * event.getCoef()) - bet.getSum());
-                    betHistory.setScore(isFinished ? event.getScore() : null);
-                    betHistory.setEvent(BetUtil.parseEvent(event.getEventTypeTitle()));
-                    betHistory.setMatchTimeWithTimestamp(new Timestamp(event.getGameStartDate() * 1000));
-                    betHistory.setTournamentName(event.getChampName());
-                    betHistory.setFirstHalfOnly(event.getPeriodName().equals("1 Half") ? true : null);
-                    betHistory.setFirstTeam(event.getOpp1Name());
-                    betHistory.setFirstTeamLogoUrl(String.format("https://v2l.cdnsfree.com/sfiles/logo_teams/%s", event.getOpp1Images().get(0)));
-                    betHistory.setSecondTeam(event.getOpp2Name());
-                    betHistory.setSecondTeamLogoUrl(String.format("https://v2l.cdnsfree.com/sfiles/logo_teams/%s", event.getOpp2Images().get(0)));
-                    betHistory.setActualProfit(calculateActualProfit(bet));
-                    betHistory.setResult(calculateResult(bet));
-                    return betHistory;
+                    BetHistory rawBet = new BetHistory();
+                    rawBet.setId(bet.getId());
+                    rawBet.setBetTimeWithTimestamp(new Timestamp(bet.getDate() * 1000));
+                    rawBet.setBetAmount(bet.getSum());
+                    rawBet.setRatio(event.getCoef());
+                    rawBet.setPotentialProfit((long) (bet.getSum() * event.getCoef()) - bet.getSum());
+                    rawBet.setScore(isFinished ? event.getScore() : null);
+                    rawBet.setEvent(BetUtil.parseEvent(event.getEventTypeTitle()));
+                    rawBet.setMatchTimeWithTimestamp(new Timestamp(event.getGameStartDate() * 1000));
+                    rawBet.setTournamentName(event.getChampName());
+                    rawBet.setFirstHalfOnly(event.getPeriodName().equals("1 Half") ? true : null);
+                    rawBet.setFirstTeam(event.getOpp1Name());
+                    rawBet.setFirstTeamLogoUrl(String.format("https://v2l.cdnsfree.com/sfiles/logo_teams/%s", event.getOpp1Images().get(0)));
+                    rawBet.setSecondTeam(event.getOpp2Name());
+                    rawBet.setSecondTeamLogoUrl(String.format("https://v2l.cdnsfree.com/sfiles/logo_teams/%s", event.getOpp2Images().get(0)));
+                    rawBet.setActualProfit(calculateActualProfit(bet));
+                    rawBet.setResult(calculateResult(bet));
+                    if (allBetHistories.containsKey(bet.getId())) {
+                        BetHistory insertedHistory = allBetHistories.get(bet.getId());
+                        rawBet.setPlayerId(insertedHistory.getPlayerId());
+                        rawBet.setRawStatus(RawBetStatus.INSERTED.name());
+
+                        if (insertedHistory.getActualProfit() != null) {
+                            rawBet.setRawStatus(RawBetStatus.SETTLED.name());
+                        } else if (event.getIsFinished()) {
+                            rawBet.setRawStatus(RawBetStatus.RESULT_READY_TO_BE_UPDATED.name());
+                        }
+                    } else {
+                        rawBet.setRawStatus(RawBetStatus.NEW.name());
+                    }
+                    return rawBet;
                 })
                 .collect(Collectors.toList());
     }

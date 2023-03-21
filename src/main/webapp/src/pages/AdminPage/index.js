@@ -1,5 +1,6 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
 import {Avatar, Button, Card, Col, message, Row, Table, Tabs} from 'antd';
+import {exportComponentAsJPEG} from 'react-component-export-image';
 import PlayersContext from "../../common/PlayersContext";
 import BetResultTag from "../../components/BetResultTag";
 import UpdateBetResultModal from "../../components/UpdateBetResultModal";
@@ -13,6 +14,7 @@ import RawBetInfoCard from "../../components/RawBetInfoCard";
 import MoneyTextCell from "../../components/MoneyTextCell";
 
 const AdminPage = () => {
+    const statisticCardRef = useRef()
     const [betHistory, setBetHistory] = useState([])
     const [modalUpdateOpen, setModalUpdateOpen] = useState(false)
     const [currentUpdateBet, setCurrentUpdateBet] = useState()
@@ -50,6 +52,11 @@ const AdminPage = () => {
     }, [])
 
     const columns = [
+        {
+            title: 'Mã Cược',
+            key: 'id',
+            dataIndex: 'id',
+        },
         {
             title: 'Người Cược',
             key: 'player',
@@ -119,7 +126,7 @@ const AdminPage = () => {
                     key: 'actualProfit',
                     width: 100,
                     render: (_, record) => {
-                        return record.actualProfit && <MoneyTextCell value={record.actualProfit} />
+                        return record.actualProfit && <MoneyTextCell value={record.actualProfit}/>
                     }
                 },
             ]
@@ -167,12 +174,17 @@ const AdminPage = () => {
                                                   onClose={handleCloseModal}/>}
 
         <Card className={"card-player-list-wrapper"}>
-            <Row>
-                {Object.values(players).map(player =>
-                    <Col span={6}>
-                        <PlayerCard key={player.playerId} data={player}/>
-                    </Col>)
-                }
+            <Row justify={"space-between"}>
+                <Col span={14}>
+                    <Row ref={statisticCardRef}>
+                        {Object.values(players).map(player =>
+                            <Col span={8}>
+                                <PlayerCard key={player.playerId} data={player}/>
+                            </Col>)
+                        }
+                    </Row>
+                </Col>
+                <Button type={"primary"} onClick={() => exportComponentAsJPEG(statisticCardRef)}>Xuất Thống Kê</Button>
             </Row>
         </Card>
 

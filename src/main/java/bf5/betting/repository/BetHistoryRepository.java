@@ -13,7 +13,7 @@ import java.util.List;
  * @author duynguyen
  */
 @Repository
-public interface BetHistoryRepository extends JpaRepository<BetHistory, Integer> {
+public interface BetHistoryRepository extends JpaRepository<BetHistory, Long> {
 
     List<BetHistory> findByPlayerId(String playerId);
 

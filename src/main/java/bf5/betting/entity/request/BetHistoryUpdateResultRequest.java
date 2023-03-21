@@ -13,6 +13,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BetHistoryUpdateResultRequest implements Serializable {
-    private int betId;
+    private long betId;
     private String result;
 }

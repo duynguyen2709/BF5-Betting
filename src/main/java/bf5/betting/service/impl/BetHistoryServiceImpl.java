@@ -57,7 +57,8 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @Transactional
     public BetHistory createBet(BetHistory entity) {
         BetHistory result = betHistoryRepository.save(entity);
-        insertTeamDataIfNotAvailable(entity);
+        updatePlayerProfit(result);
+        insertTeamDataIfNotAvailable(result);
         return result;
     }
 

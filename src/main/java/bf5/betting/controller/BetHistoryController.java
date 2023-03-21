@@ -39,7 +39,12 @@ public class BetHistoryController {
 
     private List<BetHistory> sortByBetTimeDesc(List<BetHistory> betHistoryList) {
         return betHistoryList.stream()
-                .sorted((bet1, bet2) -> Long.compare(bet2.getBetTimeMs(), bet1.getBetTimeMs()))
+                .sorted((bet1, bet2) -> {
+                    if (bet2.getBetTimeMs() != bet1.getBetTimeMs()) {
+                        return Long.compare(bet2.getBetTimeMs(), bet1.getBetTimeMs());
+                    }
+                    return Long.compare(bet2.getId(), bet1.getId());
+                })
                 .collect(Collectors.toList());
     }
 
@@ -57,7 +62,7 @@ public class BetHistoryController {
     }
 
     @PutMapping("/{betId}/result")
-    public BaseResponse<BetHistory> updateResult(@PathVariable("betId") int betId, @RequestBody BetHistoryUpdateResultRequest request) {
+    public BaseResponse<BetHistory> updateResult(@PathVariable("betId") long betId, @RequestBody BetHistoryUpdateResultRequest request) {
         request.setBetId(betId);
         return BaseResponse.success(betHistoryService.updateBetResult(request));
     }

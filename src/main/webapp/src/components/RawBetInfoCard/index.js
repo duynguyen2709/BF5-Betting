@@ -1,17 +1,39 @@
-import React, {useCallback, useState} from "react";
+import React, {useCallback, useContext, useState} from "react";
 import QueryRawBetInfoForm from "../QueryRawBetInfoForm";
-import {Button, Col, Row, Table} from "antd";
+import {Avatar, Button, Col, Row, Table, Tag} from "antd";
 import {parseBetEvent} from "../../utils/betHistoryUtil";
 import MoneyTextCell from "../MoneyTextCell";
 import BetResultTag from "../BetResultTag";
 import {BET_RESULT} from "../../common/Constant";
-import {getRawBetInfo, insertBetHistory} from "../../apis/BetHistoryApi";
+import {getRawBetInfo} from "../../apis/BetHistoryApi";
 import InsertBetHistoryModal from "../InsertBetHistoryModal";
+import PlayersContext from "../../common/PlayersContext";
+
+const RawStatusTag = ({text}) => {
+    switch (text) {
+        case "NEW":
+            return <Tag color="warning">Chưa Xử Lý</Tag>;
+        case "INSERTED":
+            return <Tag color="cyan">
+                <p style={{marginBottom: 0}}>Đã Lưu Dữ Liệu<br/>Chờ Kết Quả</p>
+            </Tag>;
+        case "RESULT_READY_TO_BE_UPDATED":
+            return <Tag color="blue">
+                <p style={{marginBottom: 0}}>Đã Có Kết Quả<br/>Chờ Cập Nhật</p>
+            </Tag>;
+        case "SETTLED":
+            return <Tag color="success">Đã Hoàn Tất</Tag>;
+        default:
+            return <Tag>{text}</Tag>
+    }
+}
 
 const RawBetInfoCard = ({onSuccessAction}) => {
     const [rawBetList, setRawBetList] = useState([])
     const [modalAddOpen, setModalAddOpen] = useState(false)
     const [currentAddBet, setCurrentAddBet] = useState()
+    const playerContext = useContext(PlayersContext)
+    const {players} = playerContext
 
     const handleFetchRawBetList = useCallback((values) => {
         const {sessionToken, dateRange} = values;
@@ -42,9 +64,30 @@ const RawBetInfoCard = ({onSuccessAction}) => {
             width: 130,
         },
         {
+            title: 'Người Cược',
+            key: 'player',
+            width: 150,
+            render: (_, record) => {
+                const betOwner = players[record.playerId]
+                if (!betOwner) {
+                    return null
+                }
+                return <Row style={{alignItems: 'center'}}>
+                    <Avatar size={32} src={betOwner.avatarUrl} style={{marginRight: 8, marginLeft: 8}}/>
+                    <p style={{marginBottom: 0}}>{betOwner.playerName}</p>
+                </Row>
+            },
+            filters: Object.values(players).map(ele => ({
+                key: ele.playerId, text: ele.playerName, value: ele.playerName
+            })),
+            onFilter: (value, record) => {
+                const betOwner = players[record.playerId]
+                return betOwner.playerName.includes(value)
+            },
+        },
+        {
             title: 'Trận Đấu',
             key: 'match',
-            width: 500,
             render: (_, record) => {
                 return <Row>
                     <Col span={11} className={"team-data"}>
@@ -74,34 +117,40 @@ const RawBetInfoCard = ({onSuccessAction}) => {
                 {
                     title: 'Tiền Gốc',
                     key: 'betAmount',
-                    width: 100,
+                    width: 80,
                     render: (_, record) => (`${record.betAmount.toLocaleString()}đ`)
                 },
                 {
                     title: 'Tỉ Lệ',
                     key: 'ratio',
                     dataIndex: 'ratio',
-                    width: 80,
+                    width: 60,
                 },
                 {
-                    title: 'Lợi Nhuận Tiềm Năng',
-                    key: 'potentialProfit',
-                    width: 100,
-                    render: (_, record) => (`${record.potentialProfit.toLocaleString()}đ`)
-                },
-                {
-                    title: 'Lời / Lỗ',
-                    key: 'actualProfit',
+                    title: 'Lợi Nhuận',
+                    key: 'profit',
                     width: 100,
                     render: (_, record) => {
-                        return record.actualProfit && <MoneyTextCell value={record.actualProfit}/>
+                        if (record.actualProfit !== null) {
+                            return record.actualProfit && <MoneyTextCell value={record.actualProfit}/>
+                        }
+                        return `${record.potentialProfit.toLocaleString()}đ`
                     }
                 },
             ]
         },
-
+        {
+            title: 'Tỉ Số',
+            key: 'score',
+            dataIndex: 'score'
+        },
         {
             title: 'Trạng Thái',
+            key: 'rawStatus',
+            render: (_, record) => <RawStatusTag text={record.rawStatus}/>
+        },
+        {
+            title: 'Kết Quả',
             key: 'result',
             width: 140,
             render: (_, record) => <BetResultTag result={record.result}/>,
@@ -117,16 +166,20 @@ const RawBetInfoCard = ({onSuccessAction}) => {
             title: 'Thời Gian Cược',
             key: 'betTime',
             dataIndex: 'betTime',
-            width: 150,
         },
         {
             title: 'Hành Động',
             key: 'action',
             width: 120,
             render: (_, record) => {
-                return <Button type="primary" onClick={() => handleOpenModalAddBet(record)}>
-                    Cập Nhật
-                </Button>
+                return <>
+                    {record.rawStatus === 'NEW' && <Button type="primary" onClick={() => handleOpenModalAddBet(record)}>
+                        Thêm Mới
+                    </Button>}
+                    {record.rawStatus === 'RESULT_READY_TO_BE_UPDATED' && <Button type="primary">
+                        Cập Nhật
+                    </Button>}
+                </>
             }
         },
     ];

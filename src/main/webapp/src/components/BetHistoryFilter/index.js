@@ -1,5 +1,5 @@
 import React, {useContext} from 'react'
-import {Button, DatePicker, Form, Row, Select} from 'antd';
+import {Button, Col, DatePicker, Form, Row, Select} from 'antd';
 import moment from 'moment';
 import PlayersContext from "../../common/PlayersContext";
 
@@ -9,7 +9,7 @@ const dateFormat = 'DD/MM/YYYY';
 
 const {Option} = Select
 
-const BetHistoryFilter = ({onSubmit}) => {
+const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
     const disabledDate = (current) => {
         return current && current >= moment().endOf('day');
     };
@@ -69,13 +69,29 @@ const BetHistoryFilter = ({onSubmit}) => {
                 />
             </Form.Item>
             <Form.Item>
-                <Button
-                    type="primary"
-                    htmlType="submit"
-                    className={"button-submit-filter"}
-                >
-                    Xem Lịch Sử
-                </Button>
+                <Row>
+                    <Col span={12}>
+                        <Button
+                            type="primary"
+                            htmlType="submit"
+                            className={"button-submit-filter"}
+                        >
+                            Xem Lịch Sử
+                        </Button>
+                    </Col>
+                    <Col span={12}>
+                        <Button
+                            type="primary"
+                            disabled={!isExportButtonActive}
+                            className={"button-submit-filter"}
+                            ghost
+                            style={{float: 'right'}}
+                            onClick={onClickExport}
+                        >
+                            Xuất Thống Kê
+                        </Button>
+                    </Col>
+                </Row>
             </Form.Item>
         </Form>
     )

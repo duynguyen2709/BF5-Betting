@@ -22,7 +22,7 @@ const StatisticDetailRow = ({left, right}) => {
 }
 
 const calculateProfit = (data) => {
-    const sum = data.map(ele => ele.actualProfit).reduce((prev, next) => prev + next)
+    const sum = data.map(ele => ele.actualProfit ?? 0).reduce((prev, next) => prev + next)
     if (sum > 0) {
         return <Tag color="success">{`Lời ${sum.toLocaleString()}đ`}</Tag>
     } else if (sum < 0) {
@@ -39,9 +39,8 @@ const BetHistoryStatistic = ({data}) => {
     const totalUnfinished = filterBetResult(data, [BET_RESULT.Unfinished]).length
     const totalBetAmount = data.map(ele => ele.betAmount).reduce((prev, next) => prev + next)
     const totalPotentialProfit = data.map(ele => ele.potentialProfit).reduce((prev, next) => prev + next)
-    const totalWithoutDraw = data.length - totalDraw
+    const totalWithoutDraw = data.length - totalDraw - totalUnfinished
     const winRate = totalWithoutDraw > 0 ? Math.round(totalWin * 100 / totalWithoutDraw) : undefined
-    const potentialWinning = totalUnfinished === data.length
     const hasAtLeastOneResult = totalUnfinished < data.length
 
     return <div className={"bet-history-statistic-wrapper"}>
@@ -51,8 +50,7 @@ const BetHistoryStatistic = ({data}) => {
         <StatisticDetailRow left={`Số Trận Thua:`} right={totalLost}/>
         <StatisticDetailRow left={`Số Trận Chưa Hoàn Tất:`} right={totalUnfinished}/>
         <StatisticDetailRow left={`Tổng Tiền Cược:`} right={`${totalBetAmount.toLocaleString()}đ`}/>
-        {potentialWinning &&
-            <StatisticDetailRow left={`Lợi Nhuận Tiềm Năng:`} right={`${totalPotentialProfit.toLocaleString()}đ`}/>}
+        <StatisticDetailRow left={`Lợi Nhuận Tiềm Năng:`} right={`${totalPotentialProfit.toLocaleString()}đ`}/>
         {hasAtLeastOneResult &&
             (<>
                 <Divider/>

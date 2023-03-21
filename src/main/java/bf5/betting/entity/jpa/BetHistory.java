@@ -51,6 +51,7 @@ public class BetHistory {
     private BetResult result;
     @Column
     private Long actualProfit;
+    private transient String rawStatus;
 
     public String getBetTime() {
         return DateTimeUtil.timestampToString(this.betTime);
