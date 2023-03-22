@@ -1,20 +1,18 @@
-import React, {useCallback, useContext, useEffect, useRef, useState} from 'react'
+import React, {useCallback, useContext, useEffect, useState} from 'react'
 import {Avatar, Button, Card, Col, message, Row, Table, Tabs} from 'antd';
-import {exportComponentAsJPEG} from 'react-component-export-image';
+import {getAllBetHistory} from "../../apis/BetHistoryApi";
+import {parseBetEvent} from "../../utils/betHistoryUtil";
+import {BET_RESULT} from "../../common/Constant";
 import PlayersContext from "../../common/PlayersContext";
 import BetResultTag from "../../components/BetResultTag";
 import UpdateBetResultModal from "../../components/UpdateBetResultModal";
-import {getAllBetHistory} from "../../apis/BetHistoryApi";
-
-import './index.scss'
-import {parseBetEvent} from "../../utils/betHistoryUtil";
-import {BET_RESULT} from "../../common/Constant";
-import PlayerCard from "../../components/PlayerCard";
 import RawBetInfoCard from "../../components/RawBetInfoCard";
 import MoneyTextCell from "../../components/MoneyTextCell";
+import AdminPlayerStatisticCard from "../../components/AdminPlayerStatisticCard";
+
+import './index.scss'
 
 const AdminPage = () => {
-    const statisticCardRef = useRef()
     const [betHistory, setBetHistory] = useState([])
     const [modalUpdateOpen, setModalUpdateOpen] = useState(false)
     const [currentUpdateBet, setCurrentUpdateBet] = useState()
@@ -60,7 +58,7 @@ const AdminPage = () => {
         {
             title: 'Người Cược',
             key: 'player',
-            width: 150,
+            width: 140,
             render: (_, record) => {
                 const betOwner = players[record.playerId]
                 if (!betOwner) {
@@ -82,7 +80,7 @@ const AdminPage = () => {
         {
             title: 'Trận Đấu',
             key: 'match',
-            width: 500,
+            width: 450,
             render: (_, record) => {
                 return <Row>
                     <Col span={11} className={"team-data"}>
@@ -112,19 +110,19 @@ const AdminPage = () => {
                 {
                     title: 'Tiền Gốc',
                     key: 'betAmount',
-                    width: 100,
+                    width: 80,
                     render: (_, record) => (`${record.betAmount.toLocaleString()}đ`)
                 },
                 {
                     title: 'Tỉ Lệ',
                     key: 'ratio',
                     dataIndex: 'ratio',
-                    width: 80,
+                    width: 60,
                 },
                 {
                     title: 'Lợi Nhuận',
                     key: 'actualProfit',
-                    width: 100,
+                    width: 90,
                     render: (_, record) => {
                         return record.actualProfit && <MoneyTextCell value={record.actualProfit}/>
                     }
@@ -135,7 +133,7 @@ const AdminPage = () => {
         {
             title: 'Trạng Thái',
             key: 'result',
-            width: 150,
+            width: 120,
             render: (_, record) => <BetResultTag result={record.result}/>,
             filters: Object.values(BET_RESULT).map(ele => ({
                 key: ele.result, text: ele.text, value: ele.text
@@ -149,7 +147,7 @@ const AdminPage = () => {
             title: 'Thời Gian Cược',
             key: 'betTime',
             dataIndex: 'betTime',
-            width: 150,
+            width: 140,
         },
         {
             title: 'Hành Động',
@@ -173,21 +171,7 @@ const AdminPage = () => {
                                                   onUpdateSuccess={handleUpdateSuccess}
                                                   onClose={handleCloseModal}/>}
 
-        <Card className={"card-player-list-wrapper"}>
-            <Row justify={"space-between"}>
-                <Col span={14}>
-                    <Row ref={statisticCardRef}>
-                        {Object.values(players).map(player =>
-                            <Col span={8}>
-                                <PlayerCard key={player.playerId} data={player}/>
-                            </Col>)
-                        }
-                    </Row>
-                </Col>
-                <Button type={"primary"} onClick={() => exportComponentAsJPEG(statisticCardRef)}>Xuất Thống Kê</Button>
-            </Row>
-        </Card>
-
+        <AdminPlayerStatisticCard players={players} />
         <Card>
             <Tabs
                 type={"card"}

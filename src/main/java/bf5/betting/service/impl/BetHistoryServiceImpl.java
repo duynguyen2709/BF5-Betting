@@ -57,8 +57,10 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @Transactional
     public BetHistory createBet(BetHistory entity) {
         BetHistory result = betHistoryRepository.save(entity);
-        updatePlayerProfit(result);
-        insertTeamDataIfNotAvailable(result);
+        if (entity.getActualProfit() != null) {
+            updatePlayerProfit(entity);
+        }
+        insertTeamDataIfNotAvailable(entity);
         return result;
     }
 
@@ -82,6 +84,29 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
         return betHistoryRepository.findById(request.getBetId())
                 .map(entity -> withTeamDataWrapper(updateProfit(entity, request.getResult())))
+                .orElseThrow(() ->
+                        EntityNotFoundException.builder()
+                                .clazz(BetHistory.class)
+                                .id(request.getBetId())
+                                .build());
+    }
+
+    @Override
+    @TryCatchWrap
+    @Transactional
+    public BetHistory updateBetResultFromRaw(BetHistoryUpdateResultRequest request) {
+        BetResult betResult = BetResult.fromValue(request.getResult());
+        if (betResult == BetResult.NOT_FINISHED) {
+            throw new IllegalArgumentException("Result NOT_FINISHED Invalid");
+        }
+
+        return betHistoryRepository.findById(request.getBetId())
+                .map(entity -> {
+                    entity.setResult(betResult);
+                    entity.setScore(request.getScore());
+                    entity.setActualProfit(request.getActualProfit());
+                    return withTeamDataWrapper(betHistoryRepository.save(entity));
+                })
                 .orElseThrow(() ->
                         EntityNotFoundException.builder()
                                 .clazz(BetHistory.class)

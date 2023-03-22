@@ -66,4 +66,10 @@ public class BetHistoryController {
         request.setBetId(betId);
         return BaseResponse.success(betHistoryService.updateBetResult(request));
     }
+
+    @PutMapping("/raw/{betId}/result")
+    public BaseResponse<BetHistory> updateResultFromRaw(@PathVariable("betId") long betId, @RequestBody BetHistoryUpdateResultRequest request) {
+        request.setBetId(betId);
+        return BaseResponse.success(betHistoryService.updateBetResultFromRaw(request));
+    }
 }

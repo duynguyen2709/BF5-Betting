@@ -1,13 +1,14 @@
 import React, {useCallback, useContext, useState} from "react";
 import QueryRawBetInfoForm from "../QueryRawBetInfoForm";
-import {Avatar, Button, Col, Row, Table, Tag} from "antd";
+import {Avatar, Button, Col, Popconfirm, Row, Table, Tag} from "antd";
+import {QuestionCircleOutlined} from '@ant-design/icons';
+import {getRawBetInfo, updateBetResultFromRaw} from "../../apis/BetHistoryApi";
+import PlayersContext from "../../common/PlayersContext";
 import {parseBetEvent} from "../../utils/betHistoryUtil";
 import MoneyTextCell from "../MoneyTextCell";
 import BetResultTag from "../BetResultTag";
 import {BET_RESULT} from "../../common/Constant";
-import {getRawBetInfo} from "../../apis/BetHistoryApi";
 import InsertBetHistoryModal from "../InsertBetHistoryModal";
-import PlayersContext from "../../common/PlayersContext";
 
 const RawStatusTag = ({text}) => {
     switch (text) {
@@ -55,6 +56,10 @@ const RawBetInfoCard = ({onSuccessAction}) => {
         setCurrentAddBet(null)
         setModalAddOpen(false)
     }, [])
+
+    const handleConfirmUpdate = useCallback((record) => {
+        updateBetResultFromRaw(record).then(() => onSuccessAction())
+    }, [onSuccessAction])
 
     const columns = [
         {
@@ -173,12 +178,20 @@ const RawBetInfoCard = ({onSuccessAction}) => {
             width: 120,
             render: (_, record) => {
                 return <>
-                    {record.rawStatus === 'NEW' && <Button type="primary" onClick={() => handleOpenModalAddBet(record)}>
-                        Thêm Mới
-                    </Button>}
-                    {record.rawStatus === 'RESULT_READY_TO_BE_UPDATED' && <Button type="primary">
-                        Cập Nhật
-                    </Button>}
+                    {record.rawStatus === 'NEW' &&
+                        (<Button type="primary" onClick={() => handleOpenModalAddBet(record)}>
+                            Thêm Mới
+                        </Button>)}
+                    {record.rawStatus === 'RESULT_READY_TO_BE_UPDATED' &&
+                        (<Popconfirm
+                            title="Xác Nhận ?"
+                            icon={<QuestionCircleOutlined style={{color: 'red',}}/>}
+                            onConfirm={() => handleConfirmUpdate(record)}
+                        >
+                            <Button type="primary">
+                                Cập Nhật
+                            </Button>
+                        </Popconfirm>)}
                 </>
             }
         },

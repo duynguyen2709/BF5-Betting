@@ -10,6 +10,5 @@ import java.util.List;
  **/
 public interface RawBetService {
 
-    List<GetRawBetResponse.RawBetEntity> getAllBet(String sessionToken, String startDate, String endDate);
     List<BetHistory> getAllBetWithConvert(String sessionToken, String startDate, String endDate);
 }

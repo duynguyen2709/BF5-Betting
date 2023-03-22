@@ -33,4 +33,10 @@ const updateBetResult = ({betId, result}) => {
     })
 }
 
-export {getAllBetHistory, getRawBetInfo, getBetHistory, insertBetHistory, updateBetResult};
+const updateBetResultFromRaw = (data) => {
+    const betId = data.id
+    const url = `${API_URL.BetHistory}/raw/${betId}/result`
+    return axiosClient.put(url, data)
+}
+
+export {getAllBetHistory, getRawBetInfo, getBetHistory, insertBetHistory, updateBetResult, updateBetResultFromRaw};
