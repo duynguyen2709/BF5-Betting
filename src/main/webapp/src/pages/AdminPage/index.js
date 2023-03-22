@@ -54,6 +54,7 @@ const AdminPage = () => {
             title: 'Mã Cược',
             key: 'id',
             dataIndex: 'id',
+            width: 130,
         },
         {
             title: 'Người Cược',

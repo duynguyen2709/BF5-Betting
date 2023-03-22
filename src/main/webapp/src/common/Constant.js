@@ -15,6 +15,13 @@ const ROUTES = {
 
 const DEFAULT_ERROR_MESSAGE = "Hệ thống có lỗi. Vui lòng thử lại sau";
 
+const RAW_BET_STATUS = {
+  New: 'NEW',
+  Inserted: 'INSERTED',
+  ResultReadyToBeUpdated: 'RESULT_READY_TO_BE_UPDATED',
+  Settled: 'SETTLED'
+}
+
 const BET_RESULT = {
   Win: {
     result: 'WIN',
@@ -42,4 +49,4 @@ const BET_RESULT = {
   },
 }
 
-export { API_URL, BET_RESULT, ROUTES, DEFAULT_ERROR_MESSAGE };
+export { API_URL, BET_RESULT, ROUTES, RAW_BET_STATUS, DEFAULT_ERROR_MESSAGE };
