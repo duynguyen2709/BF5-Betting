@@ -1,7 +1,7 @@
 import React from 'react'
 import {Col, Divider, Row, Tag} from 'antd'
 import {BET_RESULT} from "../../common/Constant";
-import {filterBetResult} from "../../utils/betHistoryUtil";
+import {filterBetResult} from "../../utils/BetHistoryUtil";
 
 import './index.scss'
 

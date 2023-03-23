@@ -10,13 +10,13 @@ const MainLayout = ({component}) => {
     const [players, setPlayers] = useState({})
 
     const fetchPlayersData = useCallback(() => {
-        setPlayers([])
+        setPlayers({})
         getAllPlayers().then(data => setPlayers(data))
     }, [])
 
     useEffect(() => {
         fetchPlayersData()
-    }, [fetchPlayersData])
+    }, [])
 
     return (
         <PlayersContext.Provider value={{

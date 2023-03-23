@@ -17,12 +17,6 @@ import java.io.Serializable;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseResponse<T> implements Serializable {
-    public static final BaseResponse SUCCESS;
-
-    static {
-        SUCCESS = BaseResponse.builder().status("success").build();
-    }
-
     private String status;
     private Integer code;
     private T data;
@@ -36,7 +30,7 @@ public class BaseResponse<T> implements Serializable {
                 .build();
     }
 
-    public static BaseResponse failed(int statusCode, String message) {
+    public static BaseResponse<Object> failed(int statusCode, String message) {
         return BaseResponse.builder()
                 .status("failed")
                 .code(statusCode)

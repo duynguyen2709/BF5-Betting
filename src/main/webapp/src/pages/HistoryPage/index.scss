@@ -1,5 +1,13 @@
 .card-bet-wrapper {
+  .ant-card-body {
+    padding: 0 0.5rem 0.5rem;
+  }
+
   .ant-tabs-nav-wrap {
     padding-left: 0.5rem;
   }
+}
+
+.card-bet-empty {
+  margin-top: 1rem;
 }

@@ -19,21 +19,29 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/bets")
 @AllArgsConstructor
 public class BetHistoryController {
-
     private final RawBetService rawBetService;
     private final BetHistoryService betHistoryService;
 
     @GetMapping("")
     public BaseResponse<List<BetHistory>> getAll(@RequestParam(name = "playerId", required = false) String playerId,
-                                                 @RequestParam(name = "date", required = false) String date) {
-        List<BetHistory> betHistoryList;
-        if (StringUtils.isNotBlank(playerId) && StringUtils.isNotBlank(date))
-            betHistoryList = betHistoryService.getByPlayerIdAndDate(playerId, date);
-        else if (StringUtils.isNotBlank(playerId))
-            betHistoryList = betHistoryService.getByPlayerId(playerId);
-        else
-            betHistoryList = betHistoryService.getAllBetHistory();
+                                                 @RequestParam(name = "startDate", required = false) String startDate,
+                                                 @RequestParam(name = "endDate", required = false) String endDate) {
+        if (StringUtils.isNotBlank(startDate) && StringUtils.isBlank(endDate)) {
+            endDate = startDate;
+        } else if (StringUtils.isNotBlank(endDate) && StringUtils.isBlank(startDate)) {
+            startDate = endDate;
+        }
 
+        List<BetHistory> betHistoryList;
+        if (StringUtils.isNotBlank(playerId) && StringUtils.isNotBlank(startDate)) {
+            betHistoryList = betHistoryService.getByPlayerIdAndDateRange(playerId, startDate, endDate);
+        } else if (StringUtils.isNotBlank(playerId)) {
+            // date empty, only userId available
+            betHistoryList = betHistoryService.getByPlayerId(playerId);
+        } else {
+            // no parameter passed, used for history page
+            betHistoryList = betHistoryService.getAllBetHistory();
+        }
         return BaseResponse.success(sortByBetTimeDesc(betHistoryList));
     }
 
@@ -47,7 +55,6 @@ public class BetHistoryController {
                 })
                 .collect(Collectors.toList());
     }
-
 
     @GetMapping("/raw")
     BaseResponse<List<BetHistory>> getRawBetInfo(@RequestParam("sessionToken") String sessionToken,

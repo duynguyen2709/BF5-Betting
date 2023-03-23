@@ -2,6 +2,7 @@ import React, {useCallback, useContext, useState} from "react";
 import {Avatar, Col, Modal, Row, Select} from "antd";
 import PlayersContext from "../../common/PlayersContext";
 import {insertBetHistory} from "../../apis/BetHistoryApi";
+import BetHistoryCard from "../BetHistoryCard";
 
 const {Option} = Select
 
@@ -34,7 +35,8 @@ const InsertBetHistoryModal = ({data, isOpen, onUpdateSuccess, onClose}) => {
         onOk={handleConfirmAdd}
         onCancel={onClose}
     >
-        <Row style={{alignItems: 'center'}}>
+        <BetHistoryCard data={data} />
+        <Row style={{alignItems: 'center', margin: '1rem 0.5rem 0 0.5rem'}}>
             <Col span={6}>Người Cược:</Col>
             <Col span={17} offset={1}>
                 <Select allowClear={false}

@@ -12,15 +12,15 @@ const App = () => {
     <Router>
       <Routes>
         <Route
-          path={ROUTES.INDEX.path}
-          element={<Navigate to={ROUTES.BASE.path} />}
+          path={ROUTES.Index.path}
+          element={<Navigate to={ROUTES.Base.path} />}
         />
         <Route
-          path={ROUTES.BASE.path}
+          path={ROUTES.Base.path}
           element={<HistoryPage/>}
         />
         <Route
-          path={ROUTES.ADMIN.path}
+          path={ROUTES.Admin.path}
           element={<AdminPage/>}
         />
         <Route path="*" element={<NotFound />} />

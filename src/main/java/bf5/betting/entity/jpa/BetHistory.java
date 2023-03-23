@@ -7,7 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import java.sql.Timestamp;
 
 /**
@@ -29,10 +31,8 @@ public class BetHistory {
     private Timestamp matchTime;
     @Column
     private String firstTeam;
-    private transient String firstTeamLogoUrl;
     @Column
     private String secondTeam;
-    private transient String secondTeamLogoUrl;
     @Column
     private String tournamentName;
     @Column
@@ -51,6 +51,9 @@ public class BetHistory {
     private BetResult result;
     @Column
     private Long actualProfit;
+
+    private transient String secondTeamLogoUrl;
+    private transient String firstTeamLogoUrl;
     private transient String rawStatus;
 
     public String getBetTime() {

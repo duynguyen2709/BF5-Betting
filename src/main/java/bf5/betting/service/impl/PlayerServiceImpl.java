@@ -20,9 +20,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Log4j2
 public class PlayerServiceImpl implements PlayerService {
-
     private final PlayerRepository playerRepository;
-
     private Map<String, Player> playerCacheMap;
 
     @PostConstruct

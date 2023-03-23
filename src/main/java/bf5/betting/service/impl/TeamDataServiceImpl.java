@@ -20,9 +20,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Log4j2
 public class TeamDataServiceImpl implements TeamDataService {
-
     private final TeamDataRepository teamDataRepository;
-
     private Map<String, TeamData> teamDataCacheMap;
 
     @PostConstruct

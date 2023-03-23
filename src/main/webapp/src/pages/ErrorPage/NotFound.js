@@ -23,7 +23,7 @@ const NotFound = () => {
               Oops! Looks like you followed a bad link. If you think this is a
               problem with us, please tell us.
             </p>
-            <Link to={ROUTES.BASE.path}>
+            <Link to={ROUTES.Base.path}>
               <Button className={"button-back-home"}>
                 <FontAwesomeIcon icon={faChevronLeft} />
                 <b style={{ marginLeft: 10 }}>Go back home</b>

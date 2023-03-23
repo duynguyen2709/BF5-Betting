@@ -8,6 +8,7 @@ import bf5.betting.util.NumberUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
@@ -26,13 +27,13 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class BaseRequestServlet extends DispatcherServlet {
 
     @Override
-    protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    protected void doDispatch(HttpServletRequest request, @NonNull HttpServletResponse response) throws Exception {
         if (request.getMethod().equals(HttpMethod.GET.name())) {
             super.doDispatch(request, response);
             return;
         }
 
-        request.setAttribute(Constant.REQUEST_TIME, System.currentTimeMillis());
+        request.setAttribute(Constant.REQUEST_TIME_ATTRIBUTE_KEY, System.currentTimeMillis());
         if (!(request instanceof ContentCachingRequestWrapper)) {
             request = new ContentCachingRequestWrapper(request);
         }
@@ -60,7 +61,7 @@ public class BaseRequestServlet extends DispatcherServlet {
                 try {
                     result = new String(buf, 0, length, wrapper.getCharacterEncoding());
                 } catch (Exception e) {
-                    log.error("getResponsePayload ex", e);
+                    log.error("[getResponsePayload] Ex", e);
                 }
             }
         }
@@ -73,15 +74,15 @@ public class BaseRequestServlet extends DispatcherServlet {
             logEnt.setMethod(request.getMethod());
             logEnt.setPath(request.getRequestURI());
             logEnt.setParams(request.getParameterMap());
-            logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME)));
+            logEnt.setRequestTime(NumberUtil.getLongValue(request.getAttribute(Constant.REQUEST_TIME_ATTRIBUTE_KEY)));
             logEnt.setResponseTime(System.currentTimeMillis());
             logEnt.setRequest(UriComponentsBuilder.fromHttpRequest(new ServletServerHttpRequest(request)).build().toUriString());
             logEnt.setBody(request);
             logEnt.setResponse(getResponsePayload(responseToCache));
         } catch (Exception e) {
-            log.error("[setLogData] ex", e);
+            log.error("[setLogData] Ex", e);
         } finally {
-            log.info("{} , Total Time : {}ms", JsonUtil.toJsonString(logEnt), logEnt.getProcessTime());
+            log.info("Log Data: {}, Total Time: {}ms", JsonUtil.toJsonString(logEnt), logEnt.getProcessTime());
         }
     }
 
@@ -93,7 +94,7 @@ public class BaseRequestServlet extends DispatcherServlet {
             }
             response.setContentType(APPLICATION_JSON_VALUE);
         } catch (Exception e) {
-            log.error("[updateResponse] ex: {}", e.getMessage(), e);
+            log.error("[updateResponse] Ex: {}", e.getMessage(), e);
         }
     }
 }

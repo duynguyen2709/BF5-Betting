@@ -1,6 +1,6 @@
 import React from "react";
 import {Avatar, Button, Col, Popconfirm, Row, Table, Tag} from "antd";
-import {parseBetEvent} from "../../../utils/betHistoryUtil";
+import {parseBetEvent} from "../../../utils/BetHistoryUtil";
 import MoneyTextCell from "../../MoneyTextCell";
 import BetResultTag from "../../BetResultTag";
 import {BET_RESULT, RAW_BET_STATUS} from "../../../common/Constant";
@@ -144,6 +144,9 @@ const RawBetTable = ({data, players, onClickAdd, onClickUpdate}) => {
             width: 120,
             render: (_, record) => {
                 return <>
+                    <Button type="primary" onClick={() => onClickAdd(record)}>
+                        Thêm Mới
+                    </Button>
                     {record.rawStatus === RAW_BET_STATUS.New &&
                         (<Button type="primary" onClick={() => onClickAdd(record)}>
                             Thêm Mới

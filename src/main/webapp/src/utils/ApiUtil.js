@@ -1,6 +1,6 @@
 import Axios from "axios";
 import {message} from "antd";
-import {DEFAULT_ERROR_MESSAGE} from "../common/Constant";
+import {MESSAGE} from "../common/Constant";
 
 const axiosClient = Axios.create({
   baseURL: `${process.env.REACT_APP_BACKEND_API_URL}`,
@@ -21,12 +21,12 @@ axiosClient.interceptors.response.use(
   },
   (error) => {
     console.error(error);
-    message.error(DEFAULT_ERROR_MESSAGE, 4);
+    message.error(MESSAGE.DefaultErrorMessage, 4);
 
     if (error.response && error.response.data) {
       return Promise.reject(error.response.data);
     }
-    return Promise.reject(DEFAULT_ERROR_MESSAGE);
+    return Promise.reject(MESSAGE.DefaultErrorMessage);
   }
 );
 

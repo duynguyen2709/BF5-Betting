@@ -1,7 +1,6 @@
 import React, {useCallback, useContext, useEffect, useState} from 'react'
 import {Avatar, Button, Card, Col, message, Row, Table, Tabs} from 'antd';
 import {getAllBetHistory} from "../../apis/BetHistoryApi";
-import {parseBetEvent} from "../../utils/betHistoryUtil";
 import {BET_RESULT} from "../../common/Constant";
 import PlayersContext from "../../common/PlayersContext";
 import BetResultTag from "../../components/BetResultTag";
@@ -9,6 +8,7 @@ import UpdateBetResultModal from "../../components/UpdateBetResultModal";
 import RawBetInfoCard from "../../components/RawBetInfoCard";
 import MoneyTextCell from "../../components/MoneyTextCell";
 import AdminPlayerStatisticCard from "../../components/AdminPlayerStatisticCard";
+import {parseBetEvent} from "../../utils/BetHistoryUtil";
 
 import './index.scss'
 

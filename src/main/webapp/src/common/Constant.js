@@ -1,19 +1,18 @@
 const API_URL = {
-  BetHistory: "/bets",
-  GET_PLAYERS: "/players",
+  BetHistory: '/bets',
+  Players: '/players',
 };
 
 const ROUTES = {
-  // pages
-  INDEX: { path: "/index.html" },
-  BASE: { path: "/" },
-  ADMIN: { path: "/admin" },
-
-  // errors
-  NOT_FOUND: { path: "/404" },
+  Index: { path: '/index.html' },
+  Base: { path: '/' },
+  Admin: { path: '/admin' },
 };
 
-const DEFAULT_ERROR_MESSAGE = "Hệ thống có lỗi. Vui lòng thử lại sau";
+const MESSAGE = {
+  DefaultErrorMessage: 'Hệ thống có lỗi. Vui lòng thử lại sau',
+  EmptyBetReturned: 'Không có cược trong thời gian trên',
+}
 
 const RAW_BET_STATUS = {
   New: 'NEW',
@@ -49,4 +48,4 @@ const BET_RESULT = {
   },
 }
 
-export { API_URL, BET_RESULT, ROUTES, RAW_BET_STATUS, DEFAULT_ERROR_MESSAGE };
+export { API_URL, BET_RESULT, ROUTES, RAW_BET_STATUS, MESSAGE };

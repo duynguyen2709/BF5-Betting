@@ -1,5 +1,5 @@
-import React, {useContext} from 'react'
-import {Button, Col, DatePicker, Form, Row, Select} from 'antd';
+import React, {useCallback, useContext} from 'react'
+import {Button, Col, DatePicker, Form, message, Row, Select} from 'antd';
 import moment from 'moment';
 import PlayersContext from "../../common/PlayersContext";
 
@@ -19,13 +19,25 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
     const {players} = playerContext
     const playerList = Object.values(players)
 
+    const handleSubmitFilter = useCallback((values) => {
+        const {startDate, endDate} = values
+        if (startDate && endDate) {
+            if (startDate.isAfter(endDate)) {
+                message.error('Ngày bắt đầu phải trước ngày kết thúc', 4)
+                return
+            }
+        }
+        onSubmit(values)
+    }, [onSubmit])
+
     return (
         <Form
             form={form}
-            onFinish={onSubmit}
+            onFinish={handleSubmitFilter}
             className={"bet-history-filter-form"}
             initialValues={{
-                date: moment().subtract(1, 'day'),
+                startDate: moment().subtract(1, 'day'),
+                endDate: moment(),
                 playerId: playerList.length > 0 ? playerList[0].playerId : null
             }}>
             <Form.Item
@@ -56,13 +68,27 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
 
             </Form.Item>
             <Form.Item
-                name="date"
+                name="startDate"
                 label="Ngày Cược"
             >
                 <DatePicker
                     format={dateFormat}
                     disabledDate={disabledDate}
                     allowClear
+                    placeholder={'Ngày bắt đầu'}
+                    style={{
+                        width: '100%',
+                    }}
+                />
+            </Form.Item>
+            <Form.Item
+                name="endDate"
+            >
+                <DatePicker
+                    format={dateFormat}
+                    disabledDate={disabledDate}
+                    allowClear
+                    placeholder={'Ngày kết thúc'}
                     style={{
                         width: '100%',
                     }}

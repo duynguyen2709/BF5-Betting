@@ -18,12 +18,8 @@ import java.util.Objects;
 public class DateTimeUtil {
 
     public static final String SYSTEM_DATE_ONLY_FORMAT = "yyyy-MM-dd";
-
-    private static final SimpleDateFormat dateTimeFormatter = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-
-    public static Timestamp currentTimestamp() {
-        return new Timestamp(System.currentTimeMillis());
-    }
+    public static final String READABLE_DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm";
+    private static final SimpleDateFormat DATE_TIME_FORMATTER = new SimpleDateFormat(READABLE_DATE_TIME_FORMAT);
 
     public static String now() {
         return timestampToString(new Timestamp(System.currentTimeMillis()));
@@ -32,11 +28,11 @@ public class DateTimeUtil {
     public static String timestampToString(Timestamp timestamp) {
         if (Objects.isNull(timestamp))
             return null;
-        return dateTimeFormatter.format(timestamp);
+        return DATE_TIME_FORMATTER.format(timestamp);
     }
 
     public static Timestamp stringToTimestamp(String timestampStr) {
-        return stringToTimestamp(timestampStr, "dd/MM/yyyy HH:mm");
+        return stringToTimestamp(timestampStr, READABLE_DATE_TIME_FORMAT);
     }
 
     public static Date stringToDate(String dateStr, String format) {

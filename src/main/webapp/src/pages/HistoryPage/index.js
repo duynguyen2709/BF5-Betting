@@ -1,21 +1,27 @@
 import React, {useCallback, useContext, useRef, useState} from "react";
 import {exportComponentAsJPEG} from 'react-component-export-image';
 import moment from 'moment'
-
-import {Avatar, Card, Tabs} from 'antd';
+import {Avatar, Card, Empty, Tabs} from 'antd';
 import {getBetHistory} from '../../apis/BetHistoryApi'
+import {MESSAGE} from "../../common/Constant";
+import PlayersContext from "../../common/PlayersContext";
 import BetHistoryCard from "../../components/BetHistoryCard";
 import BetHistoryFilter from "../../components/BetHistoryFilter";
 import BetHistoryStatistic from "../../components/BetHistoryStatistic";
 
 import './index.scss'
-import PlayersContext from "../../common/PlayersContext";
 
 const {Meta} = Card
 
 const TAB_KEYS = {
-   History: 'history',
-   Statistic: 'statistic',
+   History: {
+       label: 'Danh Sách Cược',
+       key: 'history',
+   },
+   Statistic: {
+       label: 'Thống Kê',
+       key: 'statistic',
+   }
 }
 
 const HistoryCardMetadata = ({players, data}) => {
@@ -32,29 +38,33 @@ const HistoryCardMetadata = ({players, data}) => {
     />
 }
 
+const DEFAULT_HISTORY_FILTER_PARAMS = {
+    playerId: '',
+    startDate: null,
+    endDate: null,
+}
+
 const HistoryPage = () => {
     const historyCardRef = useRef()
     const [activeTab, setActiveTab] = useState(TAB_KEYS.History)
-    const [betHistories, setBetHistories] = useState([])
-    const [historyFilterParams, setHistoryFilterParams] = useState({
-        playerId: '',
-        date: null,
-    })
+    const [betHistories, setBetHistories] = useState(undefined)
+    const [historyFilterParams, setHistoryFilterParams] = useState(DEFAULT_HISTORY_FILTER_PARAMS)
     const playerContext = useContext(PlayersContext)
     const {players} = playerContext
 
     const handleSubmitFilter = useCallback((fieldsValue) => {
-        setBetHistories([])
-        setHistoryFilterParams({
-            playerId: '',
-            date: null,
-        })
-        const {playerId, date} = fieldsValue
+        // Reset current filter & data
+        setBetHistories(undefined)
+        setHistoryFilterParams(DEFAULT_HISTORY_FILTER_PARAMS)
+        // Parse new filter params
+        const {playerId, startDate, endDate} = fieldsValue
         const queryParams = {
             playerId,
-            date: date && date.format('YYYY-MM-DD'),
+            startDate: startDate && startDate.format('YYYY-MM-DD'),
+            endDate: endDate && endDate.format('YYYY-MM-DD'),
         }
         setHistoryFilterParams(queryParams)
+        // Fetch data
         getBetHistory(queryParams).then((data) => setBetHistories(data))
     }, [])
 
@@ -78,27 +88,26 @@ const HistoryPage = () => {
     }, [])
 
     const isHistoryListNotEmpty = betHistories && betHistories.length > 0
+    const isHistoryFetchedButEmpty = betHistories !== undefined && betHistories.length === 0
 
     return <>
         <BetHistoryFilter onSubmit={handleSubmitFilter} onClickExport={handleClickExport} isExportButtonActive={isHistoryListNotEmpty}/>
+        {isHistoryFetchedButEmpty && <Empty className={'card-bet-empty'} description={MESSAGE.EmptyBetReturned}/>}
         {isHistoryListNotEmpty &&
-            (<Card ref={historyCardRef} className={"card-bet-wrapper"}
-                   bodyStyle={{
-                       padding: '0 0.5rem 0.5rem',
-                   }}>
+            (<Card ref={historyCardRef} className={"card-bet-wrapper"}>
                 <HistoryCardMetadata players={players} data={historyFilterParams}/>
                 <Tabs
                     activeKey={activeTab}
                     onChange={handleChangeTab}
                     items={[
                         {
-                            label: `Danh Sách Cược`,
-                            key: TAB_KEYS.History,
+                            label: TAB_KEYS.History.label,
+                            key: TAB_KEYS.History.key,
                             children: <>{betHistories.map((ele) => <BetHistoryCard key={ele.id} data={ele}/>)}</>,
                         },
                         {
-                            label: `Thống Kê`,
-                            key: TAB_KEYS.Statistic,
+                            label: TAB_KEYS.Statistic.label,
+                            key: TAB_KEYS.Statistic.key,
                             children: <BetHistoryStatistic data={betHistories}/>,
                         },
                     ]}

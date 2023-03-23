@@ -29,7 +29,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Log4j2
 public class BetHistoryServiceImpl implements BetHistoryService {
-
     private final BetHistoryRepository betHistoryRepository;
     private final TeamDataService teamDataService;
     private final PlayerService playerService;
@@ -47,9 +46,10 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     }
 
     @Override
-    public List<BetHistory> getByPlayerIdAndDate(String playerId, String dateStr) {
-        Date date = DateTimeUtil.stringToDate(dateStr, DateTimeUtil.SYSTEM_DATE_ONLY_FORMAT);
-        return withTeamDataWrapper(betHistoryRepository.findByPlayerIdAndBetTime(playerId, date));
+    public List<BetHistory> getByPlayerIdAndDateRange(String playerId, String startDateStr, String endDateStr) {
+        Date startDate = DateTimeUtil.stringToDate(startDateStr, DateTimeUtil.SYSTEM_DATE_ONLY_FORMAT);
+        Date endDate = DateTimeUtil.stringToDate(endDateStr, DateTimeUtil.SYSTEM_DATE_ONLY_FORMAT);
+        return withTeamDataWrapper(betHistoryRepository.findByPlayerIdAndDateRange(playerId, startDate, endDate));
     }
 
     @Override
@@ -57,9 +57,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @Transactional
     public BetHistory createBet(BetHistory entity) {
         BetHistory result = betHistoryRepository.save(entity);
-        if (entity.getActualProfit() != null) {
-            updatePlayerProfit(entity);
-        }
+        updatePlayerProfit(entity);
         insertTeamDataIfNotAvailable(entity);
         return result;
     }
@@ -99,7 +97,6 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         if (betResult == BetResult.NOT_FINISHED) {
             throw new IllegalArgumentException("Result NOT_FINISHED Invalid");
         }
-
         return betHistoryRepository.findById(request.getBetId())
                 .map(entity -> {
                     entity.setResult(betResult);
@@ -141,6 +138,9 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     }
 
     private void updatePlayerProfit(BetHistory newBetHistory) {
+        if (Objects.isNull(newBetHistory.getActualProfit())) {
+            return;
+        }
         Player player = playerService.getAllPlayer().get(newBetHistory.getPlayerId());
         long newTotalProfit = player.getTotalProfit() + newBetHistory.getActualProfit();
         player.setTotalProfit(newTotalProfit);

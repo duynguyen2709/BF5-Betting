@@ -1,5 +1,3 @@
-import {BET_RESULT} from "../common/Constant";
-
 const parseBetEvent = (betHistory) => {
     const {event, firstHalfOnly} = betHistory;
     const parsedEvent = event

@@ -3,11 +3,12 @@ import {API_URL} from "../common/Constant";
 
 const getAllBetHistory = () => axiosClient.get(API_URL.BetHistory);
 
-const getBetHistory = ({playerId = '', date = ''}) => {
+const getBetHistory = ({playerId = '', startDate = '', endDate = ''}) => {
     return axiosClient.get(API_URL.BetHistory, {
         params: {
             playerId,
-            date
+            startDate,
+            endDate
         }
     })
 }

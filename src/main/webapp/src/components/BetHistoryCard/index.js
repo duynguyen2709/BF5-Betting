@@ -1,6 +1,6 @@
 import React from 'react'
 import {Card, Col, Row} from 'antd'
-import {parseBetEvent} from "../../utils/betHistoryUtil";
+import {parseBetEvent} from "../../utils/BetHistoryUtil";
 import BetResultTag from "../BetResultTag";
 
 import './index.scss'

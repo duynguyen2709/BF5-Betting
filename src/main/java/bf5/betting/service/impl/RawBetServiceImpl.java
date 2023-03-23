@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 @AllArgsConstructor
 @Log4j2
 public class RawBetServiceImpl implements RawBetService {
-
     private static final String API_URL = "https://1x88.net/api/internal/v1/betHistory/getBetHistoryList";
 
     private final RawBetEntityConverter entityConverter;
@@ -42,13 +42,11 @@ public class RawBetServiceImpl implements RawBetService {
     @TryCatchWrap
     public List<BetHistory> getAllBetWithConvert(String sessionToken, String startDate, String endDate) {
         String cacheKey = String.format("%s-%s", startDate, endDate);
-        List<GetRawBetResponse.RawBetEntity> bets = cache.get(cacheKey, k -> {
-            try {
-                return getFromApi(sessionToken, startDate, endDate);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        List<GetRawBetResponse.RawBetEntity> bets = cache.getIfPresent(cacheKey);
+        if (Objects.isNull(bets)) {
+            bets = getFromApi(sessionToken, startDate, endDate);
+            cache.put(cacheKey, bets);
+        }
         return entityConverter.convertToPlayerBetHistory(bets);
     }
 

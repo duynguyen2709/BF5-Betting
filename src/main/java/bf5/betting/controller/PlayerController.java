@@ -17,7 +17,6 @@ import java.util.Map;
 @RequestMapping("/api/players")
 @AllArgsConstructor
 public class PlayerController {
-
     private final PlayerService playerService;
 
     @GetMapping("")

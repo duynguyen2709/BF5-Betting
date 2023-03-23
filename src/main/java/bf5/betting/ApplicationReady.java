@@ -20,7 +20,6 @@ import java.util.Map;
 @Log4j2
 @Component
 public class ApplicationReady {
-
     private final ConfigurableEnvironment configurableEnvironment;
 
     @EventListener(ApplicationReadyEvent.class)
