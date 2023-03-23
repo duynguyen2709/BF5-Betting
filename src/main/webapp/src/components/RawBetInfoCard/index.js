@@ -2,20 +2,27 @@ import React, {useCallback, useContext, useState} from "react";
 import QueryRawBetInfoForm from "../QueryRawBetInfoForm";
 import {getRawBetInfo, updateBetResultFromRaw} from "../../apis/BetHistoryApi";
 import PlayersContext from "../../common/PlayersContext";
+import CenterLoadingSpinner from "../CenterLoadingSpinner";
 import InsertBetHistoryModal from "../InsertBetHistoryModal";
 import RawBetTable from "./RawBetTable";
+import {LOCAL_STORAGE_KEY} from "../../common/Constant";
 
 const RawBetInfoCard = ({onSuccessAction}) => {
+    const [isFetching, setIsFetching] = useState(false)
     const [rawBetList, setRawBetList] = useState([])
     const [modalAddOpen, setModalAddOpen] = useState(false)
     const [currentAddBet, setCurrentAddBet] = useState()
-    const [queryParam, setQueryParam] = useState()
     const playerContext = useContext(PlayersContext)
     const {players} = playerContext
 
     const queryRawBetList = useCallback(() => {
-        getRawBetInfo(queryParam).then(data => setRawBetList(data))
-    }, [queryParam])
+        setRawBetList([])
+        setIsFetching(true)
+        const queryParams = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY.RawBetQueryParams))
+        getRawBetInfo(queryParams)
+            .then(data => setRawBetList(data))
+            .finally(() => setIsFetching(false))
+    }, [])
 
     const handleProcessRawBetSuccess = useCallback(() => {
         queryRawBetList()
@@ -29,8 +36,7 @@ const RawBetInfoCard = ({onSuccessAction}) => {
             startDate: dateRange[0].format('YYYY-MM-DD'),
             endDate: dateRange[1].format('YYYY-MM-DD'),
         }
-        setQueryParam(queryParams)
-        setRawBetList([])
+        localStorage.setItem(LOCAL_STORAGE_KEY.RawBetQueryParams, JSON.stringify(queryParams))
         queryRawBetList()
     }, [queryRawBetList])
 
@@ -49,15 +55,20 @@ const RawBetInfoCard = ({onSuccessAction}) => {
     }, [handleProcessRawBetSuccess])
 
     return <>
-        <InsertBetHistoryModal data={currentAddBet}
+        {modalAddOpen &&
+            <InsertBetHistoryModal data={currentAddBet}
                                isOpen={modalAddOpen}
                                onClose={handleCloseModalAdd}
-                               onUpdateSuccess={handleProcessRawBetSuccess}/>
+                               onUpdateSuccess={handleProcessRawBetSuccess}/>}
         <QueryRawBetInfoForm onSubmit={handleFetchRawBetList}/>
-        <RawBetTable data={rawBetList}
-                     players={players}
-                     onClickAdd={handleOpenModalAddBet}
-                     onClickUpdate={handleConfirmUpdate}/>
+        {isFetching ?
+            <CenterLoadingSpinner /> :
+            <RawBetTable data={rawBetList}
+                         players={players}
+                         loading={isFetching}
+                         onClickAdd={handleOpenModalAddBet}
+                         onClickUpdate={handleConfirmUpdate}/>}
+
     </>
 }
 

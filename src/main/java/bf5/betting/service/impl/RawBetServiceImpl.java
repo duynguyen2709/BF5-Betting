@@ -42,11 +42,13 @@ public class RawBetServiceImpl implements RawBetService {
     @TryCatchWrap
     public List<BetHistory> getAllBetWithConvert(String sessionToken, String startDate, String endDate) {
         String cacheKey = String.format("%s-%s", startDate, endDate);
-        List<GetRawBetResponse.RawBetEntity> bets = cache.getIfPresent(cacheKey);
-        if (Objects.isNull(bets)) {
-            bets = getFromApi(sessionToken, startDate, endDate);
-            cache.put(cacheKey, bets);
-        }
+        List<GetRawBetResponse.RawBetEntity> bets = cache.get(cacheKey, k -> {
+            try {
+                return getFromApi(sessionToken, startDate, endDate);
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        });
         return entityConverter.convertToPlayerBetHistory(bets);
     }
 
@@ -75,7 +77,13 @@ public class RawBetServiceImpl implements RawBetService {
                 .setHeader("sec-fetch-site", "same-origin")
                 .setHeader("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
 
+        log.info("Process query raw bet data from 1xBet with params: sessionToken [{}], startDate [{}], endDate [{}]",
+                sessionToken, startDate, endDate);
+
+        long now = System.currentTimeMillis();
         String rawResponse = httpRequest.execute().returnContent().asString();
+
+        log.info("Receive raw response from 1xBet: {}, total query time: {}ms", rawResponse, (System.currentTimeMillis() - now));
         GetRawBetResponse response = JsonUtil.fromJsonString(rawResponse, GetRawBetResponse.class);
         return response.getData().getBets();
     }

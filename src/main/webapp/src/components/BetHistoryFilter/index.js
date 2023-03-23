@@ -33,6 +33,7 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
     return (
         <Form
             form={form}
+            layout={'vertical'}
             onFinish={handleSubmitFilter}
             className={"bet-history-filter-form"}
             initialValues={{
@@ -40,85 +41,90 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
                 endDate: moment(),
                 playerId: playerList.length > 0 ? playerList[0].playerId : null
             }}>
-            <Form.Item
-                name="playerId"
-                label="Chọn Tên:"
-                rules={[
-                    {
-                        required: true,
-                        message: 'Vui lòng chọn tên'
-                    },
-                ]}
-            >
-                <Select
-                    style={{
-                        width: '100%',
-                    }}
-                    allowClear={false}
-                    loading={playerList.length === 0}
+            <Col lg={{
+                span: 8
+            }} md={{
+                span: 8
+            }}>
+                <Form.Item
+                    name="playerId"
+                    label="Chọn Tên:"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'Vui lòng chọn tên'
+                        },
+                    ]}
                 >
-                    {playerList.map(ele => {
-                        return <Option key={ele.playerId} value={ele.playerId}>
-                            <Row>
-                                {ele.playerName}
-                            </Row>
-                        </Option>
-                    })}
-                </Select>
-
-            </Form.Item>
-            <Form.Item
-                name="startDate"
-                label="Ngày Cược"
-            >
-                <DatePicker
-                    format={dateFormat}
-                    disabledDate={disabledDate}
-                    allowClear
-                    placeholder={'Ngày bắt đầu'}
-                    style={{
-                        width: '100%',
-                    }}
-                />
-            </Form.Item>
-            <Form.Item
-                name="endDate"
-            >
-                <DatePicker
-                    format={dateFormat}
-                    disabledDate={disabledDate}
-                    allowClear
-                    placeholder={'Ngày kết thúc'}
-                    style={{
-                        width: '100%',
-                    }}
-                />
-            </Form.Item>
-            <Form.Item>
-                <Row>
-                    <Col span={12}>
-                        <Button
-                            type="primary"
-                            htmlType="submit"
-                            className={"button-submit-filter"}
-                        >
-                            Xem Lịch Sử
-                        </Button>
-                    </Col>
-                    <Col span={12}>
-                        <Button
-                            type="primary"
-                            disabled={!isExportButtonActive}
-                            className={"button-submit-filter"}
-                            ghost
-                            style={{float: 'right'}}
-                            onClick={onClickExport}
-                        >
-                            Xuất Thống Kê
-                        </Button>
-                    </Col>
-                </Row>
-            </Form.Item>
+                    <Select
+                        style={{
+                            width: '100%',
+                        }}
+                        allowClear={false}
+                        loading={playerList.length === 0}
+                    >
+                        {playerList.map(ele => {
+                            return <Option key={ele.playerId} value={ele.playerId}>
+                                <Row>
+                                    {ele.playerName}
+                                </Row>
+                            </Option>
+                        })}
+                    </Select>
+                </Form.Item>
+                <Form.Item
+                    name="startDate"
+                    label="Ngày Cược"
+                >
+                    <DatePicker
+                        format={dateFormat}
+                        disabledDate={disabledDate}
+                        allowClear
+                        placeholder={'Ngày bắt đầu'}
+                        style={{
+                            width: '100%',
+                        }}
+                    />
+                </Form.Item>
+                <Form.Item
+                    name="endDate"
+                >
+                    <DatePicker
+                        format={dateFormat}
+                        disabledDate={disabledDate}
+                        allowClear
+                        placeholder={'Ngày kết thúc'}
+                        style={{
+                            width: '100%',
+                        }}
+                    />
+                </Form.Item>
+                <Form.Item>
+                    <Row>
+                        <Col span={12}>
+                            <Button
+                                type="primary"
+                                htmlType="submit"
+                                className={"button-submit-filter"}
+                            >
+                                Xem Lịch Sử
+                            </Button>
+                        </Col>
+                        <Col span={12}>
+                            <Button
+                                type="primary"
+                                disabled={!isExportButtonActive}
+                                className={"button-submit-filter"}
+                                ghost
+                                style={{float: 'right'}}
+                                onClick={onClickExport}
+                            >
+                                Xuất Thống Kê
+                            </Button>
+                        </Col>
+                    </Row>
+                </Form.Item>
+            </Col>
         </Form>
     )
 }

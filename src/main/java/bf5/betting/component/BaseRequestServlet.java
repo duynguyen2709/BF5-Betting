@@ -28,10 +28,10 @@ public class BaseRequestServlet extends DispatcherServlet {
 
     @Override
     protected void doDispatch(HttpServletRequest request, @NonNull HttpServletResponse response) throws Exception {
-        if (request.getMethod().equals(HttpMethod.GET.name())) {
-            super.doDispatch(request, response);
-            return;
-        }
+//        if (request.getMethod().equals(HttpMethod.GET.name())) {
+//            super.doDispatch(request, response);
+//            return;
+//        }
 
         request.setAttribute(Constant.REQUEST_TIME_ATTRIBUTE_KEY, System.currentTimeMillis());
         if (!(request instanceof ContentCachingRequestWrapper)) {

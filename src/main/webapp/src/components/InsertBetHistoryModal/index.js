@@ -35,7 +35,7 @@ const InsertBetHistoryModal = ({data, isOpen, onUpdateSuccess, onClose}) => {
         onOk={handleConfirmAdd}
         onCancel={onClose}
     >
-        <BetHistoryCard data={data} />
+        {data && <BetHistoryCard data={data} />}
         <Row style={{alignItems: 'center', margin: '1rem 0.5rem 0 0.5rem'}}>
             <Col span={6}>Người Cược:</Col>
             <Col span={17} offset={1}>

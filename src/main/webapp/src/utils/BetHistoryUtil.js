@@ -1,5 +1,9 @@
 const parseBetEvent = (betHistory) => {
     const {event, firstHalfOnly} = betHistory;
+    if (!event) {
+        console.error('Invalid event of betHistory', event, betHistory)
+        return ''
+    }
     const parsedEvent = event
         .replace("Handicap 1", betHistory.firstTeam)
         .replace("Handicap 2", betHistory.secondTeam)

@@ -1,6 +1,7 @@
 import React from 'react';
 import moment from "moment";
 import {Button, DatePicker, Form, Input} from 'antd';
+import {LOCAL_STORAGE_KEY} from "../../common/Constant";
 
 const {RangePicker} = DatePicker;
 
@@ -19,6 +20,11 @@ const disabledDate = (current) => {
     return current && current > moment().endOf('day');
 }
 
+const getLastQuerySessionToken = () => {
+    const data = localStorage.getItem(LOCAL_STORAGE_KEY.RawBetQueryParams)
+    return data ? JSON.parse(data).sessionToken : ''
+}
+
 const QueryRawBetInfoForm = ({onSubmit}) => {
     const [form] = Form.useForm();
     return (
@@ -28,6 +34,7 @@ const QueryRawBetInfoForm = ({onSubmit}) => {
             form={form}
             onFinish={onSubmit}
             initialValues={{
+                sessionToken: getLastQuerySessionToken(),
                 dateRange: [moment().subtract(1, 'day'), moment()],
             }}
         >

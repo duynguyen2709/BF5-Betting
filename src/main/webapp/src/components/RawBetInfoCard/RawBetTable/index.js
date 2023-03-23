@@ -144,9 +144,6 @@ const RawBetTable = ({data, players, onClickAdd, onClickUpdate}) => {
             width: 120,
             render: (_, record) => {
                 return <>
-                    <Button type="primary" onClick={() => onClickAdd(record)}>
-                        Thêm Mới
-                    </Button>
                     {record.rawStatus === RAW_BET_STATUS.New &&
                         (<Button type="primary" onClick={() => onClickAdd(record)}>
                             Thêm Mới
@@ -166,21 +163,18 @@ const RawBetTable = ({data, players, onClickAdd, onClickUpdate}) => {
         },
     ];
 
-    return <>
-        {data && data.length > 0 &&
-            <Table size="middle"
-                   className="table-bet-history"
-                   rowKey="id"
-                   bordered
-                   columns={columns}
-                   dataSource={data}
-                   pagination={{
-                       pageSize: 10,
-                       showSizeChanger: false,
-                       showTotal: (total) => `Tổng: ${total} cược`
-                   }}
-            />}
-    </>
+    return <Table size="middle"
+               className="table-bet-history"
+               rowKey="id"
+               bordered
+               columns={columns}
+               dataSource={data}
+               pagination={{
+                   pageSize: 10,
+                   showSizeChanger: false,
+                   showTotal: (total) => `Tổng: ${total} cược`
+               }}
+        />
 }
 
 export default RawBetTable

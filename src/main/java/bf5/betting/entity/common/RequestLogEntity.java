@@ -3,8 +3,10 @@ package bf5.betting.entity.common;
 import bf5.betting.util.JsonUtil;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * @author duynguyen
@@ -30,8 +32,10 @@ public class RequestLogEntity implements Serializable {
     }
 
     public void setBody(RequestWrapper request) {
-        Object obj = JsonUtil.fromJsonString(request.getBody(), Object.class);
-        this.body = (obj != null) ? obj : "";
+        if (StringUtils.isNotBlank(request.getBody())) {
+            Object obj = JsonUtil.fromJsonString(request.getBody(), Object.class);
+            this.body = (obj != null) ? obj : "";
+        }
     }
 
     public long getProcessTime() {

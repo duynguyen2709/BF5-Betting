@@ -24,16 +24,29 @@ const TAB_KEYS = {
    }
 }
 
+const parseDateDescription = (startDate, endDate) => {
+    const start = startDate && moment(startDate).format('DD/MM/YYYY')
+    const end = endDate && moment(endDate).format('DD/MM/YYYY')
+    if (start && end) {
+        if (start === end) {
+            return start
+        }
+        return `${start} - ${end}`
+    } else {
+        return start || end
+    }
+};
+
 const HistoryCardMetadata = ({players, data}) => {
-    const {playerId, date} = data
-    if (!players || !playerId || !date)
+    const {playerId, startDate, endDate} = data
+    if (!players || !playerId)
         return null
 
     const actualPlayer = players[playerId]
     return <Meta
         avatar={<Avatar src={actualPlayer.avatarUrl} size={48}/>}
         title={actualPlayer.playerName}
-        description={moment(date).format('DD/MM/YYYY')}
+        description={parseDateDescription(startDate, endDate)}
         style={{padding: '1rem'}}
     />
 }
@@ -46,7 +59,7 @@ const DEFAULT_HISTORY_FILTER_PARAMS = {
 
 const HistoryPage = () => {
     const historyCardRef = useRef()
-    const [activeTab, setActiveTab] = useState(TAB_KEYS.History)
+    const [activeTab, setActiveTab] = useState(TAB_KEYS.History.key)
     const [betHistories, setBetHistories] = useState(undefined)
     const [historyFilterParams, setHistoryFilterParams] = useState(DEFAULT_HISTORY_FILTER_PARAMS)
     const playerContext = useContext(PlayersContext)
@@ -71,11 +84,11 @@ const HistoryPage = () => {
     const handleClickExport = useCallback(() => {
         const delay = 50
         const lastActiveTab = activeTab;
-        setActiveTab(TAB_KEYS.History)
+        setActiveTab(TAB_KEYS.History.key)
         setTimeout(() => {
             exportComponentAsJPEG(historyCardRef)
                 .then(() => {
-                    setActiveTab(TAB_KEYS.Statistic)
+                    setActiveTab(TAB_KEYS.Statistic.key)
                     setTimeout(() => exportComponentAsJPEG(historyCardRef)
                         .then(() => setActiveTab(lastActiveTab)),
                         delay)

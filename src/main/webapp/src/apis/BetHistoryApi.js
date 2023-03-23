@@ -14,6 +14,7 @@ const getBetHistory = ({playerId = '', startDate = '', endDate = ''}) => {
 }
 
 const getRawBetInfo = ({sessionToken, startDate, endDate}) => {
+    console.log('getRawBetInfo', {sessionToken, startDate, endDate})
     const url = `${API_URL.BetHistory}/raw`
     return axiosClient.get(url, {
         params: {
