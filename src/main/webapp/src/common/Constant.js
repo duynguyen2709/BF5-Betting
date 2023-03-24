@@ -16,6 +16,7 @@ const MESSAGE = {
   EmptyBetReturned: 'Không có cược trong thời gian trên',
   EmptyBetToBeUpdated: 'Không có cược cần cập nhật',
   UpdateBetSuccess: 'Cập nhật cược thành công',
+  StartDateMustBeBeforeOrEqualError: 'Ngày bắt đầu phải trước hoặc bằng ngày kết thúc',
 }
 
 const RAW_BET_STATUS = {

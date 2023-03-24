@@ -13,9 +13,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/Bf5Betting?allowPublicKeyRetrieval=true&useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=GMT%2B7
-    username: root
-    password: abcd@123
+    url: jdbc:mysql://${MYSQL_HOST}:3306/Bf5Betting?allowPublicKeyRetrieval=true&useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=GMT%2B7
+    username: ${MYSQL_USERNAME}
+    password: ${MYSQL_PASSWORD}
     hikari:
       connectionTestQuery: SELECT 1
       data-source-properties:

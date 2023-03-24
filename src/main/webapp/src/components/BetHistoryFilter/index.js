@@ -6,6 +6,7 @@ import moment from 'moment';
 import PlayersContext from "../../common/PlayersContext";
 
 import './index.scss'
+import {MESSAGE} from "../../common/Constant";
 
 const dateFormat = 'DD/MM/YYYY';
 
@@ -25,7 +26,7 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
         const {startDate, endDate} = values
         if (startDate && endDate) {
             if (startDate.isAfter(endDate)) {
-                message.error('Ngày bắt đầu phải trước ngày kết thúc', 4)
+                message.error(MESSAGE.StartDateMustBeBeforeOrEqualError, 4)
                 return
             }
         }

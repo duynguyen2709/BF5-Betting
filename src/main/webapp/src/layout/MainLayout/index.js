@@ -25,7 +25,7 @@ const MainLayout = ({component}) => {
         }}>
             <Layout className="main-layout">
                 <Header className="main-header">
-                    <h2 style={{color: '#fff'}}>BF5 Betting</h2>
+                    <img src={"/bf5-betting-logo.png"} alt={"bf5-betting-logo"} style={{height: '48px'}}/>
                 </Header>
                 <Content className="main-content">
                     {component}
