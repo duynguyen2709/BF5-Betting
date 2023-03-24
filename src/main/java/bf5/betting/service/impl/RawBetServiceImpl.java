@@ -5,6 +5,7 @@ import bf5.betting.converter.RawBetEntityConverter;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.request.GetRawBetRequest;
 import bf5.betting.entity.response.GetRawBetResponse;
+import bf5.betting.exception.UncheckedHttpResponseException;
 import bf5.betting.service.RawBetService;
 import bf5.betting.util.DateTimeUtil;
 import bf5.betting.util.JsonUtil;
@@ -13,13 +14,13 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.fluent.Request;
 import org.apache.hc.core5.http.ContentType;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,10 +43,14 @@ public class RawBetServiceImpl implements RawBetService {
     @TryCatchWrap
     public List<BetHistory> getAllBetWithConvert(String sessionToken, String startDate, String endDate) {
         String cacheKey = String.format("%s-%s", startDate, endDate);
-        List<GetRawBetResponse.RawBetEntity> bets = cache.get(cacheKey, k -> {
+        List<GetRawBetResponse.RawBetEntity> bets = cache.get(cacheKey, s -> {
             try {
                 return getFromApi(sessionToken, startDate, endDate);
             } catch (Exception ex) {
+                if (ex instanceof HttpResponseException) {
+                    HttpResponseException castedException = (HttpResponseException) ex;
+                    throw new UncheckedHttpResponseException(castedException);
+                }
                 throw new RuntimeException(ex);
             }
         });

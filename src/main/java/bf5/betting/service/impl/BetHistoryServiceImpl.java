@@ -12,6 +12,7 @@ import bf5.betting.service.BetHistoryService;
 import bf5.betting.service.PlayerService;
 import bf5.betting.service.TeamDataService;
 import bf5.betting.util.DateTimeUtil;
+import bf5.betting.util.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -126,6 +127,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
             betHistories.add(betHistory);
         }
 
+        log.info("Process update batch bets from raw data: {}", JsonUtil.toJsonString(betHistories));
         betHistories = this.betHistoryRepository.saveAll(betHistories);
         updatePlayersProfitInBatch(betHistories);
         return betHistories;

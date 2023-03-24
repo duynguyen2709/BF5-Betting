@@ -22,24 +22,27 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {ConstraintViolationException.class, IllegalArgumentException.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ResponseEntity<BaseResponse> handleConstraintViolation(IllegalArgumentException ex) {
+    public ResponseEntity<BaseResponse<Object>> handleConstraintViolation(IllegalArgumentException ex) {
         return response(HttpStatus.BAD_REQUEST, ex);
     }
 
+    @ExceptionHandler(value = {UncheckedHttpResponseException.class})
+    public ResponseEntity<BaseResponse<Object>> handleHttpResponseException(UncheckedHttpResponseException ex) {
+        return response(HttpStatus.valueOf(ex.getStatusCode()), ex);
+    }
+
     @ExceptionHandler(value = {EntityNotFoundException.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ResponseEntity<BaseResponse> handleNotFound(EntityNotFoundException ex) {
+    public ResponseEntity<BaseResponse<Object>> handleNotFound(EntityNotFoundException ex) {
         return response(HttpStatus.NOT_FOUND, ex);
     }
 
     @ExceptionHandler(value = {Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<BaseResponse> handle(Exception ex) {
+    public ResponseEntity<BaseResponse<Object>> handle(Exception ex) {
         return response(HttpStatus.INTERNAL_SERVER_ERROR, ex);
     }
 
-    private ResponseEntity<BaseResponse> response(HttpStatus status, Exception ex) {
+    private ResponseEntity<BaseResponse<Object>> response(HttpStatus status, Exception ex) {
         log.error("An exception occurred, ex: {}", ex.getMessage(), ex);
         return ResponseEntity.status(status)
                 .contentType(MediaType.APPLICATION_JSON)

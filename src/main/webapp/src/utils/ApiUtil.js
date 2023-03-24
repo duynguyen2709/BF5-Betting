@@ -21,10 +21,14 @@ axiosClient.interceptors.response.use(
   },
   (error) => {
     console.error(error);
-    message.error(MESSAGE.DefaultErrorMessage, 4);
+    if (error.response?.status === 403) {
+      message.error(MESSAGE.TokenExpiredMessage, 4);
+    } else {
+      message.error(MESSAGE.DefaultErrorMessage, 4);
+    }
 
-    if (error.response && error.response.data) {
-      return Promise.reject(error.response.data);
+    if (error.response) {
+      return Promise.reject(error.response?.data || error.response);
     }
     return Promise.reject(MESSAGE.DefaultErrorMessage);
   }

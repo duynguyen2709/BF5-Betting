@@ -6,7 +6,6 @@ import bf5.betting.entity.common.RequestWrapper;
 import bf5.betting.util.JsonUtil;
 import bf5.betting.util.NumberUtil;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.DispatcherServlet;

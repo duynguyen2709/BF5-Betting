@@ -11,6 +11,8 @@ import java.util.Map;
  **/
 public interface PlayerService {
     Map<String, Player> getAllPlayer();
+
     Player updatePlayerData(Player player);
+
     List<Player> updatePlayerDataBatch(Collection<Player> players);
 }
