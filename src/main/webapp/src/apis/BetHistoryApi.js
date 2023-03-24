@@ -13,18 +13,6 @@ const getBetHistory = ({playerId = '', startDate = '', endDate = ''}) => {
     })
 }
 
-const getRawBetInfo = ({sessionToken, startDate, endDate}) => {
-    console.log('getRawBetInfo', {sessionToken, startDate, endDate})
-    const url = `${API_URL.BetHistory}/raw`
-    return axiosClient.get(url, {
-        params: {
-            sessionToken,
-            startDate,
-            endDate
-        }
-    })
-}
-
 const insertBetHistory = (bet) => axiosClient.post(API_URL.BetHistory, bet)
 
 const updateBetResult = ({betId, result}) => {
@@ -35,10 +23,4 @@ const updateBetResult = ({betId, result}) => {
     })
 }
 
-const updateBetResultFromRaw = (data) => {
-    const betId = data.id
-    const url = `${API_URL.BetHistory}/raw/${betId}/result`
-    return axiosClient.put(url, data)
-}
-
-export {getAllBetHistory, getRawBetInfo, getBetHistory, insertBetHistory, updateBetResult, updateBetResultFromRaw};
+export {getAllBetHistory, getBetHistory, insertBetHistory, updateBetResult};

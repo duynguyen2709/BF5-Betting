@@ -1,11 +1,13 @@
 import React, {useCallback, useContext, useState} from "react";
-import QueryRawBetInfoForm from "../QueryRawBetInfoForm";
-import {getRawBetInfo, updateBetResultFromRaw} from "../../apis/BetHistoryApi";
+import {message, Row} from "antd";
+import {getRawBetData, updateBatchResultFromRaw, updateResultFromRaw} from "../../apis/RawBetApi";
+import {LOCAL_STORAGE_KEY, MESSAGE, RAW_BET_STATUS} from "../../common/Constant";
 import PlayersContext from "../../common/PlayersContext";
+import BatchUpdateRawBetButton from "../BatchUpdateRawBetButton";
 import CenterLoadingSpinner from "../CenterLoadingSpinner";
 import InsertBetHistoryModal from "../InsertBetHistoryModal";
+import QueryRawBetInfoForm from "../QueryRawBetInfoForm";
 import RawBetTable from "./RawBetTable";
-import {LOCAL_STORAGE_KEY} from "../../common/Constant";
 
 const RawBetInfoCard = ({onSuccessAction}) => {
     const [isFetching, setIsFetching] = useState(false)
@@ -19,7 +21,7 @@ const RawBetInfoCard = ({onSuccessAction}) => {
         setRawBetList([])
         setIsFetching(true)
         const queryParams = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY.RawBetQueryParams))
-        getRawBetInfo(queryParams)
+        getRawBetData(queryParams)
             .then(data => setRawBetList(data))
             .finally(() => setIsFetching(false))
     }, [])
@@ -51,18 +53,31 @@ const RawBetInfoCard = ({onSuccessAction}) => {
     }, [])
 
     const handleConfirmUpdate = useCallback((record) => {
-        updateBetResultFromRaw(record).then(() => handleProcessRawBetSuccess())
+        updateResultFromRaw(record).then(() => handleProcessRawBetSuccess())
     }, [handleProcessRawBetSuccess])
+
+    const handleUpdateBatchFromRaw = useCallback(() => {
+        const betListToBeUpdated = rawBetList
+            .filter(bet => bet.rawStatus === RAW_BET_STATUS.New || bet.rawStatus === RAW_BET_STATUS.ResultReadyToBeUpdated)
+        if (betListToBeUpdated.length === 0) {
+            message.warn(MESSAGE.EmptyBetToBeUpdated, 4)
+            return
+        }
+        updateBatchResultFromRaw(betListToBeUpdated).then(() => handleProcessRawBetSuccess())
+    }, [rawBetList, handleProcessRawBetSuccess])
 
     return <>
         {modalAddOpen &&
             <InsertBetHistoryModal data={currentAddBet}
-                               isOpen={modalAddOpen}
-                               onClose={handleCloseModalAdd}
-                               onUpdateSuccess={handleProcessRawBetSuccess}/>}
-        <QueryRawBetInfoForm onSubmit={handleFetchRawBetList}/>
+                                   isOpen={modalAddOpen}
+                                   onClose={handleCloseModalAdd}
+                                   onUpdateSuccess={handleProcessRawBetSuccess}/>}
+        <Row justify={"space-between"}>
+            <QueryRawBetInfoForm onSubmit={handleFetchRawBetList}/>
+            <BatchUpdateRawBetButton onUpdateBatchFromRaw={handleUpdateBatchFromRaw}/>
+        </Row>
         {isFetching ?
-            <CenterLoadingSpinner /> :
+            <CenterLoadingSpinner/> :
             <RawBetTable data={rawBetList}
                          players={players}
                          loading={isFetching}

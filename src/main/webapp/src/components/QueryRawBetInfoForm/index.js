@@ -46,7 +46,7 @@ const QueryRawBetInfoForm = ({onSubmit}) => {
                 <RangePicker disabledDate={disabledDate} allowClear={false}/>
             </Form.Item>
             <Form.Item>
-                <Button type="primary" htmlType="submit">Lấy Dữ Liệu</Button>
+                <Button type="primary" htmlType="submit" ghost>Lấy Dữ Liệu</Button>
             </Form.Item>
         </Form>
     );

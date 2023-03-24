@@ -17,9 +17,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -75,13 +73,9 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @TryCatchWrap
     @Transactional
     public BetHistory updateBetResult(BetHistoryUpdateResultRequest request) {
-        BetResult betResult = BetResult.fromValue(request.getResult());
-        if (betResult == BetResult.NOT_FINISHED) {
-            throw new IllegalArgumentException("Result NOT_FINISHED Invalid");
-        }
-
+        BetResult betResult = validateBetResult(request);
         return betHistoryRepository.findById(request.getBetId())
-                .map(entity -> withTeamDataWrapper(updateProfit(entity, request.getResult())))
+                .map(entity -> withTeamDataWrapper(updateProfit(entity, betResult)))
                 .orElseThrow(() ->
                         EntityNotFoundException.builder()
                                 .clazz(BetHistory.class)
@@ -93,16 +87,15 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @TryCatchWrap
     @Transactional
     public BetHistory updateBetResultFromRaw(BetHistoryUpdateResultRequest request) {
-        BetResult betResult = BetResult.fromValue(request.getResult());
-        if (betResult == BetResult.NOT_FINISHED) {
-            throw new IllegalArgumentException("Result NOT_FINISHED Invalid");
-        }
+        BetResult betResult = validateBetResult(request);
         return betHistoryRepository.findById(request.getBetId())
                 .map(entity -> {
                     entity.setResult(betResult);
                     entity.setScore(request.getScore());
                     entity.setActualProfit(request.getActualProfit());
-                    return withTeamDataWrapper(betHistoryRepository.save(entity));
+                    BetHistory result = withTeamDataWrapper(betHistoryRepository.save(entity));
+                    updatePlayerProfit(result);
+                    return result;
                 })
                 .orElseThrow(() ->
                         EntityNotFoundException.builder()
@@ -111,8 +104,53 @@ public class BetHistoryServiceImpl implements BetHistoryService {
                                 .build());
     }
 
-    private BetHistory updateProfit(BetHistory betHistoryEntity, String result) {
-        BetResult betResult = BetResult.fromValue(result);
+    @Override
+    @TryCatchWrap
+    @Transactional
+    public List<BetHistory> updateBatchBetResultFromRaw(List<BetHistoryUpdateResultRequest> request) {
+        List<BetHistory> betHistories = new ArrayList<>();
+        for (BetHistoryUpdateResultRequest updateRequest : request) {
+            BetResult betResult = validateBetResult(updateRequest);
+            BetHistory betHistory = betHistoryRepository.findById(updateRequest.getBetId())
+                    .map(entity -> {
+                        entity.setResult(betResult);
+                        entity.setScore(updateRequest.getScore());
+                        entity.setActualProfit(updateRequest.getActualProfit());
+                        return entity;
+                    })
+                    .orElseThrow(() ->
+                            EntityNotFoundException.builder()
+                                    .clazz(BetHistory.class)
+                                    .id(updateRequest.getBetId())
+                                    .build());
+            betHistories.add(betHistory);
+        }
+
+        betHistories = this.betHistoryRepository.saveAll(betHistories);
+        updatePlayersProfitInBatch(betHistories);
+        return betHistories;
+    }
+
+    private void updatePlayersProfitInBatch(List<BetHistory> betHistories) {
+        Map<String, Player> allPlayers = this.playerService.getAllPlayer();
+        betHistories.forEach(betHistory -> {
+            Player player = allPlayers.get(betHistory.getPlayerId());
+            long newTotalProfit = player.getTotalProfit() + betHistory.getActualProfit();
+            player.setTotalProfit(newTotalProfit);
+            allPlayers.put(betHistory.getPlayerId(), player);
+        });
+        this.playerService.updatePlayerDataBatch(allPlayers.values());
+    }
+
+    private BetResult validateBetResult(BetHistoryUpdateResultRequest request) {
+        BetResult betResult = BetResult.fromValue(request.getResult());
+        if (betResult == BetResult.NOT_FINISHED) {
+            throw new IllegalArgumentException("Result NOT_FINISHED Invalid");
+        }
+        return betResult;
+    }
+
+    private BetHistory updateProfit(BetHistory betHistoryEntity, BetResult betResult) {
         long actualProfit = 0;
         switch (betResult) {
             case WIN:

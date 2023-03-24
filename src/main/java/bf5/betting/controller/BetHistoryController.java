@@ -1,16 +1,17 @@
 package bf5.betting.controller;
 
+import bf5.betting.constant.BetResult;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.request.BetHistoryUpdateResultRequest;
 import bf5.betting.entity.response.BaseResponse;
 import bf5.betting.service.BetHistoryService;
-import bf5.betting.service.RawBetService;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author duynguyen
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/bets")
 @AllArgsConstructor
 public class BetHistoryController {
-    private final RawBetService rawBetService;
     private final BetHistoryService betHistoryService;
 
     @GetMapping("")
@@ -42,25 +42,33 @@ public class BetHistoryController {
             // no parameter passed, used for history page
             betHistoryList = betHistoryService.getAllBetHistory();
         }
-        return BaseResponse.success(sortByBetTimeDesc(betHistoryList));
+        return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistoryList));
     }
 
-    private List<BetHistory> sortByBetTimeDesc(List<BetHistory> betHistoryList) {
-        return betHistoryList.stream()
-                .sorted((bet1, bet2) -> {
-                    if (bet2.getBetTimeMs() != bet1.getBetTimeMs()) {
-                        return Long.compare(bet2.getBetTimeMs(), bet1.getBetTimeMs());
-                    }
-                    return Long.compare(bet2.getId(), bet1.getId());
-                })
-                .collect(Collectors.toList());
-    }
+    private List<BetHistory> sortByStatusAndBetTimeDesc(List<BetHistory> betHistoryList) {
+        List<BetHistory> unfinishedBets = new ArrayList<>();
+        List<BetHistory> finishedBets = new ArrayList<>();
+        betHistoryList.forEach(betHistory -> {
+            if (betHistory.getResult() == BetResult.NOT_FINISHED) {
+                unfinishedBets.add(betHistory);
+            } else {
+                finishedBets.add(betHistory);
+            }
+        });
 
-    @GetMapping("/raw")
-    BaseResponse<List<BetHistory>> getRawBetInfo(@RequestParam("sessionToken") String sessionToken,
-                                                 @RequestParam("startDate") String startDate,
-                                                 @RequestParam("endDate") String endDate) {
-        return BaseResponse.success(rawBetService.getAllBetWithConvert(sessionToken, startDate, endDate));
+        Comparator<BetHistory> betHistoryComparator = (bet1, bet2) -> {
+            if (bet2.getBetTimeMs() != bet1.getBetTimeMs()) {
+                return Long.compare(bet2.getBetTimeMs(), bet1.getBetTimeMs());
+            }
+            return Long.compare(bet2.getId(), bet1.getId());
+        };
+
+        unfinishedBets.sort(betHistoryComparator);
+        finishedBets.sort(betHistoryComparator);
+
+        List<BetHistory> result = new ArrayList<>(unfinishedBets);
+        result.addAll(finishedBets);
+        return result;
     }
 
     @PostMapping("")
@@ -72,11 +80,5 @@ public class BetHistoryController {
     public BaseResponse<BetHistory> updateResult(@PathVariable("betId") long betId, @RequestBody BetHistoryUpdateResultRequest request) {
         request.setBetId(betId);
         return BaseResponse.success(betHistoryService.updateBetResult(request));
-    }
-
-    @PutMapping("/raw/{betId}/result")
-    public BaseResponse<BetHistory> updateResultFromRaw(@PathVariable("betId") long betId, @RequestBody BetHistoryUpdateResultRequest request) {
-        request.setBetId(betId);
-        return BaseResponse.success(betHistoryService.updateBetResultFromRaw(request));
     }
 }

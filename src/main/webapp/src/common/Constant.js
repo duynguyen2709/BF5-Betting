@@ -1,5 +1,6 @@
 const API_URL = {
   BetHistory: '/bets',
+  RawBet: '/bets/raw',
   Players: '/players',
 };
 
@@ -12,6 +13,8 @@ const ROUTES = {
 const MESSAGE = {
   DefaultErrorMessage: 'Hệ thống có lỗi. Vui lòng thử lại sau',
   EmptyBetReturned: 'Không có cược trong thời gian trên',
+  EmptyBetToBeUpdated: 'Không có cược cần cập nhật',
+  UpdateBetSuccess: 'Cập nhật cược thành công',
 }
 
 const RAW_BET_STATUS = {

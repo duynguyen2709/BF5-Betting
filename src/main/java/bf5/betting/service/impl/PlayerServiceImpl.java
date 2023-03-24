@@ -9,6 +9,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -42,7 +44,14 @@ public class PlayerServiceImpl implements PlayerService {
     @TryCatchWrap
     public Player updatePlayerData(Player player) {
         Player newPlayer = this.playerRepository.save(player);
-        this.playerCacheMap.replace(player.getPlayerId(), newPlayer);
+        this.playerCacheMap.put(player.getPlayerId(), newPlayer);
         return newPlayer;
+    }
+
+    @Override
+    public List<Player> updatePlayerDataBatch(Collection<Player> players) {
+        List<Player> newPlayers = this.playerRepository.saveAll(players);
+        newPlayers.forEach(player -> this.playerCacheMap.put(player.getPlayerId(), player));
+        return newPlayers;
     }
 }
