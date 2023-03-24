@@ -1,5 +1,7 @@
 import React, {useCallback, useContext} from 'react'
 import {Button, Col, DatePicker, Form, message, Row, Select} from 'antd';
+import {DownloadOutlined} from '@ant-design/icons';
+
 import moment from 'moment';
 import PlayersContext from "../../common/PlayersContext";
 
@@ -74,7 +76,7 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
                 </Form.Item>
                 <Form.Item
                     name="startDate"
-                    label="Ngày Cược"
+                    label="Ngày Cược:"
                 >
                     <DatePicker
                         format={dateFormat}
@@ -118,8 +120,9 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
                                 ghost
                                 style={{float: 'right'}}
                                 onClick={onClickExport}
+                                icon={<DownloadOutlined style={{fontSize: '16px'}}/>}
                             >
-                                Xuất Thống Kê
+                                Tải Lịch Sử
                             </Button>
                         </Col>
                     </Row>

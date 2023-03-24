@@ -1,7 +1,7 @@
 import React, {useCallback, useContext, useRef, useState} from "react";
 import {exportComponentAsJPEG} from 'react-component-export-image';
 import moment from 'moment'
-import {Avatar, Card, Empty, Tabs} from 'antd';
+import {Avatar, Card, Empty, Row, Statistic, Tabs} from 'antd';
 import {getBetHistory} from '../../apis/BetHistoryApi'
 import {MESSAGE} from "../../common/Constant";
 import PlayersContext from "../../common/PlayersContext";
@@ -14,14 +14,14 @@ import './index.scss'
 const {Meta} = Card
 
 const TAB_KEYS = {
-   History: {
-       label: 'Danh Sách Cược',
-       key: 'history',
-   },
-   Statistic: {
-       label: 'Thống Kê',
-       key: 'statistic',
-   }
+    History: {
+        label: 'Danh Sách Cược',
+        key: 'history',
+    },
+    Statistic: {
+        label: 'Thống Kê',
+        key: 'statistic',
+    }
 }
 
 const parseDateDescription = (startDate, endDate) => {
@@ -43,11 +43,26 @@ const HistoryCardMetadata = ({players, data}) => {
         return null
 
     const actualPlayer = players[playerId]
+
+    // TODO: Should not put profit in card history, should be separated into other statistic component
+    const title = <Row justify={"space-between"}>
+        <span>{actualPlayer.playerName}</span>
+        <Statistic
+            value={actualPlayer.totalProfit}
+            valueStyle={actualPlayer.totalProfit > 0 ? {color: 'green', fontSize: '15px'} : {
+                color: 'red',
+                fontSize: '15px'
+            }}
+            prefix={actualPlayer.totalProfit > 0 && '+'}
+            suffix="đ"
+        />
+    </Row>
+
     return <Meta
         avatar={<Avatar src={actualPlayer.avatarUrl} size={48}/>}
-        title={actualPlayer.playerName}
+        title={title}
         description={parseDateDescription(startDate, endDate)}
-        style={{padding: '1rem'}}
+        style={{padding: '0.5rem', paddingTop: '1rem'}}
     />
 }
 
@@ -90,7 +105,7 @@ const HistoryPage = () => {
                 .then(() => {
                     setActiveTab(TAB_KEYS.Statistic.key)
                     setTimeout(() => exportComponentAsJPEG(historyCardRef)
-                        .then(() => setActiveTab(lastActiveTab)),
+                            .then(() => setActiveTab(lastActiveTab)),
                         delay)
                 })
         }, delay)
@@ -100,32 +115,37 @@ const HistoryPage = () => {
         setActiveTab(key)
     }, [])
 
+    const hasFetched = betHistories !== undefined
     const isHistoryListNotEmpty = betHistories && betHistories.length > 0
     const isHistoryFetchedButEmpty = betHistories !== undefined && betHistories.length === 0
 
     return <>
-        <BetHistoryFilter onSubmit={handleSubmitFilter} onClickExport={handleClickExport} isExportButtonActive={isHistoryListNotEmpty}/>
-        {isHistoryFetchedButEmpty && <Empty className={'card-bet-empty'} description={MESSAGE.EmptyBetReturned}/>}
-        {isHistoryListNotEmpty &&
-            (<Card ref={historyCardRef} className={"card-bet-wrapper"}>
+        <BetHistoryFilter onSubmit={handleSubmitFilter}
+                          onClickExport={handleClickExport}
+                          isExportButtonActive={isHistoryListNotEmpty}/>
+        {hasFetched &&
+            <Card ref={historyCardRef} className={"card-bet-wrapper"}>
                 <HistoryCardMetadata players={players} data={historyFilterParams}/>
-                <Tabs
-                    activeKey={activeTab}
-                    onChange={handleChangeTab}
-                    items={[
-                        {
-                            label: TAB_KEYS.History.label,
-                            key: TAB_KEYS.History.key,
-                            children: <>{betHistories.map((ele) => <BetHistoryCard key={ele.id} data={ele}/>)}</>,
-                        },
-                        {
-                            label: TAB_KEYS.Statistic.label,
-                            key: TAB_KEYS.Statistic.key,
-                            children: <BetHistoryStatistic data={betHistories}/>,
-                        },
-                    ]}
-                />
-            </Card>)}
+                {isHistoryFetchedButEmpty &&
+                    <Empty className={'card-bet-empty'} description={MESSAGE.EmptyBetReturned}/>}
+                {isHistoryListNotEmpty && (
+                    <Tabs
+                        activeKey={activeTab}
+                        onChange={handleChangeTab}
+                        items={[
+                            {
+                                label: TAB_KEYS.History.label,
+                                key: TAB_KEYS.History.key,
+                                children: <>{betHistories.map((ele) => <BetHistoryCard key={ele.id} data={ele}/>)}</>,
+                            },
+                            {
+                                label: TAB_KEYS.Statistic.label,
+                                key: TAB_KEYS.Statistic.key,
+                                children: <BetHistoryStatistic data={betHistories}/>,
+                            },
+                        ]}
+                    />)}
+            </Card>}
     </>;
 };
 

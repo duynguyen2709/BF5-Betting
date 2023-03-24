@@ -53,6 +53,7 @@ const BetHistoryCard = ({data}) => {
         <Card title={<BetHistoryCardTitle data={data}/>}
               bordered={true}
               className={"card-bet-history"}
+              bodyStyle={{padding: '0.5rem 1rem 0.5rem'}}
         >
             <BetHistoryDetailRow left={'Loại Cược:'} right={parseBetEvent(data)}/>
             <BetHistoryDetailRow left={'Tiền Cược:'} right={`${data.betAmount.toLocaleString()}đ`}/>
