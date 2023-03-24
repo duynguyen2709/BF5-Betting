@@ -16,7 +16,7 @@ const MainLayout = ({component}) => {
 
     useEffect(() => {
         fetchPlayersData()
-    }, [])
+    }, [fetchPlayersData])
 
     return (
         <PlayersContext.Provider value={{
