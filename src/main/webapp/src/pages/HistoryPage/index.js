@@ -1,17 +1,15 @@
 import React, {useCallback, useContext, useRef, useState} from "react";
 import {exportComponentAsJPEG} from 'react-component-export-image';
-import moment from 'moment'
-import {Avatar, Card, Empty, Row, Statistic, Tabs} from 'antd';
+import {Card, Empty, Tabs} from 'antd';
 import {getBetHistory} from '../../apis/BetHistoryApi'
 import {MESSAGE} from "../../common/Constant";
 import PlayersContext from "../../common/PlayersContext";
 import BetHistoryCard from "../../components/BetHistoryCard";
 import BetHistoryFilter from "../../components/BetHistoryFilter";
 import BetHistoryStatistic from "../../components/BetHistoryStatistic";
+import HistoryCardMetadata from "../../components/HistoryCardMetadata";
 
 import './index.scss'
-
-const {Meta} = Card
 
 const TAB_KEYS = {
     History: {
@@ -22,48 +20,6 @@ const TAB_KEYS = {
         label: 'Thống Kê',
         key: 'statistic',
     }
-}
-
-const parseDateDescription = (startDate, endDate) => {
-    const start = startDate && moment(startDate).format('DD/MM/YYYY')
-    const end = endDate && moment(endDate).format('DD/MM/YYYY')
-    if (start && end) {
-        if (start === end) {
-            return start
-        }
-        return `${start} - ${end}`
-    } else {
-        return start || end
-    }
-};
-
-const HistoryCardMetadata = ({players, data}) => {
-    const {playerId, startDate, endDate} = data
-    if (!players || !playerId)
-        return null
-
-    const actualPlayer = players[playerId]
-
-    // TODO: Should not put profit in card history, should be separated into other statistic component
-    const title = <Row justify={"space-between"}>
-        <span>{actualPlayer.playerName}</span>
-        <Statistic
-            value={actualPlayer.totalProfit}
-            valueStyle={actualPlayer.totalProfit > 0 ? {color: 'green', fontSize: '15px'} : {
-                color: 'red',
-                fontSize: '15px'
-            }}
-            prefix={actualPlayer.totalProfit > 0 && '+'}
-            suffix="đ"
-        />
-    </Row>
-
-    return <Meta
-        avatar={<Avatar src={actualPlayer.avatarUrl} size={48}/>}
-        title={title}
-        description={parseDateDescription(startDate, endDate)}
-        style={{padding: '0.5rem', paddingTop: '1rem'}}
-    />
 }
 
 const DEFAULT_HISTORY_FILTER_PARAMS = {
