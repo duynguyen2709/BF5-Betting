@@ -92,7 +92,7 @@ const HistoryPage = () => {
                             {
                                 label: TAB_KEYS.History.label,
                                 key: TAB_KEYS.History.key,
-                                children: <>{betHistories.map((ele) => <BetHistoryCard key={ele.id} data={ele}/>)}</>,
+                                children: <>{betHistories.map((ele) => <BetHistoryCard key={ele.betId} data={ele}/>)}</>,
                             },
                             {
                                 label: TAB_KEYS.Statistic.label,

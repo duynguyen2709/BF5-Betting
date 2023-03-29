@@ -28,13 +28,13 @@ public class RawBetController {
     }
 
     @PutMapping("/{betId}/result")
-    public BaseResponse<BetHistory> updateResultFromRaw(@PathVariable("betId") long betId, @RequestBody BetHistoryUpdateResultRequest request) {
+    public BaseResponse<BetHistory> updateResultFromRaw(@PathVariable("betId") long betId, @RequestBody BetHistory request) {
         request.setBetId(betId);
         return BaseResponse.success(betHistoryService.updateBetResultFromRaw(request));
     }
 
     @PutMapping("/result/batch")
-    public BaseResponse<List<BetHistory>> updateBatchResultFromRaw(@RequestBody List<BetHistoryUpdateResultRequest> request) {
+    public BaseResponse<List<BetHistory>> updateBatchResultFromRaw(@RequestBody List<BetHistory> request) {
         return BaseResponse.success(betHistoryService.updateBatchBetResultFromRaw(request));
     }
 }

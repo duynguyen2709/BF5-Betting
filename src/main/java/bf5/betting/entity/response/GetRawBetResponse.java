@@ -33,6 +33,8 @@ public class GetRawBetResponse implements Serializable {
         private long date; // date * 1000 = betTime
         private double coef; // ratio
         private int status;
+        @JsonProperty("type_title")
+        private String typeTitle; // Single / Accumulator
         private long sum; // betAmount
         @JsonProperty("win_sum")
         private Long winSum; // actualProfit
@@ -65,6 +67,8 @@ public class GetRawBetResponse implements Serializable {
         private String opp2Name;
         @JsonProperty("opp2_images")
         private List<String> opp2Images;
+        @JsonProperty("result_type")
+        private int resultType;
     }
 }
 

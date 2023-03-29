@@ -24,4 +24,15 @@ public enum BetResult {
                         .id(value)
                         .build());
     }
+
+    public static BetResult fromRawBetResult(int result) {
+        switch (result) {
+            case 0: return LOST;
+            case 1: return WIN;
+            case 2: return DRAW;
+            case 4: return HALF_WIN;
+            case 5: return HALF_LOST;
+            default: return NOT_FINISHED;
+        }
+    }
 }

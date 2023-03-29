@@ -15,12 +15,9 @@ const getBetHistory = ({playerId = '', startDate = '', endDate = ''}) => {
 
 const insertBetHistory = (bet) => axiosClient.post(API_URL.BetHistory, bet)
 
-const updateBetResult = ({betId, result}) => {
-    const url = `${API_URL.BetHistory}/${betId}/result`
-    return axiosClient.put(url, {
-        betId,
-        result
-    })
+const updateBetResult = (data) => {
+    const url = `${API_URL.BetHistory}/${data.betId}/result`
+    return axiosClient.put(url, data)
 }
 
 export {getAllBetHistory, getBetHistory, insertBetHistory, updateBetResult};

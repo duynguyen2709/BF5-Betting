@@ -12,8 +12,7 @@ const getRawBetData = ({sessionToken, startDate, endDate}) => {
 }
 
 const updateResultFromRaw = (data) => {
-    const betId = data.id
-    const url = `${API_URL.RawBet}/${betId}/result`
+    const url = `${API_URL.RawBet}/${data.betId}/result`
     return axiosClient.put(url, data)
 }
 

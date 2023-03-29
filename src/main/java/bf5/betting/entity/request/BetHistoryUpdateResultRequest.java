@@ -1,5 +1,6 @@
 package bf5.betting.entity.request;
 
+import bf5.betting.constant.BetResult;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,6 @@ import java.io.Serializable;
 public class BetHistoryUpdateResultRequest implements Serializable {
     private long betId;
     private String score;
-    private String result;
+    private BetResult result;
     private Long actualProfit;
 }

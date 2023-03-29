@@ -12,12 +12,14 @@ const AdminPlayerStatisticCard = ({players}) => {
         exportComponentAsJPEG(statisticCardRef)
     }, [statisticCardRef])
 
+    const numberOfPlayers = Object.keys(players).length
+
     return <Card className={"card-player-list-wrapper"}>
         <Row justify={"space-between"}>
-            <Col span={14}>
+            <Col span={18}>
                 <Row ref={statisticCardRef}>
                     {Object.values(players).map(player =>
-                        <Col span={8} key={player.playerId}>
+                        <Col span={Math.round(24 / numberOfPlayers)} key={player.playerId}>
                             <PlayerCard key={player.playerId} data={player}/>
                         </Col>)
                     }

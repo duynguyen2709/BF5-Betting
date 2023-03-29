@@ -1,8 +1,10 @@
 package bf5.betting.converter;
 
 import bf5.betting.constant.BetResult;
+import bf5.betting.constant.BetType;
 import bf5.betting.constant.RawBetStatus;
 import bf5.betting.entity.jpa.BetHistory;
+import bf5.betting.entity.jpa.BetMatchDetail;
 import bf5.betting.entity.response.GetRawBetResponse;
 import bf5.betting.service.BetHistoryService;
 import bf5.betting.util.BetUtil;
@@ -28,29 +30,22 @@ public class RawBetEntityConverter {
     public List<BetHistory> convertToPlayerBetHistory(List<GetRawBetResponse.RawBetEntity> bets) {
         Map<Long, BetHistory> allBetHistories = betHistoryService.getAllBetHistory()
                 .stream()
-                .collect(Collectors.toMap(BetHistory::getId, Function.identity()));
+                .collect(Collectors.toMap(BetHistory::getBetId, Function.identity()));
 
         return bets.stream()
                 .map(bet -> {
-                    GetRawBetResponse.RawBetEvent event = bet.getEvents().get(0);
-                    boolean isFinished = bet.getStatus() != 1;
                     BetHistory rawBet = new BetHistory();
-                    rawBet.setId(bet.getId());
+                    rawBet.setBetId(bet.getId());
+                    rawBet.setBetType(BetType.fromValue(bet.getTypeTitle()));
                     rawBet.setBetTimeWithTimestamp(new Timestamp(bet.getDate() * 1000));
                     rawBet.setBetAmount(bet.getSum());
-                    rawBet.setRatio(event.getCoef());
-                    rawBet.setPotentialProfit((long) (bet.getSum() * event.getCoef()) - bet.getSum());
-                    rawBet.setScore(isFinished ? event.getScore() : null);
-                    rawBet.setEvent(BetUtil.parseEvent(event.getEventTypeTitle()));
-                    rawBet.setMatchTimeWithTimestamp(new Timestamp(event.getGameStartDate() * 1000));
-                    rawBet.setTournamentName(event.getChampName());
-                    rawBet.setFirstHalfOnly(event.getPeriodName().equals("1 Half") ? true : null);
-                    rawBet.setFirstTeam(event.getOpp1Name());
-                    rawBet.setFirstTeamLogoUrl(String.format(TEAM_AVATAR_FORMAT_URL, event.getOpp1Images().get(0)));
-                    rawBet.setSecondTeam(event.getOpp2Name());
-                    rawBet.setSecondTeamLogoUrl(String.format(TEAM_AVATAR_FORMAT_URL, event.getOpp2Images().get(0)));
+                    double ratio = calculateRatio(bet);
+                    rawBet.setRatio(ratio);
+                    rawBet.setPotentialProfit((long) (bet.getSum() * ratio) - bet.getSum());
                     rawBet.setActualProfit(calculateActualProfit(bet));
-                    rawBet.setResult(calculateBetResult(bet));
+                    rawBet.setResult(calculateBetHistoryResult(bet));
+                    List<BetMatchDetail> matchDetails = extractMatchDetails(bet.getEvents(), bet.getId());
+                    rawBet.setEvents(matchDetails);
                     if (allBetHistories.containsKey(bet.getId())) {
                         BetHistory insertedHistory = allBetHistories.get(bet.getId());
                         rawBet.setPlayerId(insertedHistory.getPlayerId());
@@ -58,7 +53,7 @@ public class RawBetEntityConverter {
 
                         if (insertedHistory.getActualProfit() != null) {
                             rawBet.setRawStatus(RawBetStatus.SETTLED.name());
-                        } else if (event.getIsFinished()) {
+                        } else if (bet.getStatus() != 1) {
                             rawBet.setRawStatus(RawBetStatus.RESULT_READY_TO_BE_UPDATED.name());
                         }
                     } else {
@@ -67,6 +62,26 @@ public class RawBetEntityConverter {
                     return rawBet;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private List<BetMatchDetail> extractMatchDetails(List<GetRawBetResponse.RawBetEvent> events, long betId) {
+        return events.stream()
+                .map(event -> {
+                    BetMatchDetail matchDetail = new BetMatchDetail();
+                    matchDetail.setBetId(betId);
+                    matchDetail.setMatchTimeWithTimestamp(new Timestamp(event.getGameStartDate() * 1000));
+                    matchDetail.setFirstTeam(event.getOpp1Name());
+                    matchDetail.setFirstTeamLogoUrl(String.format(TEAM_AVATAR_FORMAT_URL, event.getOpp1Images().get(0)));
+                    matchDetail.setSecondTeam(event.getOpp2Name());
+                    matchDetail.setSecondTeamLogoUrl(String.format(TEAM_AVATAR_FORMAT_URL, event.getOpp2Images().get(0)));
+                    matchDetail.setTournamentName(event.getChampName());
+                    matchDetail.setEvent(BetUtil.parseEvent(event.getEventTypeTitle()));
+                    matchDetail.setFirstHalfOnly(event.getPeriodName().equals("1 Half") ? true : null);
+                    matchDetail.setScore(event.getIsFinished() ? event.getScore() : null);
+                    matchDetail.setRatio(event.getCoef());
+                    matchDetail.setResult(calculateBetMatchDetailResult(event));
+                    return matchDetail;
+                }).collect(Collectors.toList());
     }
 
     private Long calculateActualProfit(GetRawBetResponse.RawBetEntity bet) {
@@ -81,8 +96,7 @@ public class RawBetEntityConverter {
         return bet.getWinSum() - bet.getSum();
     }
 
-    private BetResult calculateBetResult(GetRawBetResponse.RawBetEntity bet) {
-        GetRawBetResponse.RawBetEvent event = bet.getEvents().get(0);
+    private BetResult calculateBetHistoryResult(GetRawBetResponse.RawBetEntity bet) {
         boolean isNotFinished = bet.getStatus() == 1;
         if (isNotFinished)
             return BetResult.NOT_FINISHED;
@@ -91,22 +105,29 @@ public class RawBetEntityConverter {
         if (isFullLost)
             return BetResult.LOST;
 
-        boolean isHalfLost = bet.getCoef() == 0.5 || bet.getSum() > bet.getWinSum();
-        if (isHalfLost)
-            return BetResult.HALF_LOST;
-
-        boolean isDraw = bet.getCoef() == 1 || bet.getSum() == bet.getWinSum();
-        if (isDraw)
-            return BetResult.DRAW;
-
-        boolean isFullWin = bet.getStatus() == 4 && bet.getCoef() == event.getCoef();
-        if (isFullWin)
-            return BetResult.WIN;
-
-        boolean isHalfWin = bet.getStatus() == 4 && bet.getCoef() < event.getCoef() && bet.getCoef() > 1;
-        if (isHalfWin)
-            return BetResult.HALF_WIN;
+        boolean isSingleBet = bet.getTypeTitle().equalsIgnoreCase(BetType.SINGLE.name());
+        if (isSingleBet) {
+            return BetResult.fromRawBetResult(bet.getEvents().get(0).getResultType());
+        } else {
+            if (bet.getStatus() == 4)
+                return BetResult.WIN;
+        }
 
         return BetResult.NOT_FINISHED;
+    }
+
+    private BetResult calculateBetMatchDetailResult(GetRawBetResponse.RawBetEvent event) {
+        if (!event.getIsFinished()) {
+            return BetResult.NOT_FINISHED;
+        }
+        return BetResult.fromRawBetResult(event.getResultType());
+    }
+
+    private double calculateRatio(GetRawBetResponse.RawBetEntity bet) {
+        boolean isSingleBet = bet.getTypeTitle().equalsIgnoreCase(BetType.SINGLE.name());
+        if (isSingleBet) {
+            return bet.getEvents().get(0).getCoef();
+        }
+        return bet.getCoef();
     }
 }

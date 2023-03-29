@@ -6,19 +6,24 @@ import './index.scss'
 const {Meta} = Card
 
 const PlayerCard = ({data}) => {
-  const positiveProfit = data.totalProfit >= 0
-  return <Card className={"card-player"}>
-    <Meta
-        avatar={<Avatar src={data.avatarUrl} size={48} />}
-        title={data.playerName}
-        description={<Statistic
-            value={data.totalProfit}
-            valueStyle={positiveProfit ? {  color: 'green' } : {color: 'red' }}
-            prefix={positiveProfit && '+'}
-            suffix="đ"
-        />}
-    />
-  </Card>
+    let valueStyle = null
+    if (data.totalProfit > 0) {
+        valueStyle = {color: 'green'}
+    } else if (data.totalProfit < 0) {
+        valueStyle = {color: 'red'}
+    }
+    return <Card className={"card-player"}>
+        <Meta
+            avatar={<Avatar src={data.avatarUrl} size={48}/>}
+            title={data.playerName}
+            description={<Statistic
+                value={data.totalProfit}
+                valueStyle={valueStyle}
+                prefix={(data.totalProfit > 0) && '+'}
+                suffix="đ"
+            />}
+        />
+    </Card>
 }
 
 export default PlayerCard

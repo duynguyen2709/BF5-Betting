@@ -1,16 +1,17 @@
 package bf5.betting.entity.jpa;
 
 import bf5.betting.constant.BetResult;
+import bf5.betting.constant.BetType;
 import bf5.betting.util.DateTimeUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * @author duynguyen
@@ -22,25 +23,13 @@ import java.sql.Timestamp;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BetHistory {
     @Id
-    private long id;
+    private long betId;
     @Column
     private String playerId;
     @Column
+    private BetType betType;
+    @Column
     private Timestamp betTime;
-    @Column
-    private Timestamp matchTime;
-    @Column
-    private String firstTeam;
-    @Column
-    private String secondTeam;
-    @Column
-    private String tournamentName;
-    @Column
-    private String event;
-    @Column
-    private Boolean firstHalfOnly;
-    @Column
-    private String score;
     @Column
     private long betAmount;
     @Column
@@ -52,8 +41,10 @@ public class BetHistory {
     @Column
     private Long actualProfit;
 
-    private transient String secondTeamLogoUrl;
-    private transient String firstTeamLogoUrl;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "betId")
+    private List<BetMatchDetail> events;
+
     private transient String rawStatus;
 
     public String getBetTime() {
@@ -68,19 +59,8 @@ public class BetHistory {
         this.betTime = time;
     }
 
+    @JsonIgnore
     public long getBetTimeMs() {
         return this.betTime.getTime();
-    }
-
-    public String getMatchTime() {
-        return DateTimeUtil.timestampToString(this.matchTime);
-    }
-
-    public void setMatchTime(String timeStr) {
-        this.matchTime = DateTimeUtil.stringToTimestamp(timeStr);
-    }
-
-    public void setMatchTimeWithTimestamp(Timestamp time) {
-        this.matchTime = time;
     }
 }

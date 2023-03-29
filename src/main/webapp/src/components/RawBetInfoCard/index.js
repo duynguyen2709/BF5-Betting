@@ -60,7 +60,7 @@ const RawBetInfoCard = ({onSuccessAction}) => {
         const betListToBeUpdated = rawBetList
             .filter(bet => bet.rawStatus === RAW_BET_STATUS.ResultReadyToBeUpdated)
             .map(ele => ({
-                betId: ele.id,
+                betId: ele.betId,
                 score: ele.score,
                 result: ele.result,
                 actualProfit: ele.actualProfit

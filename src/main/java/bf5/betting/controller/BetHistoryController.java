@@ -60,7 +60,7 @@ public class BetHistoryController {
             if (bet2.getBetTimeMs() != bet1.getBetTimeMs()) {
                 return Long.compare(bet2.getBetTimeMs(), bet1.getBetTimeMs());
             }
-            return Long.compare(bet2.getId(), bet1.getId());
+            return Long.compare(bet2.getBetId(), bet1.getBetId());
         };
 
         unfinishedBets.sort(betHistoryComparator);
@@ -77,7 +77,7 @@ public class BetHistoryController {
     }
 
     @PutMapping("/{betId}/result")
-    public BaseResponse<BetHistory> updateResult(@PathVariable("betId") long betId, @RequestBody BetHistoryUpdateResultRequest request) {
+    public BaseResponse<BetHistory> updateResult(@PathVariable("betId") long betId, @RequestBody BetHistory request) {
         request.setBetId(betId);
         return BaseResponse.success(betHistoryService.updateBetResult(request));
     }

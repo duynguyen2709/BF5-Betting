@@ -8,6 +8,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -43,5 +45,12 @@ public class TeamDataServiceImpl implements TeamDataService {
         TeamData result = this.teamDataRepository.save(teamData);
         this.teamDataCacheMap.put(result.getTeamName(), result);
         return teamData;
+    }
+
+    @Override
+    public List<TeamData> insertBatch(Collection<TeamData> teams) {
+        List<TeamData> result = this.teamDataRepository.saveAll(teams);
+        result.forEach(data -> this.teamDataCacheMap.put(data.getTeamName(), data));
+        return result;
     }
 }
