@@ -8,6 +8,7 @@ import BetHistoryCard from "../../components/BetHistoryCard";
 import BetHistoryFilter from "../../components/BetHistoryFilter";
 import BetHistoryStatistic from "../../components/BetHistoryStatistic";
 import HistoryCardMetadata from "../../components/HistoryCardMetadata";
+import {groupBetHistoriesByType} from "../../utils/BetHistoryUtil";
 
 import './index.scss'
 
@@ -35,6 +36,7 @@ const HistoryPage = () => {
     const [historyFilterParams, setHistoryFilterParams] = useState(DEFAULT_HISTORY_FILTER_PARAMS)
     const playerContext = useContext(PlayersContext)
     const {players} = playerContext
+    const betHistoriesByGroup = groupBetHistoriesByType(betHistories)
 
     const handleSubmitFilter = useCallback((fieldsValue) => {
         // Reset current filter & data
@@ -92,7 +94,9 @@ const HistoryPage = () => {
                             {
                                 label: TAB_KEYS.History.label,
                                 key: TAB_KEYS.History.key,
-                                children: <>{betHistories.map((ele) => <BetHistoryCard key={ele.betId} data={ele}/>)}</>,
+                                children: <>{betHistoriesByGroup.map((ele, index) => {
+                                    return <BetHistoryCard key={index} data={ele.data} type={ele.type}/>
+                                })}</>,
                             },
                             {
                                 label: TAB_KEYS.Statistic.label,

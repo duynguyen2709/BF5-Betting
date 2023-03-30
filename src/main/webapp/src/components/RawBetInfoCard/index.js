@@ -59,12 +59,6 @@ const RawBetInfoCard = ({onSuccessAction}) => {
     const handleUpdateBatchFromRaw = useCallback(() => {
         const betListToBeUpdated = rawBetList
             .filter(bet => bet.rawStatus === RAW_BET_STATUS.ResultReadyToBeUpdated)
-            .map(ele => ({
-                betId: ele.betId,
-                score: ele.score,
-                result: ele.result,
-                actualProfit: ele.actualProfit
-            }))
         if (betListToBeUpdated.length === 0) {
             message.warn(MESSAGE.EmptyBetToBeUpdated, 4)
             return

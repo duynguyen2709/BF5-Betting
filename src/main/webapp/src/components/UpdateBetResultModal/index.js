@@ -1,15 +1,16 @@
 import React, {useCallback, useEffect, useState} from "react";
 import {Col, message, Modal, Row, Select} from "antd";
 import {updateBetResult} from "../../apis/BetHistoryApi";
-import {BET_RESULT} from "../../common/Constant";
-import BetHistoryCard from "../BetHistoryCard";
+import {BET_RESULT, BET_TYPE} from "../../common/Constant";
 import {isAccumulatorBet, isSingleBet} from "../../utils/BetHistoryUtil";
+import BetHistoryCard from "../BetHistoryCard";
 
 const {Option} = Select
 
 const UpdateBetResultModal = ({data, isOpen, onUpdateSuccess, onClose}) => {
     const [result, setResult] = useState(BET_RESULT.Win.result)
     const [matchResults, setMatchResults] = useState({})
+    const betType = isSingleBet(data) ? BET_TYPE.Single : BET_TYPE.Accumulator
 
     useEffect(() => {
         if (data) {
@@ -32,7 +33,7 @@ const UpdateBetResultModal = ({data, isOpen, onUpdateSuccess, onClose}) => {
     const handleConfirmUpdate = useCallback(() => {
         const obj = {...data, result}
         if (isSingleBet(data)) {
-            obj.events.result = result
+            obj.events[0].result = result
         } else {
             for (let matchResult of Object.values(matchResults)) {
                 if (matchResult === BET_RESULT.Unfinished.result) {
@@ -49,6 +50,10 @@ const UpdateBetResultModal = ({data, isOpen, onUpdateSuccess, onClose}) => {
         updateBetResult(obj).then(() => onUpdateSuccess())
     }, [result, matchResults, data, onUpdateSuccess])
 
+    if (!data) {
+        return null
+    }
+
     return <Modal
         title="Cập Nhật Kết Quả Cược"
         destroyOnClose
@@ -59,9 +64,8 @@ const UpdateBetResultModal = ({data, isOpen, onUpdateSuccess, onClose}) => {
         onOk={handleConfirmUpdate}
         onCancel={onClose}
     >
-        {data && <BetHistoryCard data={data} isHistoryViewMode={false} />}
-
-        {data && isAccumulatorBet(data) && data.events.map((event, index) => {
+        <BetHistoryCard data={data} type={betType} isAdminView={true} isHistoryViewMode={false} />
+        {isAccumulatorBet(data) && data.events.map((event, index) => {
             return <Row key={event.id} style={{alignItems: 'center', margin: '1rem 0.5rem 0 0.5rem'}}>
                 <Col span={4}>{`Game ${index + 1}:`}</Col>
                 <Col span={19} offset={1}>

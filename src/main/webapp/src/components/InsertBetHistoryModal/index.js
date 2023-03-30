@@ -3,6 +3,8 @@ import {Avatar, Col, Modal, Row, Select} from "antd";
 import PlayersContext from "../../common/PlayersContext";
 import {insertBetHistory} from "../../apis/BetHistoryApi";
 import BetHistoryCard from "../BetHistoryCard";
+import {isSingleBet} from "../../utils/BetHistoryUtil";
+import {BET_TYPE} from "../../common/Constant";
 
 const {Option} = Select
 
@@ -10,6 +12,7 @@ const InsertBetHistoryModal = ({data, isOpen, onUpdateSuccess, onClose}) => {
     const playerContext = useContext(PlayersContext)
     const {players} = playerContext
     const [selectedPlayer, setSelectedPlayer] = useState()
+    const betType = isSingleBet(data) ? BET_TYPE.Single : BET_TYPE.Accumulator
 
     const handleChangePlayer = useCallback((value) => {
         setSelectedPlayer(value)
@@ -35,7 +38,7 @@ const InsertBetHistoryModal = ({data, isOpen, onUpdateSuccess, onClose}) => {
         onOk={handleConfirmAdd}
         onCancel={onClose}
     >
-        {data && <BetHistoryCard data={data} />}
+        {data && <BetHistoryCard data={data} type={betType} isAdminView={true} />}
         <Row style={{alignItems: 'center', margin: '1rem 0.5rem 0 0.5rem'}}>
             <Col span={6}>Người Cược:</Col>
             <Col span={17} offset={1}>

@@ -1,6 +1,6 @@
 import React from "react";
 import {Avatar, Col, Row} from "antd";
-import {BET_RESULT, BET_TYPE} from "../common/Constant";
+import {BET_GROUP_TYPE_KEY, BET_RESULT, BET_TYPE} from "../common/Constant";
 import BetResultTag from "../components/BetResultTag";
 import MoneyTextCell from "../components/MoneyTextCell";
 import VerticalCenterRowCellWithDivider from "../components/VerticalCenterRowCellWithDivider";
@@ -196,4 +196,48 @@ const buildCommonTableColumn = (players) => {
     ];
 }
 
-export {buildCommonTableColumn, filterBetResult, isSingleBet, isAccumulatorBet, parseBetEvent}
+const groupBetHistoriesByType = (betHistories) => {
+    if (!betHistories) {
+        return null
+    }
+    const betGroupByTypeMap = new Map()
+    betGroupByTypeMap.set(BET_GROUP_TYPE_KEY.Single, [])
+    betGroupByTypeMap.set(BET_GROUP_TYPE_KEY.MultiBetsSameMatch, [])
+    betGroupByTypeMap.set(BET_GROUP_TYPE_KEY.Accumulator, [])
+
+    const tempMap = new Map()
+    for (let bet of betHistories) {
+        if (isAccumulatorBet(bet)) {
+            betGroupByTypeMap.get(BET_GROUP_TYPE_KEY.Accumulator).push(bet)
+            continue
+        }
+
+        const {matchTime, firstTeam, secondTeam, tournamentName} = bet.events[0]
+        const matchKey = `${bet.playerId}_${matchTime}_${firstTeam}_${secondTeam}_${tournamentName}`
+        if (!tempMap.has(matchKey)) {
+            tempMap.set(matchKey, [])
+        }
+        tempMap.get(matchKey).push(bet)
+    }
+
+    tempMap.forEach(value => {
+        if (value.length > 1) {
+            betGroupByTypeMap.get(BET_GROUP_TYPE_KEY.MultiBetsSameMatch).push(value)
+        } else {
+            betGroupByTypeMap.get(BET_GROUP_TYPE_KEY.Single).push(value)
+        }
+    })
+
+    const groupBetHistories = []
+    betGroupByTypeMap.forEach((betArray, key) => {
+        betArray.forEach(value => {
+            groupBetHistories.push({
+                type: key,
+                data: value
+            })
+        })
+    })
+    return groupBetHistories
+}
+
+export {buildCommonTableColumn, groupBetHistoriesByType, filterBetResult, isSingleBet, isAccumulatorBet, parseBetEvent}
