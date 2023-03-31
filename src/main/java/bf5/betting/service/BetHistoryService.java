@@ -1,7 +1,6 @@
 package bf5.betting.service;
 
 import bf5.betting.entity.jpa.BetHistory;
-import bf5.betting.entity.request.BetHistoryUpdateResultRequest;
 
 import java.util.List;
 
@@ -12,7 +11,8 @@ public interface BetHistoryService {
     List<BetHistory> getAllBetHistory();
     List<BetHistory> getByPlayerId(String playerId);
     List<BetHistory> getByPlayerIdAndDateRange(String playerId, String startDate, String endDate);
-    BetHistory createBet(BetHistory entity);
+    BetHistory insertBet(BetHistory entity);
+    List<BetHistory> insertBetInBatch(List<BetHistory> request);
     BetHistory updateBetResult(BetHistory request);
     BetHistory updateBetResultFromRaw(BetHistory request);
     List<BetHistory> updateBatchBetResultFromRaw(List<BetHistory> request);

@@ -2,7 +2,6 @@ package bf5.betting.controller;
 
 import bf5.betting.constant.BetResult;
 import bf5.betting.entity.jpa.BetHistory;
-import bf5.betting.entity.request.BetHistoryUpdateResultRequest;
 import bf5.betting.entity.response.BaseResponse;
 import bf5.betting.service.BetHistoryService;
 import lombok.AllArgsConstructor;
@@ -72,8 +71,13 @@ public class BetHistoryController {
     }
 
     @PostMapping("")
-    public BaseResponse<BetHistory> create(@RequestBody BetHistory request) {
-        return BaseResponse.success(betHistoryService.createBet(request));
+    public BaseResponse<BetHistory> insert(@RequestBody BetHistory request) {
+        return BaseResponse.success(betHistoryService.insertBet(request));
+    }
+
+    @PostMapping("/batch")
+    public BaseResponse<List<BetHistory>> insertInBatch(@RequestBody List<BetHistory> request) {
+        return BaseResponse.success(betHistoryService.insertBetInBatch(request));
     }
 
     @PutMapping("/{betId}/result")

@@ -37,7 +37,16 @@ const hasAtLeastOneMatchWithScore = (data) => {
     return false
 }
 
-const RawBetTable = ({data, players, onClickAdd, onClickUpdate}) => {
+const RawBetTable = ({data, players, onClickAdd, onClickUpdate, onSelectBatchBet}) => {
+    const rowSelection = {
+        onChange: (selectedRowKeys, selectedRows) => {
+            onSelectBatchBet(selectedRows)
+        },
+        getCheckboxProps: (record) => ({
+            disabled: record.rawStatus !== RAW_BET_STATUS.New,
+            rawStatus: record.rawStatus,
+        }),
+    };
     const columns = buildCommonTableColumn(players)
     const hasScoreColumn = hasAtLeastOneMatchWithScore(data)
     let index = 4
@@ -91,9 +100,13 @@ const RawBetTable = ({data, players, onClickAdd, onClickUpdate}) => {
                   bordered
                   columns={columns}
                   dataSource={data}
+                  rowSelection={{
+                      type: 'checkbox',
+                      ...rowSelection,
+                  }}
                   pagination={{
-                      pageSize: 10,
-                      showSizeChanger: false,
+                      defaultPageSize: 10,
+                      showSizeChanger: true,
                       showTotal: (total) => `Tổng: ${total} cược`
                   }}
     />

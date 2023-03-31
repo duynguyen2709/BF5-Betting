@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -56,12 +57,40 @@ public class RawBetEntityConverter {
                         } else if (bet.getStatus() != 1) {
                             rawBet.setRawStatus(RawBetStatus.RESULT_READY_TO_BE_UPDATED.name());
                         }
+
+                        setMatchDetailKeyId(insertedHistory, rawBet);
+
                     } else {
                         rawBet.setRawStatus(RawBetStatus.NEW.name());
                     }
                     return rawBet;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private void setMatchDetailKeyId(BetHistory insertedHistory, BetHistory rawBet) {
+        Comparator<BetMatchDetail> comparator = (match1, match2) -> {
+            String key1 = String.format("%s_%s_%s_%s_%s",
+                    match1.getMatchTime(),
+                    match1.getFirstTeam(),
+                    match1.getSecondTeam(),
+                    match1.getTournamentName(),
+                    match1.getEvent());
+            String key2 = String.format("%s_%s_%s_%s_%s",
+                    match2.getMatchTime(),
+                    match2.getFirstTeam(),
+                    match2.getSecondTeam(),
+                    match2.getTournamentName(),
+                    match2.getEvent());
+            return key1.compareTo(key2);
+        };
+
+        insertedHistory.getEvents().sort(comparator);
+        rawBet.getEvents().sort(comparator);
+
+        for (int i = 0; i < insertedHistory.getEvents().size(); i++) {
+            rawBet.getEvents().get(i).setId(insertedHistory.getEvents().get(i).getId());
+        }
     }
 
     private List<BetMatchDetail> extractMatchDetails(List<GetRawBetResponse.RawBetEvent> events, long betId) {

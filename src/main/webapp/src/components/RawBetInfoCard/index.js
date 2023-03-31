@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useState} from "react";
-import {message, Row} from "antd";
+import {Col, message, Row} from "antd";
 import {getRawBetData, updateBatchResultFromRaw, updateResultFromRaw} from "../../apis/RawBetApi";
 import {LOCAL_STORAGE_KEY, MESSAGE, RAW_BET_STATUS} from "../../common/Constant";
 import PlayersContext from "../../common/PlayersContext";
@@ -8,12 +8,17 @@ import CenterLoadingSpinner from "../CenterLoadingSpinner";
 import InsertBetHistoryModal from "../InsertBetHistoryModal";
 import QueryRawBetInfoForm from "../QueryRawBetInfoForm";
 import RawBetTable from "./RawBetTable";
+import BatchInsertRawBetButton from "../BatchInsertRawBetButton";
+import BatchInsertBetHistoryModal from "../BatchInsertBetHistoryModal";
 
 const RawBetInfoCard = ({onSuccessAction}) => {
     const [isFetching, setIsFetching] = useState(false)
     const [rawBetList, setRawBetList] = useState([])
-    const [modalAddOpen, setModalAddOpen] = useState(false)
+    const [modalAddSingleOpen, setModalAddSingleOpen] = useState(false)
+    const [modalAddBatchOpen, setModalAddBatchOpen] = useState(false)
     const [currentAddBet, setCurrentAddBet] = useState()
+    const [currentBatchAddBet, setCurrentBatchAddBet] = useState([])
+
     const playerContext = useContext(PlayersContext)
     const {players} = playerContext
 
@@ -27,6 +32,8 @@ const RawBetInfoCard = ({onSuccessAction}) => {
     }, [])
 
     const handleProcessRawBetSuccess = useCallback(() => {
+        setModalAddBatchOpen(false)
+        setModalAddSingleOpen(false)
         queryRawBetList()
         onSuccessAction()
     }, [queryRawBetList, onSuccessAction])
@@ -42,15 +49,19 @@ const RawBetInfoCard = ({onSuccessAction}) => {
         queryRawBetList()
     }, [queryRawBetList])
 
-    const handleOpenModalAddBet = useCallback((record) => {
+    const handleOpenModalAddSingleBet = useCallback((record) => {
         setCurrentAddBet(record)
-        setModalAddOpen(true)
+        setModalAddSingleOpen(true)
     }, [])
 
-    const handleCloseModalAdd = useCallback(() => {
+    const handleCloseModalAddSingleBet = useCallback(() => {
         setCurrentAddBet(null)
-        setModalAddOpen(false)
+        setModalAddSingleOpen(false)
     }, [])
+
+    const toggleModalAddBatchBet = useCallback(() => {
+        setModalAddBatchOpen(!modalAddBatchOpen)
+    }, [modalAddBatchOpen])
 
     const handleConfirmUpdate = useCallback((record) => {
         updateResultFromRaw(record).then(() => handleProcessRawBetSuccess())
@@ -67,22 +78,31 @@ const RawBetInfoCard = ({onSuccessAction}) => {
     }, [rawBetList, handleProcessRawBetSuccess])
 
     return <>
-        {modalAddOpen &&
+        {modalAddSingleOpen &&
             <InsertBetHistoryModal data={currentAddBet}
-                                   isOpen={modalAddOpen}
-                                   onClose={handleCloseModalAdd}
+                                   isOpen={modalAddSingleOpen}
+                                   onClose={handleCloseModalAddSingleBet}
                                    onUpdateSuccess={handleProcessRawBetSuccess}/>}
+        {modalAddBatchOpen &&
+            <BatchInsertBetHistoryModal data={currentBatchAddBet}
+                                        isOpen={modalAddBatchOpen}
+                                        onClose={toggleModalAddBatchBet}
+                                        onUpdateSuccess={handleProcessRawBetSuccess}/>}
         <Row justify={"space-between"}>
             <QueryRawBetInfoForm onSubmit={handleFetchRawBetList}/>
-            <BatchUpdateRawBetButton onUpdateBatchFromRaw={handleUpdateBatchFromRaw}/>
+            <Col span={8} style={{display: 'flex', justifyContent: 'flex-end'}}>
+                <BatchInsertRawBetButton disabled={currentBatchAddBet.length === 0} onClickAdd={toggleModalAddBatchBet}/>
+                <BatchUpdateRawBetButton onUpdateBatchFromRaw={handleUpdateBatchFromRaw}/>
+            </Col>
         </Row>
         {isFetching ?
             <CenterLoadingSpinner/> :
             <RawBetTable data={rawBetList}
                          players={players}
                          loading={isFetching}
-                         onClickAdd={handleOpenModalAddBet}
-                         onClickUpdate={handleConfirmUpdate}/>}
+                         onClickAdd={handleOpenModalAddSingleBet}
+                         onClickUpdate={handleConfirmUpdate}
+                         onSelectBatchBet={setCurrentBatchAddBet}/>}
 
     </>
 }

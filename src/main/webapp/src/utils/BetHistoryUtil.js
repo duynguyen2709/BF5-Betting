@@ -99,7 +99,7 @@ const buildCommonTableColumn = (players) => {
         {
             title: 'Loại Cược',
             key: 'event',
-            width: 250,
+            width: 200,
             render: (_, record) => {
                 return record.events.map((event, index) =>
                     <VerticalCenterRowCellWithDivider key={event.id}

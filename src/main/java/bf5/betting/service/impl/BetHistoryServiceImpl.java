@@ -55,11 +55,20 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @Override
     @TryCatchWrap
     @Transactional
-    public BetHistory createBet(BetHistory entity) {
+    public BetHistory insertBet(BetHistory entity) {
         BetHistory result = betHistoryRepository.save(entity);
         updatePlayerProfit(entity);
         insertTeamDataIfNotAvailable(entity);
         return result;
+    }
+
+    @Override
+    public List<BetHistory> insertBetInBatch(List<BetHistory> request) {
+        log.info("Process insert batch bets from raw data: {}", JsonUtil.toJsonString(request));
+        List<BetHistory> betHistories = this.betHistoryRepository.saveAll(request);
+        updatePlayersProfitInBatch(request);
+        insertTeamDataIfNotAvailable(request);
+        return betHistories;
     }
 
     @Override
@@ -176,13 +185,32 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         }
     }
 
+    private void insertTeamDataIfNotAvailable(List<BetHistory> betHistories) {
+        Map<String, TeamData> newTeamData = new HashMap<>();
+        betHistories.forEach(bet -> {
+            bet.getEvents().forEach(event -> {
+                if (Objects.isNull(teamDataService.getTeamLogoUrl(event.getFirstTeam()))) {
+                    newTeamData.put(event.getFirstTeam(), new TeamData(event.getFirstTeam(), event.getFirstTeamLogoUrl()));
+                }
+                if (Objects.isNull(teamDataService.getTeamLogoUrl(event.getSecondTeam()))) {
+                    newTeamData.put(event.getSecondTeam(), new TeamData(event.getSecondTeam(), event.getSecondTeamLogoUrl()));
+                }
+            });
+        });
+        if (newTeamData.size() > 0) {
+            teamDataService.insertBatch(newTeamData.values());
+        }
+    }
+
     private void updatePlayersProfitInBatch(List<BetHistory> betHistories) {
         Map<String, Player> allPlayers = this.playerService.getAllPlayer();
         betHistories.forEach(betHistory -> {
-            Player player = allPlayers.get(betHistory.getPlayerId());
-            long newTotalProfit = player.getTotalProfit() + betHistory.getActualProfit();
-            player.setTotalProfit(newTotalProfit);
-            allPlayers.put(betHistory.getPlayerId(), player);
+            if (betHistory.getActualProfit() != null) {
+                Player player = allPlayers.get(betHistory.getPlayerId());
+                long newTotalProfit = player.getTotalProfit() + betHistory.getActualProfit();
+                player.setTotalProfit(newTotalProfit);
+                allPlayers.put(betHistory.getPlayerId(), player);
+            }
         });
         this.playerService.updatePlayerDataBatch(allPlayers.values());
     }

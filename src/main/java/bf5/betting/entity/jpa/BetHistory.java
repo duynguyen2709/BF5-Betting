@@ -41,8 +41,8 @@ public class BetHistory {
     @Column
     private Long actualProfit;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "betId")
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "betId", nullable = false, updatable = false, insertable = false)
     private List<BetMatchDetail> events;
 
     private transient String rawStatus;
