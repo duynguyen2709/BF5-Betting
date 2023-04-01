@@ -7,6 +7,7 @@ import bf5.betting.service.PlayerService;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
@@ -42,6 +43,7 @@ public class PlayerServiceImpl implements PlayerService {
 
     @Override
     @TryCatchWrap
+    @Transactional
     public Player updatePlayerData(Player player) {
         Player newPlayer = this.playerRepository.save(player);
         this.playerCacheMap.put(player.getPlayerId(), newPlayer);
@@ -49,6 +51,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    @Transactional
     public List<Player> updatePlayerDataBatch(Collection<Player> players) {
         List<Player> newPlayers = this.playerRepository.saveAll(players);
         newPlayers.forEach(player -> this.playerCacheMap.put(player.getPlayerId(), player));

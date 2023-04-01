@@ -2,6 +2,7 @@ package bf5.betting.constant;
 
 import bf5.betting.exception.EntityNotFoundException;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -25,7 +26,10 @@ public enum BetResult {
                         .build());
     }
 
-    public static BetResult fromRawBetResult(int result) {
+    public static BetResult fromRawBetResult(Integer result) {
+        if (Objects.isNull(result)) {
+            return NOT_FINISHED;
+        }
         switch (result) {
             case 0: return LOST;
             case 1: return WIN;

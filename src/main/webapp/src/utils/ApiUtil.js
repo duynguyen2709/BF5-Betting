@@ -23,6 +23,8 @@ axiosClient.interceptors.response.use(
     console.error(error);
     if (error.response?.status === 403) {
       message.error(MESSAGE.TokenExpiredMessage, 4);
+    } else if (error.response?.status === 400) {
+      message.error(error.response.data.message, 4);
     } else {
       message.error(MESSAGE.DefaultErrorMessage, 4);
     }

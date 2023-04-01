@@ -100,9 +100,11 @@ public class RawBetEntityConverter {
                     matchDetail.setBetId(betId);
                     matchDetail.setMatchTimeWithTimestamp(new Timestamp(event.getGameStartDate() * 1000));
                     matchDetail.setFirstTeam(event.getOpp1Name());
-                    matchDetail.setFirstTeamLogoUrl(String.format(TEAM_AVATAR_FORMAT_URL, event.getOpp1Images().get(0)));
                     matchDetail.setSecondTeam(event.getOpp2Name());
-                    matchDetail.setSecondTeamLogoUrl(String.format(TEAM_AVATAR_FORMAT_URL, event.getOpp2Images().get(0)));
+                    if (event.getOpp1Images() != null && event.getOpp1Images().size() > 0)
+                        matchDetail.setFirstTeamLogoUrl(String.format(TEAM_AVATAR_FORMAT_URL, event.getOpp1Images().get(0)));
+                    if (event.getOpp2Images() != null && event.getOpp2Images().size() > 0)
+                        matchDetail.setSecondTeamLogoUrl(String.format(TEAM_AVATAR_FORMAT_URL, event.getOpp2Images().get(0)));
                     matchDetail.setTournamentName(event.getChampName());
                     matchDetail.setEvent(BetUtil.parseEvent(event.getEventTypeTitle()));
                     matchDetail.setFirstHalfOnly(event.getPeriodName().equals("1 Half") ? true : null);

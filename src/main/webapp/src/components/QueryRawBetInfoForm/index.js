@@ -38,8 +38,7 @@ const QueryRawBetInfoForm = ({onSubmit}) => {
                 dateRange: [moment().subtract(1, 'day'), moment()],
             }}
         >
-            <Form.Item label="Nhập Token: " name={"sessionToken"}
-                       rules={[{required: true, message: 'Vui lòng nhập token'}]}>
+            <Form.Item label="Nhập Token: " name={"sessionToken"}>
                 <Input style={{width: 300}}/>
             </Form.Item>
             <Form.Item name="dateRange" label="Chọn Ngày: " {...rangeConfig} format="YYYY-MM-DD">

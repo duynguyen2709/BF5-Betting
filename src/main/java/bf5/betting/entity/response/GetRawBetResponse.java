@@ -68,7 +68,7 @@ public class GetRawBetResponse implements Serializable {
         @JsonProperty("opp2_images")
         private List<String> opp2Images;
         @JsonProperty("result_type")
-        private int resultType;
+        private Integer resultType;
     }
 }
 

@@ -46,7 +46,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.error("An exception occurred, ex: {}", ex.getMessage(), ex);
         return ResponseEntity.status(status)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BaseResponse.failed(status.value(), "An exception occurred. Try again later."));
+                .body(BaseResponse.failed(status.value(), ex.getMessage()));
     }
 
 }

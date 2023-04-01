@@ -14,6 +14,7 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.HttpResponseException;
 import org.apache.hc.client5.http.fluent.Request;
 import org.apache.hc.core5.http.ContentType;
@@ -23,6 +24,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static bf5.betting.constant.Constant.ERROR_MISSING_SESSION_TOKEN_PARAM;
+
 /**
  * @author duynguyen
  **/
@@ -31,6 +34,8 @@ import java.util.concurrent.TimeUnit;
 @Log4j2
 public class RawBetServiceImpl implements RawBetService {
     private static final String API_URL = "https://1x88.net/api/internal/v1/betHistory/getBetHistoryList";
+
+    public static String LAST_ACTIVE_SESSION_TOKEN = "";
 
     private final RawBetEntityConverter entityConverter;
 
@@ -42,12 +47,23 @@ public class RawBetServiceImpl implements RawBetService {
     @Override
     @TryCatchWrap
     public List<BetHistory> getAllBetWithConvert(String sessionToken, String startDate, String endDate) {
-        String cacheKey = String.format("%s-%s", startDate, endDate);
+        if (StringUtils.isBlank(sessionToken)) {
+            if (StringUtils.isBlank(LAST_ACTIVE_SESSION_TOKEN)) {
+                throw new IllegalArgumentException(ERROR_MISSING_SESSION_TOKEN_PARAM);
+            } else {
+                sessionToken = LAST_ACTIVE_SESSION_TOKEN;
+            }
+        }
+
+        final String cacheKey = String.format("%s-%s", startDate, endDate);
+        final String nonEmptySessionToken = sessionToken;
         List<GetRawBetResponse.RawBetEntity> bets = cache.get(cacheKey, s -> {
             try {
-                return getFromApi(sessionToken, startDate, endDate);
+                return getFromApi(nonEmptySessionToken, startDate, endDate);
             } catch (Exception ex) {
+                log.error(ex);
                 if (ex instanceof HttpResponseException) {
+                    LAST_ACTIVE_SESSION_TOKEN = "";
                     HttpResponseException castedException = (HttpResponseException) ex;
                     throw new UncheckedHttpResponseException(castedException);
                 }
@@ -89,6 +105,8 @@ public class RawBetServiceImpl implements RawBetService {
         String rawResponse = httpRequest.execute().returnContent().asString();
 
         log.info("Receive raw response from 1xBet: {}, total query time: {}ms", rawResponse, (System.currentTimeMillis() - now));
+        LAST_ACTIVE_SESSION_TOKEN = sessionToken;
+
         GetRawBetResponse response = JsonUtil.fromJsonString(rawResponse, GetRawBetResponse.class);
         return response.getData().getBets();
     }

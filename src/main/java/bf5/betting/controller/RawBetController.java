@@ -21,7 +21,7 @@ public class RawBetController {
     private final BetHistoryService betHistoryService;
 
     @GetMapping("")
-    BaseResponse<List<BetHistory>> getRawBetInfo(@RequestParam("sessionToken") String sessionToken,
+    BaseResponse<List<BetHistory>> getRawBetInfo(@RequestParam(value = "sessionToken", required = false) String sessionToken,
                                                  @RequestParam("startDate") String startDate,
                                                  @RequestParam("endDate") String endDate) {
         return BaseResponse.success(rawBetService.getAllBetWithConvert(sessionToken, startDate, endDate));
