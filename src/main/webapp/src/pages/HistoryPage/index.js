@@ -1,15 +1,14 @@
-import React, {useCallback, useContext, useRef, useState} from "react";
+import React, {useCallback, useRef, useState} from "react";
 import {exportComponentAsJPEG} from 'react-component-export-image';
 import {Card, Empty, Tabs} from 'antd';
 import {getBetHistory} from '../../apis/BetHistoryApi'
 import {MESSAGE} from "../../common/Constant";
-import PlayersContext from "../../common/PlayersContext";
 import BetHistoryCard from "../../components/BetHistoryCard";
 import BetHistoryFilter from "../../components/BetHistoryFilter";
 import BetHistoryStatistic from "../../components/BetHistoryStatistic";
 import HistoryCardMetadata from "../../components/HistoryCardMetadata";
+import {usePlayerContextHook} from "../../hooks";
 import {groupBetHistoriesByType} from "../../utils/BetHistoryUtil";
-
 import './index.scss'
 
 const TAB_KEYS = {
@@ -34,8 +33,7 @@ const HistoryPage = () => {
     const [activeTab, setActiveTab] = useState(TAB_KEYS.History.key)
     const [betHistories, setBetHistories] = useState(undefined)
     const [historyFilterParams, setHistoryFilterParams] = useState(DEFAULT_HISTORY_FILTER_PARAMS)
-    const playerContext = useContext(PlayersContext)
-    const {players} = playerContext
+    const {players} = usePlayerContextHook()
     const betHistoriesByGroup = groupBetHistoriesByType(betHistories)
 
     const handleSubmitFilter = useCallback((fieldsValue) => {

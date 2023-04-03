@@ -1,16 +1,15 @@
-import React, {useCallback, useContext, useState} from "react";
+import React, {useCallback, useState} from "react";
 import {Avatar, Col, Modal, Row, Select} from "antd";
-import PlayersContext from "../../common/PlayersContext";
 import {insertBetHistory} from "../../apis/BetHistoryApi";
-import BetHistoryCard from "../BetHistoryCard";
-import {isSingleBet} from "../../utils/BetHistoryUtil";
 import {BET_TYPE} from "../../common/Constant";
+import {usePlayerContextHook} from "../../hooks";
+import {isSingleBet} from "../../utils/BetHistoryUtil";
+import BetHistoryCard from "../BetHistoryCard";
 
 const {Option} = Select
 
 const InsertBetHistoryModal = ({data, isOpen, onUpdateSuccess, onClose}) => {
-    const playerContext = useContext(PlayersContext)
-    const {players} = playerContext
+    const {players} = usePlayerContextHook()
     const [selectedPlayer, setSelectedPlayer] = useState()
     const betType = isSingleBet(data) ? BET_TYPE.Single : BET_TYPE.Accumulator
 

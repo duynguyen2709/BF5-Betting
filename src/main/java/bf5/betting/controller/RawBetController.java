@@ -1,7 +1,6 @@
 package bf5.betting.controller;
 
 import bf5.betting.entity.jpa.BetHistory;
-import bf5.betting.entity.request.BetHistoryUpdateResultRequest;
 import bf5.betting.entity.response.BaseResponse;
 import bf5.betting.service.BetHistoryService;
 import bf5.betting.service.RawBetService;

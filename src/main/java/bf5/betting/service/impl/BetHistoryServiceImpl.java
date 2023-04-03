@@ -6,7 +6,6 @@ import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.BetMatchDetail;
 import bf5.betting.entity.jpa.Player;
 import bf5.betting.entity.jpa.TeamData;
-import bf5.betting.entity.request.BetHistoryUpdateResultRequest;
 import bf5.betting.exception.EntityNotFoundException;
 import bf5.betting.repository.BetHistoryRepository;
 import bf5.betting.service.BetHistoryService;

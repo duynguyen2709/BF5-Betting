@@ -1,5 +1,5 @@
-import axiosClient from "../utils/ApiUtil";
 import {API_URL} from "../common/Constant";
+import axiosClient from "../utils/ApiUtil";
 
 const getRawBetData = ({sessionToken, startDate, endDate}) => {
     return axiosClient.get(API_URL.RawBet, {

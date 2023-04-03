@@ -1,7 +1,7 @@
-import React, {useCallback, useContext, useState} from "react";
+import React, {useCallback, useState} from "react";
 import {Avatar, Col, Modal, Row, Select, Table} from "antd";
 import {insertBetHistoryInBatch} from "../../apis/BetHistoryApi";
-import PlayersContext from "../../common/PlayersContext";
+import {usePlayerContextHook} from "../../hooks";
 import {buildCommonTableColumn} from "../../utils/BetHistoryUtil";
 
 const {Option} = Select
@@ -13,8 +13,7 @@ const buildTableColumns = (players) => {
 }
 
 const BatchInsertBetHistoryModal = ({data, isOpen, onUpdateSuccess, onClose}) => {
-    const playerContext = useContext(PlayersContext)
-    const {players} = playerContext
+    const {players} = usePlayerContextHook()
     const [selectedPlayer, setSelectedPlayer] = useState()
 
     const handleChangePlayer = useCallback((value) => {

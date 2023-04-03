@@ -1,7 +1,6 @@
 package bf5.betting.entity.jpa;
 
 import bf5.betting.constant.BetResult;
-import bf5.betting.constant.BetType;
 import bf5.betting.util.DateTimeUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

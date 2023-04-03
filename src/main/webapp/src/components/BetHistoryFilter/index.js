@@ -1,12 +1,12 @@
-import React, {useCallback, useContext} from 'react'
+import React, {useCallback} from 'react'
 import {Button, Col, DatePicker, Form, message, Row, Select} from 'antd';
 import {DownloadOutlined} from '@ant-design/icons';
-
 import moment from 'moment';
-import PlayersContext from "../../common/PlayersContext";
+import {MESSAGE} from "../../common/Constant";
+import {usePlayerContextHook} from "../../hooks";
+
 
 import './index.scss'
-import {MESSAGE} from "../../common/Constant";
 
 const dateFormat = 'DD/MM/YYYY';
 
@@ -18,8 +18,7 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
     };
 
     const [form] = Form.useForm();
-    const playerContext = useContext(PlayersContext)
-    const {players} = playerContext
+    const {players} = usePlayerContextHook()
     const playerList = Object.values(players)
 
     const handleSubmitFilter = useCallback((values) => {

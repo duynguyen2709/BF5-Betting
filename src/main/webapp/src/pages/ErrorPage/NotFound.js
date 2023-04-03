@@ -1,11 +1,9 @@
 import React from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faChevronLeft} from "@fortawesome/free-solid-svg-icons";
-import NotFoundImage from "../../images/illustrations/404.svg";
-import {Button, Col, Row} from "antd";
-import "./index.scss";
 import {Link} from "react-router-dom";
+import {Button, Col, Row} from "antd";
 import {ROUTES} from "../../common/Constant";
+import NotFoundImage from "../../images/illustrations/404.svg";
+import "./index.scss";
 
 const NotFound = () => {
   return (
@@ -25,7 +23,6 @@ const NotFound = () => {
             </p>
             <Link to={ROUTES.Base.path}>
               <Button className={"button-back-home"}>
-                <FontAwesomeIcon icon={faChevronLeft} />
                 <b style={{ marginLeft: 10 }}>Go back home</b>
               </Button>
             </Link>

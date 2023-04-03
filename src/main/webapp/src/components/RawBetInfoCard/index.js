@@ -1,15 +1,15 @@
-import React, {useCallback, useContext, useState} from "react";
+import React, {useCallback, useState} from "react";
 import {Col, message, Row} from "antd";
 import {getRawBetData, updateBatchResultFromRaw, updateResultFromRaw} from "../../apis/RawBetApi";
 import {LOCAL_STORAGE_KEY, MESSAGE, RAW_BET_STATUS} from "../../common/Constant";
-import PlayersContext from "../../common/PlayersContext";
+import {usePlayerContextHook} from "../../hooks";
+import BatchInsertRawBetButton from "../BatchInsertRawBetButton";
+import BatchInsertBetHistoryModal from "../BatchInsertBetHistoryModal";
 import BatchUpdateRawBetButton from "../BatchUpdateRawBetButton";
 import CenterLoadingSpinner from "../CenterLoadingSpinner";
 import InsertBetHistoryModal from "../InsertBetHistoryModal";
 import QueryRawBetInfoForm from "../QueryRawBetInfoForm";
 import RawBetTable from "./RawBetTable";
-import BatchInsertRawBetButton from "../BatchInsertRawBetButton";
-import BatchInsertBetHistoryModal from "../BatchInsertBetHistoryModal";
 
 const RawBetInfoCard = ({onSuccessAction}) => {
     const [isFetching, setIsFetching] = useState(false)
@@ -18,9 +18,7 @@ const RawBetInfoCard = ({onSuccessAction}) => {
     const [modalAddBatchOpen, setModalAddBatchOpen] = useState(false)
     const [currentAddBet, setCurrentAddBet] = useState()
     const [currentBatchAddBet, setCurrentBatchAddBet] = useState([])
-
-    const playerContext = useContext(PlayersContext)
-    const {players} = playerContext
+    const {players} = usePlayerContextHook()
 
     const queryRawBetList = useCallback(() => {
         setRawBetList([])

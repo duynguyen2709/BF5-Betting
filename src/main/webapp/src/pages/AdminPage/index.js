@@ -1,18 +1,17 @@
-import React, {useCallback, useContext, useEffect, useState} from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {Card, message, Tabs} from 'antd';
 import {getAllBetHistory} from "../../apis/BetHistoryApi";
 import {MESSAGE} from "../../common/Constant";
 import AdminBetHistoryTable from "../../components/AdminBetHistoryTable";
-import PlayersContext from "../../common/PlayersContext";
 import RawBetInfoCard from "../../components/RawBetInfoCard";
 import AdminPlayerStatisticCard from "../../components/AdminPlayerStatisticCard";
+import {usePlayerContextHook} from "../../hooks";
 
 import './index.scss'
 
 const AdminPage = () => {
     const [betHistoryList, setBetHistoryList] = useState([])
-    const playerContext = useContext(PlayersContext)
-    const {players, fetchPlayersData} = playerContext
+    const {players, fetchPlayersData} = usePlayerContextHook()
 
     const fetchAllBets = useCallback(() => {
         getAllBetHistory().then(data => setBetHistoryList(data))

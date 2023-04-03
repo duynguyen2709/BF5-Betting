@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -54,7 +55,7 @@ public class RawBetEntityConverter {
 
                         if (insertedHistory.getActualProfit() != null) {
                             rawBet.setRawStatus(RawBetStatus.SETTLED.name());
-                        } else if (bet.getStatus() != 1) {
+                        } else if (bet.getStatus() != 1 && isAllEventsFinished(bet.getEvents())) {
                             rawBet.setRawStatus(RawBetStatus.RESULT_READY_TO_BE_UPDATED.name());
                         }
 
@@ -66,6 +67,17 @@ public class RawBetEntityConverter {
                     return rawBet;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private boolean isAllEventsFinished(List<GetRawBetResponse.RawBetEvent> events) {
+        // In Accumulator bets, the final result may available BEFORE some other bets have finished
+        // We should wait for all bets to be finished before updating final result
+        for (GetRawBetResponse.RawBetEvent event: events) {
+            if (Objects.isNull(event.getIsFinished()) || !event.getIsFinished()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void setMatchDetailKeyId(BetHistory insertedHistory, BetHistory rawBet) {
@@ -108,7 +120,7 @@ public class RawBetEntityConverter {
                     matchDetail.setTournamentName(event.getChampName());
                     matchDetail.setEvent(BetUtil.parseEvent(event.getEventTypeTitle()));
                     matchDetail.setFirstHalfOnly(event.getPeriodName().equals("1 Half") ? true : null);
-                    matchDetail.setScore(event.getIsFinished() ? event.getScore() : null);
+                    matchDetail.setScore(event.getScore());
                     matchDetail.setRatio(event.getCoef());
                     matchDetail.setResult(calculateBetMatchDetailResult(event));
                     return matchDetail;

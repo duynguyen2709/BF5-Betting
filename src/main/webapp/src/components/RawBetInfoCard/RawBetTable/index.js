@@ -1,8 +1,8 @@
 import React from "react";
 import {Button, Popconfirm, Table, Tag} from "antd";
 import {QuestionCircleOutlined} from "@ant-design/icons";
-import {buildCommonTableColumn} from "../../../utils/BetHistoryUtil";
 import {RAW_BET_STATUS} from "../../../common/Constant";
+import {buildCommonTableColumn} from "../../../utils/BetHistoryUtil";
 import VerticalCenterRowCellWithDivider from "../../VerticalCenterRowCellWithDivider";
 
 const RawStatusTag = ({text}) => {

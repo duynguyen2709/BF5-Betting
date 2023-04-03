@@ -2,10 +2,10 @@ import React from 'react'
 import {BET_GROUP_TYPE_KEY} from "../../common/Constant";
 import {isSingleBet} from "../../utils/BetHistoryUtil";
 import AccumulatorBetHistoryCard from "./Accumulator";
+import MultiBetHistoryCard from "./Multi";
 import SingleBetHistoryCard from "./Single";
 
 import './index.scss'
-import MultiBetHistoryCard from "./Multi";
 
 const BetHistoryCard = ({data, type, isAdminView = false, isHistoryViewMode = true}) => {
     if (isAdminView) {
@@ -23,7 +23,7 @@ const BetHistoryCard = ({data, type, isAdminView = false, isHistoryViewMode = tr
                 card = <SingleBetHistoryCard data={data[0]} isHistoryViewMode={isHistoryViewMode}/>
                 break
             case BET_GROUP_TYPE_KEY.Accumulator:
-                card = <AccumulatorBetHistoryCard data={data[0]} isHistoryViewMode={isHistoryViewMode}/>
+                card = <AccumulatorBetHistoryCard data={data} isHistoryViewMode={isHistoryViewMode}/>
                 break
             case BET_GROUP_TYPE_KEY.MultiBetsSameMatch:
                 card = <MultiBetHistoryCard data={data} />
