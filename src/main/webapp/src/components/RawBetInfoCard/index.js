@@ -16,7 +16,7 @@ const RawBetInfoCard = ({onSuccessAction}) => {
     const [rawBetList, setRawBetList] = useState([])
     const [modalAddSingleOpen, setModalAddSingleOpen] = useState(false)
     const [modalAddBatchOpen, setModalAddBatchOpen] = useState(false)
-    const [currentAddBet, setCurrentAddBet] = useState()
+    const [currentAddBet, setCurrentAddBet] = useState(undefined)
     const [currentBatchAddBet, setCurrentBatchAddBet] = useState([])
     const {players} = usePlayerContextHook()
 
@@ -30,6 +30,8 @@ const RawBetInfoCard = ({onSuccessAction}) => {
     }, [])
 
     const handleProcessRawBetSuccess = useCallback(() => {
+        setCurrentBatchAddBet([])
+        setCurrentAddBet(undefined)
         setModalAddBatchOpen(false)
         setModalAddSingleOpen(false)
         queryRawBetList()

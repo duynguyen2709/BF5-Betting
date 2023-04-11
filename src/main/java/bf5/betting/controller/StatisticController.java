@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -33,7 +34,14 @@ public class StatisticController {
     @GetMapping("")
     public BaseResponse<List<PlayerAssetHistory>> getAll() {
         List<PlayerAssetHistory> assetHistories = assetHistoryService.getAll();
-        assetHistories.sort((o1, o2) -> Long.compare(o2.getRawPaymentTime().getTime(), o1.getRawPaymentTime().getTime()));
+        assetHistories.sort((o1, o2) -> {
+            long firstPaymentTime = o1.getRawPaymentTime().getTime();
+            long secondPaymentTime = o2.getRawPaymentTime().getTime();
+            if (firstPaymentTime != secondPaymentTime) {
+                return Long.compare(secondPaymentTime, firstPaymentTime);
+            }
+            return Integer.compare(o2.getId(), o1.getId());
+        });
         return BaseResponse.success(assetHistories);
     }
 

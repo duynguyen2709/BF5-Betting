@@ -1,7 +1,7 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {Avatar, Row, Table, Tag} from "antd";
-import {getAllStatistics} from "../../apis/StatisticApi";
 import {usePlayerContextHook} from "../../hooks";
+import MoneyTextCell from "../MoneyTextCell";
 
 const PaymentActionTag = ({action}) => {
     switch (action) {
@@ -17,13 +17,8 @@ const PaymentActionTag = ({action}) => {
 }
 
 
-const AdminPlayerAssetHistoryTable = () => {
-    const [data, setData] = useState([])
+const AdminPlayerAssetHistoryTable = ({data}) => {
     const {players} = usePlayerContextHook()
-
-    useEffect(() => {
-        getAllStatistics().then(data => setData(data))
-    }, [])
 
     const columns = [
         {
@@ -71,17 +66,17 @@ const AdminPlayerAssetHistoryTable = () => {
                 {
                     title: 'Số Tiền Thanh Toán',
                     key: 'amount',
-                    dataIndex: 'amount',
+                    render: (_, record) => <MoneyTextCell value={record.amount} />
                 },
                 {
                     title: 'Số Dư Đầu',
                     key: 'assetBefore',
-                    dataIndex: 'assetBefore',
+                    render: (_, record) => <MoneyTextCell value={record.assetBefore} />
                 },
                 {
                     title: 'Số Dư Cuối',
                     key: 'assetAfter',
-                    dataIndex: 'assetAfter',
+                    render: (_, record) => <MoneyTextCell value={record.assetAfter} />
                 },
             ]
         },
@@ -107,7 +102,7 @@ const AdminPlayerAssetHistoryTable = () => {
                   pagination={{
                       pageSize: 10,
                       showSizeChanger: false,
-                      showTotal: (total) => `Tổng: ${total} cược`
+                      showTotal: (total) => `Tổng: ${total} dòng`
                   }}
     />
 }

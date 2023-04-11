@@ -9,25 +9,33 @@ import {usePlayerContextHook} from "../../hooks";
 
 import './index.scss'
 import AdminPlayerAssetHistoryTable from "../../components/AdminPlayerAssetHistoryTable";
+import {getAllStatistics} from "../../apis/StatisticApi";
 
 const AdminPage = () => {
     const [betHistoryList, setBetHistoryList] = useState([])
+    const [assetHistoryList, setAssetHistoryList] = useState([])
     const {players, fetchPlayersData} = usePlayerContextHook()
 
     const fetchAllBets = useCallback(() => {
         getAllBetHistory().then(data => setBetHistoryList(data))
     }, [])
 
+    const fetchAllAssetHistories = useCallback(() => {
+        getAllStatistics().then(data => setAssetHistoryList(data))
+    }, [])
+
     useEffect(() => {
         fetchAllBets()
-    }, [fetchAllBets])
+        fetchAllAssetHistories()
+    }, [fetchAllBets, fetchAllAssetHistories])
 
     const handleUpdateBetSuccess = useCallback(() => {
         message.success(MESSAGE.UpdateBetSuccess)
         setBetHistoryList([])
         fetchAllBets()
+        fetchAllAssetHistories()
         fetchPlayersData()
-    }, [fetchAllBets, fetchPlayersData])
+    }, [fetchAllBets, fetchPlayersData, fetchAllAssetHistories])
 
     return (<div className={"admin-table-wrapper"}>
         <AdminPlayerStatisticCard players={players} />
@@ -48,7 +56,7 @@ const AdminPage = () => {
                     {
                         label: `Lịch Sử Thanh Toán`,
                         key: '3',
-                        children: <AdminPlayerAssetHistoryTable/>,
+                        children: <AdminPlayerAssetHistoryTable data={assetHistoryList}/>,
                     },
                 ]}
             />

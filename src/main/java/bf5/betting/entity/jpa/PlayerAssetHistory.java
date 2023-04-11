@@ -23,7 +23,7 @@ import java.sql.Timestamp;
 public class PlayerAssetHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
     @Column
     private String playerId;
     @Column

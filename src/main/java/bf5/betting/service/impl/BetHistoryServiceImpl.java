@@ -2,13 +2,12 @@ package bf5.betting.service.impl;
 
 import bf5.betting.annotation.TryCatchWrap;
 import bf5.betting.constant.BetResult;
-import bf5.betting.entity.jpa.BetHistory;
-import bf5.betting.entity.jpa.BetMatchDetail;
-import bf5.betting.entity.jpa.Player;
-import bf5.betting.entity.jpa.TeamData;
+import bf5.betting.constant.PaymentAction;
+import bf5.betting.entity.jpa.*;
 import bf5.betting.exception.EntityNotFoundException;
 import bf5.betting.repository.BetHistoryRepository;
 import bf5.betting.service.BetHistoryService;
+import bf5.betting.service.PlayerAssetHistoryService;
 import bf5.betting.service.PlayerService;
 import bf5.betting.service.TeamDataService;
 import bf5.betting.util.DateTimeUtil;
@@ -32,6 +31,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     private final BetHistoryRepository betHistoryRepository;
     private final TeamDataService teamDataService;
     private final PlayerService playerService;
+    private final PlayerAssetHistoryService assetHistoryService;
 
     @Override
     @TryCatchWrap
@@ -53,10 +53,12 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         updateResultSettledTime(entity);
         log.info("Process insert bet from raw data: {}", JsonUtil.toJsonString(entity));
 
-        BetHistory result = betHistoryRepository.save(entity);
+        BetHistory betHistory = betHistoryRepository.save(entity);
+        // Asset Histories must be updated before Players' profit to get most recent states of assets
+        updateAssetHistory(betHistory);
         updatePlayerProfit(entity);
         insertTeamDataIfNotAvailable(entity);
-        return result;
+        return betHistory;
     }
 
     @Override
@@ -67,6 +69,8 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         log.info("Process insert batch bets from raw data: {}", JsonUtil.toJsonString(request));
 
         List<BetHistory> betHistories = this.betHistoryRepository.saveAll(request);
+        // Asset Histories must be updated before Players' profit to get most recent states of assets
+        updateAssetHistoryInBatch(betHistories);
         updatePlayersProfitInBatch(request);
         insertTeamDataIfNotAvailable(request);
         return betHistories;
@@ -81,6 +85,8 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
         log.info("Process update bet: {}", JsonUtil.toJsonString(betHistory));
         betHistory = withTeamDataWrapper(betHistoryRepository.save(betHistory));
+        // Asset Histories must be updated before Players' profit to get most recent states of assets
+        updateAssetHistory(betHistory);
         updatePlayerProfit(betHistory);
         return betHistory;
     }
@@ -94,6 +100,8 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
         log.info("Process update bet from raw data: {}", JsonUtil.toJsonString(betHistory));
         betHistory = withTeamDataWrapper(betHistoryRepository.save(betHistory));
+        // Asset Histories must be updated before Players' profit to get most recent states of assets
+        updateAssetHistory(betHistory);
         updatePlayerProfit(betHistory);
         return betHistory;
     }
@@ -111,8 +119,64 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
         log.info("Process update batch bets from raw data: {}", JsonUtil.toJsonString(betHistories));
         betHistories = this.betHistoryRepository.saveAll(betHistories);
+        // Asset Histories must be updated before Players' profit to get most recent states of assets
+        updateAssetHistoryInBatch(betHistories);
         updatePlayersProfitInBatch(betHistories);
         return betHistories;
+    }
+
+    private void updateAssetHistoryInBatch(List<BetHistory> betHistories) {
+        List<BetHistory> finishedBets = betHistories.stream()
+                .filter(bet -> bet.getResult() != BetResult.NOT_FINISHED && bet.getResult() != BetResult.DRAW)
+                .collect(Collectors.toList());
+        if (finishedBets.isEmpty()) {
+            return;
+        }
+
+        finishedBets.sort(Comparator.comparingLong(o -> o.getResultSettledTime().getTime()));
+        List<PlayerAssetHistory> assetHistories = new ArrayList<>();
+        Map<String, Long> playerAsset = this.playerService.getAllPlayer()
+                .values()
+                .stream()
+                .collect(Collectors.toMap(Player::getPlayerId, Player::getTotalProfit));
+
+        for (BetHistory bet : finishedBets) {
+            long assetAfter = playerAsset.get(bet.getPlayerId()) + bet.getActualProfit();
+            PlayerAssetHistory assetHistory = PlayerAssetHistory.builder()
+                    .playerId(bet.getPlayerId())
+                    .betId(bet.getBetId())
+                    .paymentTime(bet.getResultSettledTime())
+                    .action(bet.getActualProfit() > 0 ? PaymentAction.BET_WIN : PaymentAction.BET_LOST)
+                    .amount(bet.getActualProfit())
+                    .assetBefore(playerAsset.get(bet.getPlayerId()))
+                    .assetAfter(assetAfter)
+                    .build();
+            assetHistories.add(assetHistory);
+
+            playerAsset.put(bet.getPlayerId(), assetAfter);
+        }
+
+        this.assetHistoryService.insertBatch(assetHistories);
+    }
+
+    private void updateAssetHistory(BetHistory betHistory) {
+        if (betHistory.getResult() == BetResult.NOT_FINISHED || betHistory.getResult() == BetResult.DRAW) {
+            return;
+        }
+
+        Map<String, Player> playerAsset = this.playerService.getAllPlayer();
+        long assetAfter = playerAsset.get(betHistory.getPlayerId()).getTotalProfit() + betHistory.getActualProfit();
+        PlayerAssetHistory assetHistory = PlayerAssetHistory.builder()
+                .playerId(betHistory.getPlayerId())
+                .betId(betHistory.getBetId())
+                .paymentTime(betHistory.getResultSettledTime())
+                .action(betHistory.getActualProfit() > 0 ? PaymentAction.BET_WIN : PaymentAction.BET_LOST)
+                .amount(betHistory.getActualProfit())
+                .assetBefore(playerAsset.get(betHistory.getPlayerId()).getTotalProfit())
+                .assetAfter(assetAfter)
+                .build();
+
+        this.assetHistoryService.insert(assetHistory);
     }
 
     private BetHistory buildBetHistoryWithResult(BetHistory updateRequest, boolean isFromRaw) {

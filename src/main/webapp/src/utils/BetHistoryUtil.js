@@ -148,9 +148,7 @@ const buildCommonTableColumn = (players) => {
                     title: 'Tiền Gốc',
                     key: 'betAmount',
                     width: 80,
-                    render: (_, record) => {
-                        return record.betAmount ? (`${record.betAmount.toLocaleString()}đ`) : ''
-                    }
+                    render: (_, record) => <MoneyTextCell value={record.betAmount} />
                 },
                 {
                     title: 'Tỉ Lệ',
@@ -181,9 +179,7 @@ const buildCommonTableColumn = (players) => {
                     title: 'Lợi Nhuận',
                     key: 'actualProfit',
                     width: 90,
-                    render: (_, record) => {
-                        return record.actualProfit && <MoneyTextCell value={record.actualProfit}/>
-                    }
+                    render: (_, record) => <MoneyTextCell value={record.actualProfit}/>
                 },
             ]
         },

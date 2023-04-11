@@ -36,7 +36,6 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
-    @TryCatchWrap
     public Map<String, Player> getAllPlayer() {
         return this.playerCacheMap;
     }
