@@ -1,0 +1,44 @@
+.card-player-statistic {
+  .ant-card-body {
+    padding: 0;
+    font-size: 12px;
+  }
+
+  .ant-card-meta-description {
+    font-size: 14px;
+  }
+
+  .card-bet-empty {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .row-bet-summary {
+    .ant-statistic {
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      .ant-statistic-title {
+        font-size: 13px;
+      }
+
+      .ant-statistic-content {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .row-chart-win-rate-by-team {
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+    padding: 0 1rem;
+
+    .label-team-select {
+      font-size: 14px;
+      margin-top: 0.25rem;
+    }
+  }
+}

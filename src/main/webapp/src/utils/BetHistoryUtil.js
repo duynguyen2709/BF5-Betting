@@ -196,8 +196,62 @@ const buildCommonTableColumn = (players) => {
     ];
 }
 
+const groupBetHistoriesByTeam = (betHistories) => {
+    if (!betHistories || !(betHistories instanceof Array)) {
+        return null
+    }
+    const betGroupByTeamMap = new Map()
+    for (let bet of betHistories) {
+        for (let event of bet.events) {
+            const {firstTeam, secondTeam} = event
+            if (!betGroupByTeamMap.has(firstTeam)) {
+                betGroupByTeamMap.set(firstTeam, [])
+            }
+            betGroupByTeamMap.get(firstTeam).push(event)
+
+            if (!betGroupByTeamMap.has(secondTeam)) {
+                betGroupByTeamMap.set(secondTeam, [])
+            }
+            betGroupByTeamMap.get(secondTeam).push(event)
+        }
+    }
+    return betGroupByTeamMap
+}
+
+const groupBetHistoriesByTournament = (betHistories) => {
+    if (!betHistories || !(betHistories instanceof Array)) {
+        return null
+    }
+    const betGroupByTournamentMap = new Map()
+    for (let bet of betHistories) {
+        for (let event of bet.events) {
+            const tournament = event.tournamentName
+            if (!betGroupByTournamentMap.has(tournament)) {
+                betGroupByTournamentMap.set(tournament, [])
+            }
+            betGroupByTournamentMap.get(tournament).push(event)
+        }
+    }
+    return betGroupByTournamentMap
+}
+
+const groupBetHistoriesByDate = (betHistories) => {
+    if (!betHistories || !(betHistories instanceof Array)) {
+        return null
+    }
+    const betGroupByDateMap = new Map()
+    for (let bet of betHistories) {
+        const betDate = bet.betTime.substring(0, 5)
+        if (!betGroupByDateMap.has(betDate)) {
+            betGroupByDateMap.set(betDate, [])
+        }
+        betGroupByDateMap.get(betDate).push(bet)
+    }
+    return betGroupByDateMap
+}
+
 const groupBetHistoriesByType = (betHistories) => {
-    if (!betHistories) {
+    if (!betHistories || !(betHistories instanceof Array)) {
         return null
     }
     const betGroupByTypeMap = new Map()
@@ -240,4 +294,17 @@ const groupBetHistoriesByType = (betHistories) => {
     return groupBetHistories
 }
 
-export {buildCommonTableColumn, groupBetHistoriesByType, filterBetResult, isSingleBet, isAccumulatorBet, parseBetEvent}
+const getDistinctTeamName = (betHistoryList) => {
+    const teams = new Set()
+    betHistoryList.forEach(bet => {
+        bet.events.forEach(event => {
+            teams.add(event.firstTeam)
+            teams.add(event.secondTeam)
+        })
+    })
+    return teams
+};
+
+export {buildCommonTableColumn, groupBetHistoriesByType, groupBetHistoriesByDate,
+    groupBetHistoriesByTeam, groupBetHistoriesByTournament, getDistinctTeamName,
+    filterBetResult, isSingleBet, isAccumulatorBet, parseBetEvent}

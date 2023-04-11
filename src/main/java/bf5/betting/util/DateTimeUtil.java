@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
@@ -19,7 +20,11 @@ public class DateTimeUtil {
 
     public static final String SYSTEM_DATE_ONLY_FORMAT = "yyyy-MM-dd";
     public static final String READABLE_DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm";
-    private static final SimpleDateFormat DATE_TIME_FORMATTER = new SimpleDateFormat(READABLE_DATE_TIME_FORMAT);
+    public static final String READABLE_DATE_ONLY_FORMAT = "dd/MM/yyyy";
+    private static final SimpleDateFormat FRIENDLY_DATE_TIME_FORMATTER = new SimpleDateFormat(READABLE_DATE_TIME_FORMAT);
+    private static final SimpleDateFormat FRIENDLY_DATE_ONLY_FORMATTER = new SimpleDateFormat(READABLE_DATE_ONLY_FORMAT);
+    private static final SimpleDateFormat SYSTEM_DATE_ONLY_FORMATTER = new SimpleDateFormat(SYSTEM_DATE_ONLY_FORMAT);
+    private static final long ONE_DAY_MILLI_SECONDS = 24 * 60 * 60 * 1000;
 
     public static String now() {
         return timestampToString(new Timestamp(System.currentTimeMillis()));
@@ -28,7 +33,13 @@ public class DateTimeUtil {
     public static String timestampToString(Timestamp timestamp) {
         if (Objects.isNull(timestamp))
             return null;
-        return DATE_TIME_FORMATTER.format(timestamp);
+        return FRIENDLY_DATE_TIME_FORMATTER.format(timestamp);
+    }
+
+    public static String timestampMsToSystemDateString(Timestamp timestamp) {
+        if (Objects.isNull(timestamp))
+            return null;
+        return SYSTEM_DATE_ONLY_FORMATTER.format(timestamp);
     }
 
     public static Timestamp stringToTimestamp(String timestampStr) {
@@ -43,6 +54,14 @@ public class DateTimeUtil {
             log.error("[stringToDate] raw = {}, format = {}, ex = {}", dateStr, format, ex.getMessage(), ex);
             return null;
         }
+    }
+
+    public static String systemDateToString(Date date) {
+        return SYSTEM_DATE_ONLY_FORMATTER.format(date);
+    }
+
+    public static String friendlyDateToString(Date date) {
+        return FRIENDLY_DATE_ONLY_FORMATTER.format(date);
     }
 
     public static Timestamp stringToTimestamp(String timestampStr, String format) {
@@ -66,5 +85,24 @@ public class DateTimeUtil {
         LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(format));
         LocalDateTime endOfDay = localDate.atTime(LocalTime.MAX);
         return Timestamp.valueOf(endOfDay).getTime();
+    }
+
+    public static Date getNextDate(String dateStr) {
+        Date date = stringToDate(dateStr, SYSTEM_DATE_ONLY_FORMAT);
+        long nextDayMilliSeconds = date.getTime() + ONE_DAY_MILLI_SECONDS;
+        return new Date(nextDayMilliSeconds);
+    }
+
+    public static Date getNextDate(Date date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.DATE, 1);
+        return calendar.getTime();
+    }
+
+    public static Date getYesterday() {
+        Date today = new Date(System.currentTimeMillis());
+        long yesterdayMs = today.getTime() - ONE_DAY_MILLI_SECONDS;
+        return new Date(yesterdayMs);
     }
 }

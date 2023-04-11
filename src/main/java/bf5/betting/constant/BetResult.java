@@ -31,12 +31,18 @@ public enum BetResult {
             return NOT_FINISHED;
         }
         switch (result) {
-            case 0: return LOST;
-            case 1: return WIN;
-            case 2: return DRAW;
-            case 4: return HALF_WIN;
-            case 5: return HALF_LOST;
-            default: return NOT_FINISHED;
+            case 0:
+                return LOST;
+            case 1:
+                return WIN;
+            case 2:
+                return DRAW;
+            case 4:
+                return HALF_WIN;
+            case 5:
+                return HALF_LOST;
+            default:
+                return NOT_FINISHED;
         }
     }
 }

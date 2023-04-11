@@ -39,6 +39,8 @@ public class BetHistory {
     @Column
     private BetResult result;
     @Column
+    private Timestamp resultSettledTime;
+    @Column
     private Long actualProfit;
 
     @OneToMany(cascade = CascadeType.ALL)

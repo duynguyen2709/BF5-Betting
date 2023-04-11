@@ -9,11 +9,16 @@ import java.util.List;
  **/
 public interface BetHistoryService {
     List<BetHistory> getAllBetHistory();
-    List<BetHistory> getByPlayerId(String playerId);
+
     List<BetHistory> getByPlayerIdAndDateRange(String playerId, String startDate, String endDate);
+
     BetHistory insertBet(BetHistory entity);
+
     List<BetHistory> insertBetInBatch(List<BetHistory> request);
+
     BetHistory updateBetResult(BetHistory request);
+
     BetHistory updateBetResultFromRaw(BetHistory request);
+
     List<BetHistory> updateBatchBetResultFromRaw(List<BetHistory> request);
 }

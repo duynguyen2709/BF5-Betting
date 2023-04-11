@@ -29,3 +29,10 @@ spring:
         cacheServerConfiguration: true
         elideSetAutoCommits: true
         maintainTimeStats: false
+
+statistic:
+  player-base-asset:
+    100004056801368: 88260 # Thanh Duy
+    100004533095969: 0 # Trung Anh
+    100010972726703: 0 # Tân
+    100002362515754: 0 # Duy Nguyễn

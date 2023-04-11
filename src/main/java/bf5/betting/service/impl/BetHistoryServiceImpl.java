@@ -18,6 +18,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,22 +40,19 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     }
 
     @Override
-    @TryCatchWrap
-    public List<BetHistory> getByPlayerId(String playerId) {
-        return withTeamDataWrapper(betHistoryRepository.findByPlayerId(playerId));
-    }
-
-    @Override
-    public List<BetHistory> getByPlayerIdAndDateRange(String playerId, String startDateStr, String endDateStr) {
+    public List<BetHistory> getByPlayerIdAndDateRange(String playerId, String startDateStr, String endDate) {
         Date startDate = DateTimeUtil.stringToDate(startDateStr, DateTimeUtil.SYSTEM_DATE_ONLY_FORMAT);
-        Date endDate = DateTimeUtil.stringToDate(endDateStr, DateTimeUtil.SYSTEM_DATE_ONLY_FORMAT);
-        return withTeamDataWrapper(betHistoryRepository.findByPlayerIdAndDateRange(playerId, startDate, endDate));
+        Date afterEndDate = DateTimeUtil.getNextDate(endDate);
+        return withTeamDataWrapper(betHistoryRepository.findByPlayerIdAndDateRange(playerId, startDate, afterEndDate));
     }
 
     @Override
     @TryCatchWrap
     @Transactional
     public BetHistory insertBet(BetHistory entity) {
+        updateResultSettledTime(entity);
+        log.info("Process insert bet from raw data: {}", JsonUtil.toJsonString(entity));
+
         BetHistory result = betHistoryRepository.save(entity);
         updatePlayerProfit(entity);
         insertTeamDataIfNotAvailable(entity);
@@ -62,8 +60,12 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     }
 
     @Override
+    @TryCatchWrap
+    @Transactional
     public List<BetHistory> insertBetInBatch(List<BetHistory> request) {
+        request.forEach(this::updateResultSettledTime);
         log.info("Process insert batch bets from raw data: {}", JsonUtil.toJsonString(request));
+
         List<BetHistory> betHistories = this.betHistoryRepository.saveAll(request);
         updatePlayersProfitInBatch(request);
         insertTeamDataIfNotAvailable(request);
@@ -75,28 +77,12 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @Transactional
     public BetHistory updateBetResult(BetHistory request) {
         validateBetResult(request);
-        return betHistoryRepository.findById(request.getBetId())
-                .map(entity -> {
-                    entity.setResult(request.getResult());
-                    entity.setActualProfit(calculateActualProfitManual(entity, request.getResult()));
-                    List<BetMatchDetail> matchDetails = entity.getEvents();
-                    request.getEvents().forEach(eventResult -> {
-                        for (BetMatchDetail match: matchDetails) {
-                            if (eventResult.getId() == match.getId()) {
-                                match.setResult(eventResult.getResult());
-                                break;
-                            }
-                        }
-                    });
-                    BetHistory result = withTeamDataWrapper(betHistoryRepository.save(entity));
-                    updatePlayerProfit(result);
-                    return result;
-                })
-                .orElseThrow(() ->
-                        EntityNotFoundException.builder()
-                                .clazz(BetHistory.class)
-                                .id(request.getBetId())
-                                .build());
+        BetHistory betHistory = buildBetHistoryWithResult(request, false);
+
+        log.info("Process update bet: {}", JsonUtil.toJsonString(betHistory));
+        betHistory = withTeamDataWrapper(betHistoryRepository.save(betHistory));
+        updatePlayerProfit(betHistory);
+        return betHistory;
     }
 
     @Override
@@ -104,27 +90,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @Transactional
     public BetHistory updateBetResultFromRaw(BetHistory request) {
         validateBetResult(request);
-        BetHistory betHistory = betHistoryRepository.findById(request.getBetId())
-                .map(entity -> {
-                    entity.setResult(request.getResult());
-                    entity.setActualProfit(request.getActualProfit());
-                    List<BetMatchDetail> matchDetails = entity.getEvents();
-                    request.getEvents().forEach(eventResult -> {
-                        for (BetMatchDetail match: matchDetails) {
-                            if (eventResult.getId() == match.getId()) {
-                                match.setResult(eventResult.getResult());
-                                match.setScore(eventResult.getScore());
-                                break;
-                            }
-                        }
-                    });
-                    return entity;
-                })
-                .orElseThrow(() ->
-                        EntityNotFoundException.builder()
-                                .clazz(BetHistory.class)
-                                .id(request.getBetId())
-                                .build());
+        BetHistory betHistory = buildBetHistoryWithResult(request, true);
 
         log.info("Process update bet from raw data: {}", JsonUtil.toJsonString(betHistory));
         betHistory = withTeamDataWrapper(betHistoryRepository.save(betHistory));
@@ -139,27 +105,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         List<BetHistory> betHistories = new ArrayList<>();
         for (BetHistory updateRequest : request) {
             validateBetResult(updateRequest);
-            BetHistory betHistory = betHistoryRepository.findById(updateRequest.getBetId())
-                    .map(entity -> {
-                        entity.setResult(updateRequest.getResult());
-                        entity.setActualProfit(updateRequest.getActualProfit());
-                        List<BetMatchDetail> matchDetails = entity.getEvents();
-                        updateRequest.getEvents().forEach(eventResult -> {
-                            for (BetMatchDetail match: matchDetails) {
-                                if (eventResult.getId() == match.getId()) {
-                                    match.setResult(eventResult.getResult());
-                                    match.setScore(eventResult.getScore());
-                                    break;
-                                }
-                            }
-                        });
-                        return entity;
-                    })
-                    .orElseThrow(() ->
-                            EntityNotFoundException.builder()
-                                    .clazz(BetHistory.class)
-                                    .id(updateRequest.getBetId())
-                                    .build());
+            BetHistory betHistory = buildBetHistoryWithResult(updateRequest, true);
             betHistories.add(betHistory);
         }
 
@@ -169,16 +115,19 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         return betHistories;
     }
 
+    private BetHistory buildBetHistoryWithResult(BetHistory updateRequest, boolean isFromRaw) {
+        return betHistoryRepository.findById(updateRequest.getBetId())
+                .map(entity -> setFinalBetHistoryResultFromRaw(updateRequest, entity, isFromRaw))
+                .orElseThrow(() ->
+                        EntityNotFoundException.builder()
+                                .clazz(BetHistory.class)
+                                .id(updateRequest.getBetId())
+                                .build());
+    }
+
     private void insertTeamDataIfNotAvailable(BetHistory entity) {
         Map<String, TeamData> newTeamData = new HashMap<>();
-        entity.getEvents().forEach(event -> {
-            if (Objects.isNull(teamDataService.getTeamLogoUrl(event.getFirstTeam()))) {
-                newTeamData.put(event.getFirstTeam(), new TeamData(event.getFirstTeam(), event.getFirstTeamLogoUrl()));
-            }
-            if (Objects.isNull(teamDataService.getTeamLogoUrl(event.getSecondTeam()))) {
-                newTeamData.put(event.getSecondTeam(), new TeamData(event.getSecondTeam(), event.getSecondTeamLogoUrl()));
-            }
-        });
+        addTeamDataIfNotAvailable(newTeamData, entity);
         if (newTeamData.size() > 0) {
             teamDataService.insertBatch(newTeamData.values());
         }
@@ -186,19 +135,21 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
     private void insertTeamDataIfNotAvailable(List<BetHistory> betHistories) {
         Map<String, TeamData> newTeamData = new HashMap<>();
-        betHistories.forEach(bet -> {
-            bet.getEvents().forEach(event -> {
-                if (Objects.isNull(teamDataService.getTeamLogoUrl(event.getFirstTeam()))) {
-                    newTeamData.put(event.getFirstTeam(), new TeamData(event.getFirstTeam(), event.getFirstTeamLogoUrl()));
-                }
-                if (Objects.isNull(teamDataService.getTeamLogoUrl(event.getSecondTeam()))) {
-                    newTeamData.put(event.getSecondTeam(), new TeamData(event.getSecondTeam(), event.getSecondTeamLogoUrl()));
-                }
-            });
-        });
+        betHistories.forEach(bet -> addTeamDataIfNotAvailable(newTeamData, bet));
         if (newTeamData.size() > 0) {
             teamDataService.insertBatch(newTeamData.values());
         }
+    }
+
+    private void addTeamDataIfNotAvailable(Map<String, TeamData> newTeamData, BetHistory bet) {
+        bet.getEvents().forEach(event -> {
+            if (Objects.isNull(teamDataService.getTeamLogoUrl(event.getFirstTeam()))) {
+                newTeamData.put(event.getFirstTeam(), new TeamData(event.getFirstTeam(), event.getFirstTeamLogoUrl()));
+            }
+            if (Objects.isNull(teamDataService.getTeamLogoUrl(event.getSecondTeam()))) {
+                newTeamData.put(event.getSecondTeam(), new TeamData(event.getSecondTeam(), event.getSecondTeamLogoUrl()));
+            }
+        });
     }
 
     private void updatePlayersProfitInBatch(List<BetHistory> betHistories) {
@@ -264,5 +215,28 @@ public class BetHistoryServiceImpl implements BetHistoryService {
             event.setSecondTeamLogoUrl(teamDataService.getTeamLogoUrl(event.getSecondTeam()));
         });
         return betHistory;
+    }
+
+    private void updateResultSettledTime(BetHistory bet) {
+        if (bet.getResult() != BetResult.NOT_FINISHED) {
+            bet.setResultSettledTime(new Timestamp(System.currentTimeMillis()));
+        }
+    }
+
+    private BetHistory setFinalBetHistoryResultFromRaw(BetHistory request, BetHistory entity, boolean isFromRaw) {
+        entity.setResult(request.getResult());
+        updateResultSettledTime(entity);
+        entity.setActualProfit(isFromRaw ? request.getActualProfit() : calculateActualProfitManual(entity, request.getResult()));
+
+        request.getEvents().forEach(eventResult -> {
+            for (BetMatchDetail match : entity.getEvents()) {
+                if (eventResult.getId() == match.getId()) {
+                    match.setResult(eventResult.getResult());
+                    match.setScore(eventResult.getScore());
+                    break;
+                }
+            }
+        });
+        return entity;
     }
 }

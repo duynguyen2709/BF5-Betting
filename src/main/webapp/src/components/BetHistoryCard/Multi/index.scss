@@ -4,7 +4,7 @@
   border-color: #d7d7d7;;
 
   .ant-card-head {
-    padding: 0.5rem 1rem 0.25rem;
+    padding: 0.5rem 1rem 0.5rem;
     font-size: 14px;
 
     .ant-card-head-title {
@@ -24,7 +24,6 @@
       .team-data {
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
         align-items: center;
 
         .team-name {

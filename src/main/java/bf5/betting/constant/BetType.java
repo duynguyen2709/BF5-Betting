@@ -9,8 +9,7 @@ import java.util.stream.Stream;
  **/
 public enum BetType {
     ACCUMULATOR,
-    SINGLE
-    ;
+    SINGLE;
 
     public static BetType fromValue(String type) {
         return Stream.of(BetType.values())

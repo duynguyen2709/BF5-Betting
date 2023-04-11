@@ -8,6 +8,7 @@ import AdminPlayerStatisticCard from "../../components/AdminPlayerStatisticCard"
 import {usePlayerContextHook} from "../../hooks";
 
 import './index.scss'
+import AdminPlayerAssetHistoryTable from "../../components/AdminPlayerAssetHistoryTable";
 
 const AdminPage = () => {
     const [betHistoryList, setBetHistoryList] = useState([])
@@ -43,6 +44,11 @@ const AdminPage = () => {
                         label: `Dữ Liệu Gốc`,
                         key: '2',
                         children: <RawBetInfoCard onSuccessAction={handleUpdateBetSuccess}/>,
+                    },
+                    {
+                        label: `Lịch Sử Thanh Toán`,
+                        key: '3',
+                        children: <AdminPlayerAssetHistoryTable/>,
                     },
                 ]}
             />

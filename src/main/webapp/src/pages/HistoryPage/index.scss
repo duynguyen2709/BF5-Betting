@@ -6,9 +6,19 @@
   .ant-tabs-nav-wrap {
     padding-left: 0.5rem;
   }
+
+  .card-bet-empty {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
 }
 
-.card-bet-empty {
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+.list-player-asset-wrapper {
+  .ant-card-body {
+    padding: 1rem;
+
+    .ant-statistic-content {
+      font-size: 18px;
+    }
+  }
 }

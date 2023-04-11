@@ -17,20 +17,20 @@ const parseDateDescription = (startDate, endDate) => {
     }
 };
 
-const HistoryCardMetadata = ({players, data}) => {
+const HistoryCardMetadata = ({players, data, style}) => {
     const {playerId, startDate, endDate} = data
     const actualPlayer = players?.[playerId]
     if (!players || !playerId || !actualPlayer)
         return null
 
     const {totalProfit} = actualPlayer
-    const style = {
+    const profitStyle = {
         fontSize: '15px'
     }
     if (totalProfit > 0) {
-        style.color = 'green'
+        profitStyle.color = 'green'
     } else if (totalProfit < 0) {
-        style.color = 'red'
+        profitStyle.color = 'red'
     }
 
     // TODO: Should not put profit in card history, should be separated into other statistic component
@@ -38,7 +38,7 @@ const HistoryCardMetadata = ({players, data}) => {
         <span>{actualPlayer.playerName}</span>
         <Statistic
             value={actualPlayer.totalProfit}
-            valueStyle={style}
+            valueStyle={profitStyle}
             prefix={actualPlayer.totalProfit > 0 && '+'}
             suffix="đ"
         />
@@ -48,7 +48,7 @@ const HistoryCardMetadata = ({players, data}) => {
         avatar={<Avatar src={actualPlayer.avatarUrl} size={48}/>}
         title={title}
         description={parseDateDescription(startDate, endDate)}
-        style={{padding: '0.5rem', paddingTop: '1rem'}}
+        style={style}
     />
 }
 

@@ -7,7 +7,7 @@ import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.BetMatchDetail;
 import bf5.betting.entity.response.GetRawBetResponse;
 import bf5.betting.service.BetHistoryService;
-import bf5.betting.util.BetUtil;
+import bf5.betting.util.BetHistoryUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -72,7 +72,7 @@ public class RawBetEntityConverter {
     private boolean isAllEventsFinished(List<GetRawBetResponse.RawBetEvent> events) {
         // In Accumulator bets, the final result may available BEFORE some other bets have finished
         // We should wait for all bets to be finished before updating final result
-        for (GetRawBetResponse.RawBetEvent event: events) {
+        for (GetRawBetResponse.RawBetEvent event : events) {
             if (Objects.isNull(event.getIsFinished()) || !event.getIsFinished()) {
                 return false;
             }
@@ -118,7 +118,7 @@ public class RawBetEntityConverter {
                     if (event.getOpp2Images() != null && event.getOpp2Images().size() > 0)
                         matchDetail.setSecondTeamLogoUrl(String.format(TEAM_AVATAR_FORMAT_URL, event.getOpp2Images().get(0)));
                     matchDetail.setTournamentName(event.getChampName());
-                    matchDetail.setEvent(BetUtil.parseEvent(event.getEventTypeTitle()));
+                    matchDetail.setEvent(BetHistoryUtil.parseEvent(event.getEventTypeTitle()));
                     matchDetail.setFirstHalfOnly(event.getPeriodName().equals("1 Half") ? true : null);
                     matchDetail.setScore(event.getScore());
                     matchDetail.setRatio(event.getCoef());

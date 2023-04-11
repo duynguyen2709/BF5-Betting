@@ -1,16 +1,19 @@
 package bf5.betting.controller;
 
-import bf5.betting.constant.BetResult;
+import bf5.betting.constant.UserAction;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.response.BaseResponse;
 import bf5.betting.service.BetHistoryService;
+import bf5.betting.util.RequestUtil;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
+
+import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeAsc;
 
 /**
  * @author duynguyen
@@ -24,50 +27,24 @@ public class BetHistoryController {
     @GetMapping("")
     public BaseResponse<List<BetHistory>> getAll(@RequestParam(name = "playerId", required = false) String playerId,
                                                  @RequestParam(name = "startDate", required = false) String startDate,
-                                                 @RequestParam(name = "endDate", required = false) String endDate) {
-        if (StringUtils.isNotBlank(startDate) && StringUtils.isBlank(endDate)) {
-            endDate = startDate;
-        } else if (StringUtils.isNotBlank(endDate) && StringUtils.isBlank(startDate)) {
-            startDate = endDate;
-        }
-
-        List<BetHistory> betHistoryList;
-        if (StringUtils.isNotBlank(playerId) && StringUtils.isNotBlank(startDate)) {
-            betHistoryList = betHistoryService.getByPlayerIdAndDateRange(playerId, startDate, endDate);
-        } else if (StringUtils.isNotBlank(playerId)) {
-            // date empty, only userId available
-            betHistoryList = betHistoryService.getByPlayerId(playerId);
-        } else {
-            // no parameter passed, used for history page
-            betHistoryList = betHistoryService.getAllBetHistory();
-        }
-        return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistoryList));
-    }
-
-    private List<BetHistory> sortByStatusAndBetTimeDesc(List<BetHistory> betHistoryList) {
-        List<BetHistory> unfinishedBets = new ArrayList<>();
-        List<BetHistory> finishedBets = new ArrayList<>();
-        betHistoryList.forEach(betHistory -> {
-            if (betHistory.getResult() == BetResult.NOT_FINISHED) {
-                unfinishedBets.add(betHistory);
+                                                 @RequestParam(name = "endDate", required = false) String endDate,
+                                                 HttpServletRequest request) {
+        try {
+            List<BetHistory> betHistoryList;
+            if (StringUtils.isBlank(playerId)) {
+                betHistoryList = this.betHistoryService.getAllBetHistory();
             } else {
-                finishedBets.add(betHistory);
+                betHistoryList = this.betHistoryService.getByPlayerIdAndDateRange(playerId, startDate, endDate);
             }
-        });
-
-        Comparator<BetHistory> betHistoryComparator = (bet1, bet2) -> {
-            if (bet2.getBetTimeMs() != bet1.getBetTimeMs()) {
-                return Long.compare(bet2.getBetTimeMs(), bet1.getBetTimeMs());
+            return BaseResponse.success(sortByStatusAndBetTimeAsc(betHistoryList));
+        } finally {
+            if (StringUtils.isNotBlank(playerId)) {
+                RequestUtil.logUserAction(request,
+                        UserAction.VIEW_HISTORY,
+                        Map.of("playerId", playerId, "startDate", startDate, "endDate", endDate)
+                );
             }
-            return Long.compare(bet2.getBetId(), bet1.getBetId());
-        };
-
-        unfinishedBets.sort(betHistoryComparator);
-        finishedBets.sort(betHistoryComparator);
-
-        List<BetHistory> result = new ArrayList<>(unfinishedBets);
-        result.addAll(finishedBets);
-        return result;
+        }
     }
 
     @PostMapping("")

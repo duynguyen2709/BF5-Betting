@@ -14,4 +14,14 @@
     width: 98%;
     margin-top: 0.5rem;
   }
+
+  .ant-badge {
+    width: 100%;
+
+    .ant-badge-dot {
+      width: 10px;
+      height: 10px;
+      top: 8px;
+    }
+  }
 }

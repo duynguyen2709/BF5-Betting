@@ -51,6 +51,7 @@ public class PlayerServiceImpl implements PlayerService {
     }
 
     @Override
+    @TryCatchWrap
     @Transactional
     public List<Player> updatePlayerDataBatch(Collection<Player> players) {
         List<Player> newPlayers = this.playerRepository.saveAll(players);

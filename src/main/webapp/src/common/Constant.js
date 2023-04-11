@@ -2,6 +2,7 @@ const API_URL = {
   BetHistory: '/bets',
   RawBet: '/bets/raw',
   Players: '/players',
+  Statistics: '/statistics',
 };
 
 const ROUTES = {
@@ -59,7 +60,8 @@ const BET_TYPE = {
 }
 
 const LOCAL_STORAGE_KEY = {
-  RawBetQueryParams: 'RAW-BET-QUERY-PARAMS'
+  RawBetQueryParams: 'RAW-BET-QUERY-PARAMS',
+  IsAdmin: 'IS-ADMIN',
 }
 
 const BET_GROUP_TYPE_KEY = {
@@ -68,4 +70,12 @@ const BET_GROUP_TYPE_KEY = {
   Accumulator: 'ACCUMULATOR'
 }
 
-export { API_URL, BET_RESULT, BET_GROUP_TYPE_KEY, BET_TYPE, LOCAL_STORAGE_KEY, ROUTES, RAW_BET_STATUS, MESSAGE };
+const QUERY_HISTORY_ACTION = {
+  View: 'VIEW',
+  Statistic: 'STATISTIC',
+}
+
+export { API_URL, BET_RESULT, BET_GROUP_TYPE_KEY,
+  BET_TYPE, LOCAL_STORAGE_KEY, ROUTES,
+  RAW_BET_STATUS, MESSAGE, QUERY_HISTORY_ACTION
+};

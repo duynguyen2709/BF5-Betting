@@ -1,5 +1,6 @@
 package bf5.betting.service.impl;
 
+import bf5.betting.annotation.TryCatchWrap;
 import bf5.betting.entity.jpa.TeamData;
 import bf5.betting.repository.TeamDataRepository;
 import bf5.betting.service.TeamDataService;
@@ -46,6 +47,7 @@ public class TeamDataServiceImpl implements TeamDataService {
     }
 
     @Override
+    @TryCatchWrap
     @Transactional
     public TeamData insert(TeamData teamData) {
         TeamData result = this.teamDataRepository.save(teamData);
@@ -54,6 +56,7 @@ public class TeamDataServiceImpl implements TeamDataService {
     }
 
     @Override
+    @TryCatchWrap
     @Transactional
     public List<TeamData> insertBatch(Collection<TeamData> teams) {
         List<TeamData> result = this.teamDataRepository.saveAll(teams);

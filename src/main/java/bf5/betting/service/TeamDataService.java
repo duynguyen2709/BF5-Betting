@@ -10,6 +10,8 @@ import java.util.List;
  **/
 public interface TeamDataService {
     String getTeamLogoUrl(String teamName);
+
     TeamData insert(TeamData teamData);
+
     List<TeamData> insertBatch(Collection<TeamData> teams);
 }

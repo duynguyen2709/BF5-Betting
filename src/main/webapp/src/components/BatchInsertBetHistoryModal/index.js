@@ -48,7 +48,11 @@ const BatchInsertBetHistoryModal = ({data, isOpen, onUpdateSuccess, onClose}) =>
                rowKey="betId"
                bordered
                columns={columns}
-               dataSource={data}/>
+               dataSource={data}
+               pagination={{
+                   showTotal: (total) => `Tổng: ${total} cược`
+               }}
+        />
         <Row style={{alignItems: 'center', margin: '1rem 0.5rem 0 0.5rem'}}>
             <Col span={2}>Người Cược:</Col>
             <Col span={4}>

@@ -1,15 +1,15 @@
 import React, {useCallback, useRef, useState} from "react";
 import {exportComponentAsJPEG} from 'react-component-export-image';
-import {Card, Empty, Tabs} from 'antd';
 import {getBetHistory} from '../../apis/BetHistoryApi'
-import {MESSAGE} from "../../common/Constant";
-import BetHistoryCard from "../../components/BetHistoryCard";
+import {getDetailStatistics} from "../../apis/StatisticApi";
+import {QUERY_HISTORY_ACTION} from "../../common/Constant";
 import BetHistoryFilter from "../../components/BetHistoryFilter";
-import BetHistoryStatistic from "../../components/BetHistoryStatistic";
-import HistoryCardMetadata from "../../components/HistoryCardMetadata";
-import {usePlayerContextHook} from "../../hooks";
-import {groupBetHistoriesByType} from "../../utils/BetHistoryUtil";
+import HistoryCardWrapper from "../../components/HistoryCardWrapper";
+
 import './index.scss'
+import PlayerStatisticCard from "../../components/PlayerStatisticCard";
+import PlayerCard from "../../components/PlayerCard";
+import {usePlayerContextHook} from "../../hooks";
 
 const TAB_KEYS = {
     History: {
@@ -28,82 +28,78 @@ const DEFAULT_HISTORY_FILTER_PARAMS = {
     endDate: null,
 }
 
+function sortPlayerByProfitDesc(players) {
+    const playerArray = Object.values(players)
+    playerArray.sort((a, b) => b.totalProfit - a.totalProfit)
+    return playerArray;
+}
+
 const HistoryPage = () => {
     const historyCardRef = useRef()
-    const [activeTab, setActiveTab] = useState(TAB_KEYS.History.key)
-    const [betHistories, setBetHistories] = useState(undefined)
+    const [historyActiveTab, setHistoryActiveTab] = useState(TAB_KEYS.History.key)
+    const [data, setData] = useState(undefined)
+    const [queryMode, setQueryMode] = useState(QUERY_HISTORY_ACTION.View)
     const [historyFilterParams, setHistoryFilterParams] = useState(DEFAULT_HISTORY_FILTER_PARAMS)
     const {players} = usePlayerContextHook()
-    const betHistoriesByGroup = groupBetHistoriesByType(betHistories)
+    const playersWithSortedProfit = sortPlayerByProfitDesc(players)
 
-    const handleSubmitFilter = useCallback((fieldsValue) => {
+    const handleSubmitFilter = useCallback((fieldsValue, queryMode) => {
         // Reset current filter & data
-        setBetHistories(undefined)
+        setQueryMode(queryMode)
+        setData(undefined)
         setHistoryFilterParams(DEFAULT_HISTORY_FILTER_PARAMS)
         // Parse new filter params
         const {playerId, startDate, endDate} = fieldsValue
         const queryParams = {
             playerId,
-            startDate: startDate && startDate.format('YYYY-MM-DD'),
-            endDate: endDate && endDate.format('YYYY-MM-DD'),
+            startDate: startDate.format('YYYY-MM-DD'),
+            endDate: endDate.format('YYYY-MM-DD'),
         }
         setHistoryFilterParams(queryParams)
         // Fetch data
-        getBetHistory(queryParams).then((data) => setBetHistories(data))
+        if (queryMode === QUERY_HISTORY_ACTION.View) {
+            getBetHistory(queryParams).then((data) => setData(data))
+        } else if (queryMode === QUERY_HISTORY_ACTION.Statistic) {
+            getDetailStatistics(queryParams).then((data) => setData(data))
+        }
     }, [])
 
     const handleClickExport = useCallback(() => {
         const delay = 50
-        const lastActiveTab = activeTab;
-        setActiveTab(TAB_KEYS.History.key)
+        const lastActiveTab = historyActiveTab;
+        setHistoryActiveTab(TAB_KEYS.History.key)
         setTimeout(() => {
             exportComponentAsJPEG(historyCardRef)
                 .then(() => {
-                    setActiveTab(TAB_KEYS.Statistic.key)
+                    setHistoryActiveTab(TAB_KEYS.Statistic.key)
                     setTimeout(() => exportComponentAsJPEG(historyCardRef)
-                            .then(() => setActiveTab(lastActiveTab)),
+                            .then(() => setHistoryActiveTab(lastActiveTab)),
                         delay)
                 })
         }, delay)
-    }, [activeTab])
+    }, [historyActiveTab])
 
     const handleChangeTab = useCallback((key) => {
-        setActiveTab(key)
+        setHistoryActiveTab(key)
     }, [])
 
-    const hasFetched = betHistories !== undefined
-    const isHistoryListNotEmpty = betHistories && betHistories.length > 0
-    const isHistoryFetchedButEmpty = betHistories !== undefined && betHistories.length === 0
+    const hasFetched = data !== undefined
+    const isHistoryViewMode = hasFetched && queryMode === QUERY_HISTORY_ACTION.View
+    const isStatisticMode = hasFetched && queryMode === QUERY_HISTORY_ACTION.Statistic
 
     return <>
-        <BetHistoryFilter onSubmit={handleSubmitFilter}
-                          onClickExport={handleClickExport}
-                          isExportButtonActive={isHistoryListNotEmpty}/>
-        {hasFetched &&
-            <Card ref={historyCardRef} className={"card-bet-wrapper"}>
-                <HistoryCardMetadata players={players} data={historyFilterParams}/>
-                {isHistoryFetchedButEmpty &&
-                    <Empty className={'card-bet-empty'} description={MESSAGE.EmptyBetReturned}/>}
-                {isHistoryListNotEmpty && (
-                    <Tabs
-                        activeKey={activeTab}
-                        onChange={handleChangeTab}
-                        items={[
-                            {
-                                label: TAB_KEYS.History.label,
-                                key: TAB_KEYS.History.key,
-                                children: <>{betHistoriesByGroup.map((ele, index) => {
-                                    return <BetHistoryCard key={index} data={ele.data} type={ele.type}/>
-                                })}</>,
-                            },
-                            {
-                                label: TAB_KEYS.Statistic.label,
-                                key: TAB_KEYS.Statistic.key,
-                                children: <BetHistoryStatistic data={betHistories}/>,
-                            },
-                        ]}
-                    />)}
-            </Card>}
+        <BetHistoryFilter onSubmitFilter={handleSubmitFilter}
+                          onClickExport={handleClickExport}/>
+        {!hasFetched && <div className={"list-player-asset-wrapper"}>
+            {playersWithSortedProfit.map(player => <PlayerCard key={player.playerId} data={player}/>)}
+        </div>}
+        {isHistoryViewMode && <HistoryCardWrapper data={data}
+                                                  historyFilterParams={historyFilterParams}
+                                                  historyActiveTab={historyActiveTab}
+                                                  onChangeHistoryActiveTab={handleChangeTab}
+                                                  cardRef={historyCardRef}/>}
+        {isStatisticMode && <PlayerStatisticCard data={data}
+                                                 historyFilterParams={historyFilterParams}/>}
     </>;
 };
 

@@ -1,8 +1,8 @@
 import React, {useCallback} from 'react'
-import {Button, Col, DatePicker, Form, message, Row, Select} from 'antd';
-import {DownloadOutlined} from '@ant-design/icons';
+import {Badge, Button, Col, DatePicker, Form, message, Row, Select} from 'antd';
+import {BarChartOutlined, DownloadOutlined, ProfileOutlined} from '@ant-design/icons';
 import moment from 'moment';
-import {MESSAGE} from "../../common/Constant";
+import {LOCAL_STORAGE_KEY, MESSAGE, QUERY_HISTORY_ACTION} from "../../common/Constant";
 import {usePlayerContextHook} from "../../hooks";
 
 
@@ -12,7 +12,7 @@ const dateFormat = 'DD/MM/YYYY';
 
 const {Option} = Select
 
-const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
+const BetHistoryFilter = ({onSubmitFilter, onClickExport}) => {
     const disabledDate = (current) => {
         return current && current >= moment().endOf('day');
     };
@@ -20,23 +20,26 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
     const [form] = Form.useForm();
     const {players} = usePlayerContextHook()
     const playerList = Object.values(players)
+    const isAdmin = !!localStorage.getItem(LOCAL_STORAGE_KEY.IsAdmin)
 
-    const handleSubmitFilter = useCallback((values) => {
+    const handleSubmitViewHistory = useCallback((values, mode = QUERY_HISTORY_ACTION.View) => {
         const {startDate, endDate} = values
-        if (startDate && endDate) {
-            if (startDate.isAfter(endDate)) {
-                message.error(MESSAGE.StartDateMustBeBeforeOrEqualError, 4)
-                return
-            }
+        if (startDate.isAfter(endDate)) {
+            message.error(MESSAGE.StartDateMustBeBeforeOrEqualError, 4)
+            return
         }
-        onSubmit(values)
-    }, [onSubmit])
+        onSubmitFilter(values, mode)
+    }, [onSubmitFilter])
+
+    const handleSubmitStatistic = useCallback(() => {
+        handleSubmitViewHistory(form.getFieldsValue(), QUERY_HISTORY_ACTION.Statistic)
+    }, [form, handleSubmitViewHistory])
 
     return (
         <Form
             form={form}
             layout={'vertical'}
-            onFinish={handleSubmitFilter}
+            onFinish={handleSubmitViewHistory}
             className={"bet-history-filter-form"}
             initialValues={{
                 startDate: moment().subtract(1, 'day'),
@@ -76,12 +79,12 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
                 </Form.Item>
                 <Form.Item
                     name="startDate"
-                    label="Ngày Cược:"
+                    label="Thời Gian:"
                 >
                     <DatePicker
                         format={dateFormat}
                         disabledDate={disabledDate}
-                        allowClear
+                        allowClear={false}
                         placeholder={'Ngày bắt đầu'}
                         style={{
                             width: '100%',
@@ -94,7 +97,7 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
                     <DatePicker
                         format={dateFormat}
                         disabledDate={disabledDate}
-                        allowClear
+                        allowClear={false}
                         placeholder={'Ngày kết thúc'}
                         style={{
                             width: '100%',
@@ -108,25 +111,38 @@ const BetHistoryFilter = ({onSubmit, onClickExport, isExportButtonActive}) => {
                                 type="primary"
                                 htmlType="submit"
                                 className={"button-submit-filter"}
+                                icon={<ProfileOutlined style={{fontSize: '16px'}}/>}
                             >
-                                Xem Lịch Sử
+                                Danh Sách Cược
                             </Button>
                         </Col>
                         <Col span={12}>
-                            <Button
-                                type="primary"
-                                disabled={!isExportButtonActive}
-                                className={"button-submit-filter"}
-                                ghost
-                                style={{float: 'right'}}
-                                onClick={onClickExport}
-                                icon={<DownloadOutlined style={{fontSize: '16px'}}/>}
-                            >
-                                Tải Lịch Sử
-                            </Button>
+                            <Badge dot>
+                                <Button
+                                    type="primary"
+                                    className={"button-submit-filter"}
+                                    ghost
+                                    style={{float: 'right'}}
+                                    onClick={handleSubmitStatistic}
+                                    icon={<BarChartOutlined style={{fontSize: '16px'}}/>}
+                                >
+                                    Thống Kê
+                                </Button>
+                            </Badge>
                         </Col>
                     </Row>
                 </Form.Item>
+                {isAdmin &&
+                    <Form.Item>
+                        <Button
+                            type="primary"
+                            block
+                            onClick={onClickExport}
+                            icon={<DownloadOutlined style={{fontSize: '16px'}}/>}
+                        >
+                            Tải Lịch Sử
+                        </Button>
+                    </Form.Item>}
             </Col>
         </Form>
     )
