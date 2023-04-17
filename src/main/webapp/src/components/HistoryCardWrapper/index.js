@@ -14,8 +14,8 @@ const TAB_KEYS = {
         key: 'history',
     },
     Statistic: {
-        label: 'Thống Kê',
-        key: 'statistic',
+        label: 'Tổng Hợp',
+        key: 'summary',
     }
 }
 

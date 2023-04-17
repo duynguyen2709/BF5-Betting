@@ -16,7 +16,7 @@ import BetStatisticGroup from "./BetStatisticGroup";
 import './index.scss'
 
 const PlayerStatisticCard = ({data, historyFilterParams}) => {
-    const {betHistoryList} = data
+    const {assetByDateList, betHistoryList} = data
     const {players} = usePlayerContextHook()
 
     const isBetHistoryEmpty = betHistoryList && betHistoryList.length === 0
@@ -31,7 +31,7 @@ const PlayerStatisticCard = ({data, historyFilterParams}) => {
             return <>
                 <Divider style={{margin: '1rem 0'}}/>
                 <BetStatisticGroup title={'Thống Kê Cược'} data={betHistoryList}/>
-                <ChartAssetByDate title={'Thống Kê Lợi Nhuận Theo Ngày'} data={betHistoryList}/>
+                <ChartAssetByDate title={'Thống Kê Tài Sản Theo Ngày'} data={assetByDateList}/>
                 <ChartWinRateByDate title={'Thống Kê Tỉ Lệ Thắng Theo Ngày'} data={betHistoryList}/>
                 <ChartTopWinRateByTournament title={'Thống Kê Kết Quả Theo Giải (Top 5)'} data={betHistoryList}/>
                 <ChartTopWinRateByTeam title={'Thống Kê Kết Quả Theo Đội (Top 5)'} data={betHistoryList}/>

@@ -114,8 +114,7 @@ const AdminPlayerAssetHistoryTable = ({data, onStatisticSuccess}) => {
                columns={columns}
                dataSource={data}
                pagination={{
-                   pageSize: 10,
-                   showSizeChanger: false,
+                   defaultPageSize: 10,
                    showTotal: (total) => `Tổng: ${total} dòng`
                }}
         />

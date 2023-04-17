@@ -36,7 +36,7 @@ public class AutoUpdateBetResultCronJob {
     }
 
     private void run() {
-        log.info("\n================================ Running scheduled auto update bet result job at {} ================================", DateTimeUtil.now());
+        log.info("\n\n======================================== Running scheduled auto update bet result job at {} ========================================", DateTimeUtil.now());
 
         try {
             List<BetHistory> betHistories = rawBetService.getListBetForAutoUpdater()
@@ -52,7 +52,7 @@ public class AutoUpdateBetResultCronJob {
         } catch (Exception ex) {
             log.error("Exception occurred when running auto update bet results job: {}", ex.getMessage(), ex);
         } finally {
-            log.info("\n================================  Finish scheduled auto update bet result job at {} ================================\n", DateTimeUtil.now());
+            log.info("\n========================================  Finish scheduled auto update bet result job at {} ========================================\n", DateTimeUtil.now());
         }
     }
 }

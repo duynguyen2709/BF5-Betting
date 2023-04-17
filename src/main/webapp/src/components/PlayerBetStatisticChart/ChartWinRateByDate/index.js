@@ -21,7 +21,7 @@ const calculateWinRateByDate = (betGroupByDate) => {
     return data
 }
 
-const ChartWinRateByDate = ({data, title}) => {
+const ChartWinRateByDate = ({data, title, width = "350"}) => {
     const betGroupByDate = groupBetHistoriesByDate(data)
     const winRateByDate = calculateWinRateByDate(betGroupByDate)
 
@@ -40,6 +40,7 @@ const ChartWinRateByDate = ({data, title}) => {
                 },
                 xaxis: {
                     categories: winRateByDate.map(ele => ele.date),
+                    tickAmount: winRateByDate.length > 6 ? (winRateByDate.length / 3) : winRateByDate.length
                 },
                 yaxis: {
                     max: 100,
@@ -55,7 +56,7 @@ const ChartWinRateByDate = ({data, title}) => {
                 grid: {
                     borderColor: '#e7e7e7',
                     row: {
-                        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                        colors: ['#f3f3f3', 'transparent'],
                         opacity: 0.5
                     },
                 },
@@ -66,12 +67,11 @@ const ChartWinRateByDate = ({data, title}) => {
             }}
             series={[
                 {
-                    name: "series-1",
                     data: winRateByDate.map(ele => ele.winRate)
                 }
             ]}
             type="line"
-            width="350"
+            width={width}
         />
         <Divider style={{margin: '1rem 0'}}/>
     </>;

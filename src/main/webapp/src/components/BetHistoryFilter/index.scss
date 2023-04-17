@@ -10,9 +10,14 @@
     margin-bottom: 0.5rem;
   }
 
-  .button-submit-filter {
+  .button-submit-filter, .button-submit-statistic {
     width: 98%;
     margin-top: 0.5rem;
+  }
+
+  .button-submit-statistic {
+    border-color: #52c41a;
+    background: #389e0d;
   }
 
   .ant-badge {

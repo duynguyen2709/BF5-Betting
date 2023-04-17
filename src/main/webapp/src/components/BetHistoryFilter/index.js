@@ -120,8 +120,7 @@ const BetHistoryFilter = ({onSubmitFilter, onClickExport}) => {
                             <Badge dot>
                                 <Button
                                     type="primary"
-                                    className={"button-submit-filter"}
-                                    ghost
+                                    className={"button-submit-statistic"}
                                     style={{float: 'right'}}
                                     onClick={handleSubmitStatistic}
                                     icon={<BarChartOutlined style={{fontSize: '16px'}}/>}

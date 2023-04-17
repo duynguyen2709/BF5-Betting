@@ -52,12 +52,12 @@ public class BetMatchDetail {
         return DateTimeUtil.timestampToReadableString(this.matchTime);
     }
 
-    public Timestamp getRawMatchTime() {
-        return this.matchTime;
-    }
-
     public void setMatchTime(String timeStr) {
         this.matchTime = DateTimeUtil.stringToTimestamp(timeStr);
+    }
+
+    public Timestamp getRawMatchTime() {
+        return this.matchTime;
     }
 
     public void setMatchTimeWithTimestamp(Timestamp time) {

@@ -146,9 +146,8 @@ public class StatisticServiceImpl implements StatisticService {
             }
         });
 
-        List<PlayerAssetHistory> assetHistories = new ArrayList<>();
-
         playerIds.forEach(playerId -> {
+            List<PlayerAssetHistory> assetHistories = this.assetHistoryService.getByPlayerIdAndDateRange(playerId, startDateStr, endDateStr);
             List<BetHistory> betHistories = this.betHistoryService.getByPlayerIdAndDateRange(playerId, startDateStr, endDateStr)
                     .stream()
                     .filter(bet -> bet.getResult() != BetResult.NOT_FINISHED && bet.getResult() != BetResult.DRAW)
@@ -156,23 +155,35 @@ public class StatisticServiceImpl implements StatisticService {
                     .collect(Collectors.toList());
 
             for (BetHistory bet : betHistories) {
-                long assetAfter = playerAssetMap.get(bet.getPlayerId()) + bet.getActualProfit();
                 PlayerAssetHistory assetHistory = PlayerAssetHistory.builder()
                         .playerId(bet.getPlayerId())
                         .betId(bet.getBetId())
                         .paymentTime(bet.getResultSettledTime())
                         .action(bet.getActualProfit() > 0 ? PaymentAction.BET_WIN : PaymentAction.BET_LOST)
                         .amount(bet.getActualProfit())
-                        .assetBefore(playerAssetMap.get(bet.getPlayerId()))
-                        .assetAfter(assetAfter)
+                        .assetBefore(0)
+                        .assetAfter(0)
                         .build();
                 assetHistories.add(assetHistory);
-
-                playerAssetMap.put(bet.getPlayerId(), assetAfter);
             }
-        });
 
-        log.info("Process inserting batch asset histories: {}", JsonUtil.toJsonString(assetHistories));
-        this.assetHistoryService.insertBatch(assetHistories);
+            assetHistories.sort(Comparator.comparingLong(o -> o.getRawPaymentTime().getTime()));
+
+            for (int i = 0; i < assetHistories.size(); i++) {
+                PlayerAssetHistory current = assetHistories.get(i);
+                if (current.getAction() == PaymentAction.BET_LOST || current.getAction() == PaymentAction.BET_WIN) {
+                    if (i == 0) {
+                        current.setAssetBefore(playerAssetMap.get(playerId));
+                        current.setAssetAfter(current.getAssetBefore() + current.getAmount());
+                    } else {
+                        current.setAssetBefore(assetHistories.get(i - 1).getAssetAfter());
+                        current.setAssetAfter(current.getAssetBefore() + current.getAmount());
+                    }
+                }
+            }
+
+            log.info("Process inserting batch asset histories: {}", JsonUtil.toJsonString(assetHistories));
+            this.assetHistoryService.insertBatch(assetHistories);
+        });
     }
 }
