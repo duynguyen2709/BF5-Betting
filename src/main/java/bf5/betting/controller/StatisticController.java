@@ -10,13 +10,9 @@ import bf5.betting.service.PlayerAssetHistoryService;
 import bf5.betting.service.StatisticService;
 import bf5.betting.util.RequestUtil;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -69,5 +65,17 @@ public class StatisticController {
                     Map.of("playerId", playerId, "startDate", startDate, "endDate", endDate)
             );
         }
+    }
+
+    @PostMapping("")
+    public BaseResponse statisticByDateRange(@RequestParam(name = "startDate") String startDate,
+                                             @RequestParam(name = "endDate") String endDate,
+                                             @RequestParam(name = "action") String action) {
+        if ("delete".equalsIgnoreCase(action)) {
+            this.assetHistoryService.deleteByDateRange(startDate, endDate);
+        } else if ("statistic".equalsIgnoreCase(action)) {
+            this.statisticService.runStatisticForDateRange(startDate, endDate);
+        }
+        return BaseResponse.SUCCESS;
     }
 }

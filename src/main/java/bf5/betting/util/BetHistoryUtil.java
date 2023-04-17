@@ -3,10 +3,13 @@ package bf5.betting.util;
 
 import bf5.betting.constant.BetResult;
 import bf5.betting.entity.jpa.BetHistory;
+import bf5.betting.entity.response.GetRawBetResponse;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author duynguyen
@@ -48,4 +51,13 @@ public class BetHistoryUtil {
         return result;
     }
 
+    public static Timestamp getLatestResultSettledTime(List<GetRawBetResponse.RawBetEvent> events) {
+        List<GetRawBetResponse.RawBetEvent> sortedEvents = events.stream()
+                .filter(event -> event.getCalculationDate() != null)
+                .sorted((o1, o2) -> Long.compare(o2.getCalculationDate(), o1.getCalculationDate()))
+                .collect(Collectors.toList());
+        long resultSettledTime = sortedEvents.size() > 0 ?
+                (sortedEvents.get(0).getCalculationDate() * 1000) : System.currentTimeMillis();
+        return new Timestamp(resultSettledTime);
+    }
 }

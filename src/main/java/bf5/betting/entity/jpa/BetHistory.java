@@ -43,14 +43,14 @@ public class BetHistory {
     @Column
     private Long actualProfit;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "betId", nullable = false, updatable = false, insertable = false)
     private List<BetMatchDetail> events;
 
     private transient String rawStatus;
 
     public String getBetTime() {
-        return DateTimeUtil.timestampToString(this.betTime);
+        return DateTimeUtil.timestampToReadableString(this.betTime);
     }
 
     public void setBetTime(String timeStr) {
@@ -64,5 +64,12 @@ public class BetHistory {
     @JsonIgnore
     public long getBetTimeMs() {
         return this.betTime.getTime();
+    }
+
+    public void updateResultSettledTime() {
+        if (this.getResultSettledTime() != null || this.getResult() == BetResult.NOT_FINISHED) {
+            return;
+        }
+        this.resultSettledTime = new Timestamp(System.currentTimeMillis());
     }
 }

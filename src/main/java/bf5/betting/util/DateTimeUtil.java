@@ -8,7 +8,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
@@ -20,17 +19,15 @@ public class DateTimeUtil {
 
     public static final String SYSTEM_DATE_ONLY_FORMAT = "yyyy-MM-dd";
     public static final String READABLE_DATE_TIME_FORMAT = "dd/MM/yyyy HH:mm";
-    public static final String READABLE_DATE_ONLY_FORMAT = "dd/MM/yyyy";
     private static final SimpleDateFormat FRIENDLY_DATE_TIME_FORMATTER = new SimpleDateFormat(READABLE_DATE_TIME_FORMAT);
-    private static final SimpleDateFormat FRIENDLY_DATE_ONLY_FORMATTER = new SimpleDateFormat(READABLE_DATE_ONLY_FORMAT);
     private static final SimpleDateFormat SYSTEM_DATE_ONLY_FORMATTER = new SimpleDateFormat(SYSTEM_DATE_ONLY_FORMAT);
     private static final long ONE_DAY_MILLI_SECONDS = 24 * 60 * 60 * 1000;
 
     public static String now() {
-        return timestampToString(new Timestamp(System.currentTimeMillis()));
+        return timestampToReadableString(new Timestamp(System.currentTimeMillis()));
     }
 
-    public static String timestampToString(Timestamp timestamp) {
+    public static String timestampToReadableString(Timestamp timestamp) {
         if (Objects.isNull(timestamp))
             return null;
         return FRIENDLY_DATE_TIME_FORMATTER.format(timestamp);
@@ -54,14 +51,6 @@ public class DateTimeUtil {
             log.error("[stringToDate] raw = {}, format = {}, ex = {}", dateStr, format, ex.getMessage(), ex);
             return null;
         }
-    }
-
-    public static String systemDateToString(Date date) {
-        return SYSTEM_DATE_ONLY_FORMATTER.format(date);
-    }
-
-    public static String friendlyDateToString(Date date) {
-        return FRIENDLY_DATE_ONLY_FORMATTER.format(date);
     }
 
     public static Timestamp stringToTimestamp(String timestampStr, String format) {
@@ -93,16 +82,15 @@ public class DateTimeUtil {
         return new Date(nextDayMilliSeconds);
     }
 
-    public static Date getNextDate(Date date) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.DATE, 1);
-        return calendar.getTime();
-    }
-
     public static Date getYesterday() {
         Date today = new Date(System.currentTimeMillis());
         long yesterdayMs = today.getTime() - ONE_DAY_MILLI_SECONDS;
         return new Date(yesterdayMs);
+    }
+
+    public static String getDateStringFromToday(int plusDays) {
+        long current = System.currentTimeMillis();
+        long plusTime = current + plusDays * ONE_DAY_MILLI_SECONDS;
+        return SYSTEM_DATE_ONLY_FORMATTER.format(new Timestamp(plusTime));
     }
 }

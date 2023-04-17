@@ -3,7 +3,7 @@ import {Card, message, Tabs} from 'antd';
 import {getAllBetHistory} from "../../apis/BetHistoryApi";
 import {MESSAGE} from "../../common/Constant";
 import AdminBetHistoryTable from "../../components/AdminBetHistoryTable";
-import RawBetInfoCard from "../../components/RawBetInfoCard";
+import AdminRawBetManagementTab from "../../components/AdminRawBetManagementTab";
 import AdminPlayerStatisticCard from "../../components/AdminPlayerStatisticCard";
 import {usePlayerContextHook} from "../../hooks";
 
@@ -37,6 +37,11 @@ const AdminPage = () => {
         fetchPlayersData()
     }, [fetchAllBets, fetchPlayersData, fetchAllAssetHistories])
 
+    const handleRunStatisticSuccess = useCallback(() => {
+        message.success(MESSAGE.RunStatisticSuccess)
+        fetchAllAssetHistories()
+    }, [fetchAllAssetHistories])
+
     return (<div className={"admin-table-wrapper"}>
         <AdminPlayerStatisticCard players={players} />
         <Card>
@@ -51,12 +56,12 @@ const AdminPage = () => {
                     {
                         label: `Dữ Liệu Gốc`,
                         key: '2',
-                        children: <RawBetInfoCard onSuccessAction={handleUpdateBetSuccess}/>,
+                        children: <AdminRawBetManagementTab onSuccessAction={handleUpdateBetSuccess}/>,
                     },
                     {
                         label: `Lịch Sử Thanh Toán`,
                         key: '3',
-                        children: <AdminPlayerAssetHistoryTable data={assetHistoryList}/>,
+                        children: <AdminPlayerAssetHistoryTable onStatisticSuccess={handleRunStatisticSuccess} data={assetHistoryList}/>,
                     },
                 ]}
             />

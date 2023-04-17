@@ -44,11 +44,11 @@ public class PlayerAssetHistory {
     private Timestamp updatedAt;
 
     public String getUpdatedAt() {
-        return DateTimeUtil.timestampToString(this.updatedAt);
+        return DateTimeUtil.timestampToReadableString(this.updatedAt);
     }
 
     public String getPaymentTime() {
-        return DateTimeUtil.timestampToString(this.paymentTime);
+        return DateTimeUtil.timestampToReadableString(this.paymentTime);
     }
 
     public Timestamp getRawPaymentTime() {

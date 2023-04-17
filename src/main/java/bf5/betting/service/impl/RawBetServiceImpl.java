@@ -21,6 +21,8 @@ import org.apache.hc.core5.http.ContentType;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -71,6 +73,27 @@ public class RawBetServiceImpl implements RawBetService {
             }
         });
         return entityConverter.convertToPlayerBetHistory(bets);
+    }
+
+    @Override
+    public List<BetHistory> getListBetForAutoUpdater() {
+        if (StringUtils.isEmpty(LAST_ACTIVE_SESSION_TOKEN)) {
+            log.info("LAST_ACTIVE_SESSION_TOKEN is empty");
+            return new ArrayList<>();
+        }
+
+        try {
+            String today = DateTimeUtil.getDateStringFromToday(0);
+            String yesterday = DateTimeUtil.getDateStringFromToday(-1);
+            return entityConverter.convertToPlayerBetHistory(getFromApi(LAST_ACTIVE_SESSION_TOKEN, yesterday, today));
+        } catch (Exception ex) {
+            if (ex instanceof HttpResponseException) {
+                LAST_ACTIVE_SESSION_TOKEN = "";
+                HttpResponseException castedException = (HttpResponseException) ex;
+                throw new UncheckedHttpResponseException(castedException);
+            }
+            throw new RuntimeException(ex);
+        }
     }
 
     private List<GetRawBetResponse.RawBetEntity> getFromApi(String sessionToken, String startDate, String endDate) throws IOException {

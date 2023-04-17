@@ -1,5 +1,6 @@
 package bf5.betting.entity.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GetRawBetResponse implements Serializable {
     private boolean success;
     private RawBetResponseData data;
@@ -21,6 +23,7 @@ public class GetRawBetResponse implements Serializable {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RawBetResponseData implements Serializable {
         private List<RawBetEntity> bets;
     }
@@ -28,6 +31,7 @@ public class GetRawBetResponse implements Serializable {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RawBetEntity implements Serializable {
         private long id; // betID
         private long date; // date * 1000 = betTime
@@ -46,9 +50,14 @@ public class GetRawBetResponse implements Serializable {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class RawBetEvent implements Serializable {
+        @JsonProperty("game_id")
+        private long gameId;
         @JsonProperty("event_type_title")
         private String eventTypeTitle; // event
+        @JsonProperty("calculation_date")
+        private Long calculationDate; // resultSettledTime
         @JsonProperty("game_start_date")
         private long gameStartDate; // gameStartDate * 1000 = matchTime
         @JsonProperty("champ_name")

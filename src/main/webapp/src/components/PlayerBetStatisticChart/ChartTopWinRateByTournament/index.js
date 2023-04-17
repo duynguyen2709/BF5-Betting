@@ -3,6 +3,7 @@ import React from "react";
 import ChartTitle from "../ChartTitle";
 import {filterBetResult, groupBetHistoriesByTournament} from "../../../utils/BetHistoryUtil";
 import {BET_RESULT} from "../../../common/Constant";
+import {Divider} from "antd";
 
 const calculateTopWinRateByTournament = (betGroupByTournament) => {
     const data = []
@@ -14,7 +15,10 @@ const calculateTopWinRateByTournament = (betGroupByTournament) => {
         const totalUnfinished = filterBetResult(group, [BET_RESULT.Unfinished]).length
         const totalWithoutDraw = group.length - totalDraw - totalUnfinished
         const winRate = totalWithoutDraw > 0 ? Math.round(totalWin * 100 / totalWithoutDraw) : undefined
-        data.push({tournament, winRate, totalWin, totalLost, totalBet})
+
+        if (totalUnfinished < totalBet) {
+            data.push({tournament, winRate, totalWin, totalLost, totalBet})
+        }
     })
     data.sort((a, b) => b.totalBet - a.totalBet)
     return data.slice(0, 5)
@@ -23,6 +27,10 @@ const calculateTopWinRateByTournament = (betGroupByTournament) => {
 const ChartTopWinRateByTournament = ({data, title, width = "350"}) => {
     const betGroupByTournament = groupBetHistoriesByTournament(data)
     const topWinRateByTournament = calculateTopWinRateByTournament(betGroupByTournament)
+
+    if (topWinRateByTournament.length === 0) {
+        return null
+    }
 
     return <>
         <ChartTitle text={title}/>
@@ -53,6 +61,11 @@ const ChartTopWinRateByTournament = ({data, title, width = "350"}) => {
                 yaxis: {
                     forceNiceScale: true,
                     decimalsInFloat: 0,
+                    labels: {
+                        style: {
+                            fontSize: '12px'
+                        }
+                    }
                 },
                 stroke: {
                     colors: ["transparent"],
@@ -89,6 +102,7 @@ const ChartTopWinRateByTournament = ({data, title, width = "350"}) => {
             type="bar"
             width={width}
         />
+        <Divider style={{margin: '1rem 0'}}/>
     </>
 }
 

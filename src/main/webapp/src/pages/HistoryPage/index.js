@@ -10,6 +10,7 @@ import './index.scss'
 import PlayerStatisticCard from "../../components/PlayerStatisticCard";
 import PlayerCard from "../../components/PlayerCard";
 import {usePlayerContextHook} from "../../hooks";
+import CenterLoadingSpinner from "../../components/CenterLoadingSpinner";
 
 const TAB_KEYS = {
     History: {
@@ -36,6 +37,7 @@ function sortPlayerByProfitDesc(players) {
 
 const HistoryPage = () => {
     const historyCardRef = useRef()
+    const [loading, setLoading] = useState(false)
     const [historyActiveTab, setHistoryActiveTab] = useState(TAB_KEYS.History.key)
     const [data, setData] = useState(undefined)
     const [queryMode, setQueryMode] = useState(QUERY_HISTORY_ACTION.View)
@@ -44,6 +46,7 @@ const HistoryPage = () => {
     const playersWithSortedProfit = sortPlayerByProfitDesc(players)
 
     const handleSubmitFilter = useCallback((fieldsValue, queryMode) => {
+        setLoading(true)
         // Reset current filter & data
         setQueryMode(queryMode)
         setData(undefined)
@@ -58,9 +61,13 @@ const HistoryPage = () => {
         setHistoryFilterParams(queryParams)
         // Fetch data
         if (queryMode === QUERY_HISTORY_ACTION.View) {
-            getBetHistory(queryParams).then((data) => setData(data))
+            getBetHistory(queryParams)
+                .then((data) => setData(data))
+                .finally(() => setLoading(false))
         } else if (queryMode === QUERY_HISTORY_ACTION.Statistic) {
-            getDetailStatistics(queryParams).then((data) => setData(data))
+            getDetailStatistics(queryParams)
+                .then((data) => setData(data))
+                .finally(() => setLoading(false))
         }
     }, [])
 
@@ -90,9 +97,11 @@ const HistoryPage = () => {
     return <>
         <BetHistoryFilter onSubmitFilter={handleSubmitFilter}
                           onClickExport={handleClickExport}/>
-        {!hasFetched && <div className={"list-player-asset-wrapper"}>
-            {playersWithSortedProfit.map(player => <PlayerCard key={player.playerId} data={player}/>)}
-        </div>}
+        {!hasFetched &&
+            <div className={"list-player-asset-wrapper"}>
+                {playersWithSortedProfit.map(player => <PlayerCard key={player.playerId} data={player}/>)}
+            </div>}
+        {loading && <CenterLoadingSpinner/>}
         {isHistoryViewMode && <HistoryCardWrapper data={data}
                                                   historyFilterParams={historyFilterParams}
                                                   historyActiveTab={historyActiveTab}

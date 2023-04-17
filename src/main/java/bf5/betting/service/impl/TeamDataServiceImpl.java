@@ -1,6 +1,7 @@
 package bf5.betting.service.impl;
 
 import bf5.betting.annotation.TryCatchWrap;
+import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.TeamData;
 import bf5.betting.repository.TeamDataRepository;
 import bf5.betting.service.TeamDataService;
@@ -11,10 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -49,18 +47,43 @@ public class TeamDataServiceImpl implements TeamDataService {
     @Override
     @TryCatchWrap
     @Transactional
-    public TeamData insert(TeamData teamData) {
-        TeamData result = this.teamDataRepository.save(teamData);
-        this.teamDataCacheMap.put(result.getTeamName(), result);
-        return teamData;
-    }
-
-    @Override
-    @TryCatchWrap
-    @Transactional
     public List<TeamData> insertBatch(Collection<TeamData> teams) {
         List<TeamData> result = this.teamDataRepository.saveAll(teams);
         result.forEach(data -> this.teamDataCacheMap.put(data.getTeamName(), data));
         return result;
     }
+
+    @Override
+    @TryCatchWrap
+    @Transactional
+    public void insertTeamDataIfNotAvailable(BetHistory betHistory) {
+        Map<String, TeamData> newTeamData = new HashMap<>();
+        addTeamDataIfNotAvailable(newTeamData, betHistory);
+        if (newTeamData.size() > 0) {
+            this.insertBatch(newTeamData.values());
+        }
+    }
+
+    @Override
+    @TryCatchWrap
+    @Transactional
+    public void insertTeamDataIfNotAvailable(List<BetHistory> betHistories) {
+        Map<String, TeamData> newTeamData = new HashMap<>();
+        betHistories.forEach(bet -> addTeamDataIfNotAvailable(newTeamData, bet));
+        if (newTeamData.size() > 0) {
+            this.insertBatch(newTeamData.values());
+        }
+    }
+
+    private void addTeamDataIfNotAvailable(Map<String, TeamData> newTeamData, BetHistory bet) {
+        bet.getEvents().forEach(event -> {
+            if (Objects.isNull(this.getTeamLogoUrl(event.getFirstTeam()))) {
+                newTeamData.put(event.getFirstTeam(), new TeamData(event.getFirstTeam(), event.getFirstTeamLogoUrl()));
+            }
+            if (Objects.isNull(this.getTeamLogoUrl(event.getSecondTeam()))) {
+                newTeamData.put(event.getSecondTeam(), new TeamData(event.getSecondTeam(), event.getSecondTeamLogoUrl()));
+            }
+        });
+    }
+
 }

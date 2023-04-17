@@ -41,8 +41,16 @@ const isSingleBet = (bet) => (bet?.betType === BET_TYPE.Single)
 
 const isAccumulatorBet = (bet) => (bet?.betType === BET_TYPE.Accumulator)
 
+const isAllUnfinishedBets = (betHistory) => (!(betHistory.some(bet => bet.result !== BET_RESULT.Unfinished.result)))
+
 const buildCommonTableColumn = (players) => {
     return [
+        {
+            title: 'Mã Cược',
+            key: 'betId',
+            dataIndex: 'betId',
+            width: 120,
+        },
         {
             title: 'Người Cược',
             key: 'player',
@@ -148,7 +156,7 @@ const buildCommonTableColumn = (players) => {
                     title: 'Tiền Gốc',
                     key: 'betAmount',
                     width: 80,
-                    render: (_, record) => <MoneyTextCell value={record.betAmount} />
+                    render: (_, record) => <MoneyTextCell value={record.betAmount}/>
                 },
                 {
                     title: 'Tỉ Lệ',
@@ -301,6 +309,8 @@ const getDistinctTeamName = (betHistoryList) => {
     return teams
 };
 
-export {buildCommonTableColumn, groupBetHistoriesByType, groupBetHistoriesByDate,
+export {
+    buildCommonTableColumn, groupBetHistoriesByType, groupBetHistoriesByDate,
     groupBetHistoriesByTeam, groupBetHistoriesByTournament, getDistinctTeamName,
-    filterBetResult, isSingleBet, isAccumulatorBet, parseBetEvent}
+    filterBetResult, isSingleBet, isAccumulatorBet, isAllUnfinishedBets, parseBetEvent
+}

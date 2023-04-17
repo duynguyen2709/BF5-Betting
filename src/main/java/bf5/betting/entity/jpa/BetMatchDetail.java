@@ -25,6 +25,8 @@ public class BetMatchDetail {
     @Column
     private long betId;
     @Column
+    private long matchId;
+    @Column
     private Timestamp matchTime;
     @Column
     private String firstTeam;
@@ -47,7 +49,11 @@ public class BetMatchDetail {
     private transient String firstTeamLogoUrl;
 
     public String getMatchTime() {
-        return DateTimeUtil.timestampToString(this.matchTime);
+        return DateTimeUtil.timestampToReadableString(this.matchTime);
+    }
+
+    public Timestamp getRawMatchTime() {
+        return this.matchTime;
     }
 
     public void setMatchTime(String timeStr) {

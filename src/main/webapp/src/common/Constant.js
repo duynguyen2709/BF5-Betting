@@ -15,8 +15,10 @@ const MESSAGE = {
   DefaultErrorMessage: 'Hệ thống có lỗi. Vui lòng thử lại sau',
   TokenExpiredMessage: 'Token không hợp lệ',
   EmptyBetReturned: 'Không có cược trong thời gian trên',
+  AllBetUnfinished: 'Cược chưa hoàn tất',
   EmptyBetToBeUpdated: 'Không có cược cần cập nhật',
   UpdateBetSuccess: 'Cập nhật cược thành công',
+  RunStatisticSuccess: 'Chạy thống kê thành công',
   StartDateMustBeBeforeOrEqualError: 'Ngày bắt đầu phải trước hoặc bằng ngày kết thúc',
 }
 

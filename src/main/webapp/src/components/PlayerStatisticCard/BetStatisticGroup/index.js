@@ -1,8 +1,8 @@
-import {filterBetResult} from "../../../utils/BetHistoryUtil";
-import {BET_RESULT} from "../../../common/Constant";
-import {ChartTitle} from "../../PlayerBetStatisticChart";
-import {Col, Row, Statistic} from "antd";
 import React from "react";
+import {Col, Divider, Row, Statistic} from "antd";
+import {BET_RESULT} from "../../../common/Constant";
+import {filterBetResult} from "../../../utils/BetHistoryUtil";
+import {ChartTitle} from "../../PlayerBetStatisticChart";
 
 const BetStatisticGroup = ({data, title}) => {
     const totalWin = filterBetResult(data, [BET_RESULT.Win, BET_RESULT.HalfWin]).length
@@ -52,6 +52,7 @@ const BetStatisticGroup = ({data, title}) => {
                 <Statistic title="Lợi Nhuận" value={actualProfit} suffix={"đ"} valueStyle={actualProfitValueStyle}/>
             </Col>
         </Row>
+        <Divider style={{margin: '1rem 0'}}/>
     </>
 }
 

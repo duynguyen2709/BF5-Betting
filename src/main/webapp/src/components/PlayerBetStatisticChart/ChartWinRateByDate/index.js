@@ -3,16 +3,20 @@ import Chart from "react-apexcharts";
 import {BET_RESULT} from "../../../common/Constant";
 import {filterBetResult, groupBetHistoriesByDate} from "../../../utils/BetHistoryUtil";
 import ChartTitle from "../ChartTitle";
+import {Divider} from "antd";
 
 const calculateWinRateByDate = (betGroupByDate) => {
     const data = []
     betGroupByDate.forEach((group, date) => {
+        const totalBet = group.length
         const totalWin = filterBetResult(group, [BET_RESULT.Win, BET_RESULT.HalfWin]).length
         const totalDraw = filterBetResult(group, [BET_RESULT.Draw]).length
         const totalUnfinished = filterBetResult(group, [BET_RESULT.Unfinished]).length
         const totalWithoutDraw = group.length - totalDraw - totalUnfinished
         const winRate = totalWithoutDraw > 0 ? Math.round(totalWin * 100 / totalWithoutDraw) : undefined
-        data.push({date, winRate})
+        if (totalUnfinished < totalBet) {
+            data.push({date, winRate})
+        }
     })
     return data
 }
@@ -20,6 +24,10 @@ const calculateWinRateByDate = (betGroupByDate) => {
 const ChartWinRateByDate = ({data, title}) => {
     const betGroupByDate = groupBetHistoriesByDate(data)
     const winRateByDate = calculateWinRateByDate(betGroupByDate)
+
+    if (winRateByDate.length === 0) {
+        return null
+    }
 
     return <>
         <ChartTitle text={title} />
@@ -53,7 +61,7 @@ const ChartWinRateByDate = ({data, title}) => {
                 },
                 markers: {
                     size: 2,
-                    strokeColors: ['#ff0000']
+                    strokeColors: ['#002A81']
                 },
             }}
             series={[
@@ -65,6 +73,7 @@ const ChartWinRateByDate = ({data, title}) => {
             type="line"
             width="350"
         />
+        <Divider style={{margin: '1rem 0'}}/>
     </>;
 }
 

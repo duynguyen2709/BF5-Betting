@@ -1,7 +1,9 @@
-import React from "react";
+import React, {useCallback} from "react";
 import {Avatar, Row, Table, Tag} from "antd";
 import {usePlayerContextHook} from "../../hooks";
 import MoneyTextCell from "../MoneyTextCell";
+import AssetHistoryStatisticForm from "./AssetHistoryStatisticForm";
+import {doStatistic} from "../../apis/StatisticApi";
 
 const PaymentActionTag = ({action}) => {
     switch (action) {
@@ -17,7 +19,7 @@ const PaymentActionTag = ({action}) => {
 }
 
 
-const AdminPlayerAssetHistoryTable = ({data}) => {
+const AdminPlayerAssetHistoryTable = ({data, onStatisticSuccess}) => {
     const {players} = usePlayerContextHook()
 
     const columns = [
@@ -93,18 +95,31 @@ const AdminPlayerAssetHistoryTable = ({data}) => {
         },
     ];
 
-    return <Table size="middle"
-                  className="table-player-asset-history"
-                  rowKey="id"
-                  bordered
-                  columns={columns}
-                  dataSource={data}
-                  pagination={{
-                      pageSize: 10,
-                      showSizeChanger: false,
-                      showTotal: (total) => `Tổng: ${total} dòng`
-                  }}
-    />
+    const handleSubmitStatistic = useCallback((values) => {
+        const {dateRange} = values;
+        const queryParams = {
+            startDate: dateRange[0].format('YYYY-MM-DD'),
+            endDate: dateRange[1].format('YYYY-MM-DD'),
+            action: 'statistic',
+        }
+        doStatistic(queryParams).then(() => onStatisticSuccess())
+    }, [onStatisticSuccess])
+
+    return <>
+        <AssetHistoryStatisticForm onSubmit={handleSubmitStatistic} />
+        <Table size="middle"
+               className="table-player-asset-history"
+               rowKey="id"
+               bordered
+               columns={columns}
+               dataSource={data}
+               pagination={{
+                   pageSize: 10,
+                   showSizeChanger: false,
+                   showTotal: (total) => `Tổng: ${total} dòng`
+               }}
+        />
+    </>
 }
 
 export default AdminPlayerAssetHistoryTable

@@ -1,8 +1,36 @@
 import Chart from "react-apexcharts";
 import React from "react";
+import {BET_RESULT} from "../../../common/Constant";
+import {filterBetResult, groupBetHistoriesByTeam} from "../../../utils/BetHistoryUtil";
 import ChartTitle from "../ChartTitle";
+import {Divider} from "antd";
 
-const ChartTopWinRateByTournament = ({data, title, width = "350"}) => {
+const calculateTopWinRateByTeam = (betGroupByTeam) => {
+    const data = []
+    betGroupByTeam.forEach((group, team) => {
+        const totalBet = group.length
+        const totalWin = filterBetResult(group, [BET_RESULT.Win, BET_RESULT.HalfWin]).length
+        const totalLost = filterBetResult(group, [BET_RESULT.Lost, BET_RESULT.HalfLost]).length
+        const totalDraw = filterBetResult(group, [BET_RESULT.Draw]).length
+        const totalUnfinished = filterBetResult(group, [BET_RESULT.Unfinished]).length
+        const totalWithoutDraw = group.length - totalDraw - totalUnfinished
+        const winRate = totalWithoutDraw > 0 ? Math.round(totalWin * 100 / totalWithoutDraw) : undefined
+
+        if (totalUnfinished < totalBet) {
+            data.push({team, winRate, totalWin, totalLost, totalBet})
+        }
+    })
+    data.sort((a, b) => b.totalBet - a.totalBet)
+    return data.slice(0, 5)
+}
+
+const ChartTopWinRateByTeam = ({data, title, width = "350"}) => {
+    const betGroupByTeam = groupBetHistoriesByTeam(data)
+    const topWinRateByTeam = calculateTopWinRateByTeam(betGroupByTeam)
+
+    if (topWinRateByTeam.length === 0) {
+        return null
+    }
     return <>
         <ChartTitle text={title}/>
         <Chart
@@ -22,7 +50,7 @@ const ChartTopWinRateByTournament = ({data, title, width = "350"}) => {
                     }
                 },
                 xaxis: {
-                    categories: data.map(ele => ele.team),
+                    categories: topWinRateByTeam.map(ele => ele.team),
                     labels: {
                         style: {
                             fontSize: '12px'
@@ -32,6 +60,11 @@ const ChartTopWinRateByTournament = ({data, title, width = "350"}) => {
                 yaxis: {
                     forceNiceScale: true,
                     decimalsInFloat: 0,
+                    labels: {
+                        style: {
+                            fontSize: '12px'
+                        }
+                    }
                 },
                 stroke: {
                     colors: ["transparent"],
@@ -58,17 +91,18 @@ const ChartTopWinRateByTournament = ({data, title, width = "350"}) => {
             series={[
                 {
                     name: "Thắng",
-                    data: data.map(ele => ele.totalWin)
+                    data: topWinRateByTeam.map(ele => ele.totalWin)
                 },
                 {
                     name: "Thua",
-                    data: data.map(ele => ele.totalLost)
+                    data: topWinRateByTeam.map(ele => ele.totalLost)
                 }
             ]}
             type="bar"
             width={width}
         />
+        <Divider style={{margin: '1rem 0'}}/>
     </>
 }
 
-export default ChartTopWinRateByTournament
+export default ChartTopWinRateByTeam

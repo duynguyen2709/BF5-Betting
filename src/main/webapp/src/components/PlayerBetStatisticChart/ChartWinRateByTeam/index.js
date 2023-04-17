@@ -2,24 +2,8 @@ import React, {useCallback, useState} from "react";
 import {Col, Row, Select} from "antd";
 import Chart from "react-apexcharts";
 import {BET_RESULT} from "../../../common/Constant";
-import {filterBetResult, getDistinctTeamName, groupBetHistoriesByTeam} from "../../../utils/BetHistoryUtil";
-import ChartTopWinRateByTeam from "../ChartTopWinRateByTeam";
-
-const calculateTopWinRateByTeam = (betGroupByTeam) => {
-    const data = []
-    betGroupByTeam.forEach((group, team) => {
-        const totalBet = group.length
-        const totalWin = filterBetResult(group, [BET_RESULT.Win, BET_RESULT.HalfWin]).length
-        const totalLost = filterBetResult(group, [BET_RESULT.Lost, BET_RESULT.HalfLost]).length
-        const totalDraw = filterBetResult(group, [BET_RESULT.Draw]).length
-        const totalUnfinished = filterBetResult(group, [BET_RESULT.Unfinished]).length
-        const totalWithoutDraw = group.length - totalDraw - totalUnfinished
-        const winRate = totalWithoutDraw > 0 ? Math.round(totalWin * 100 / totalWithoutDraw) : undefined
-        data.push({team, winRate, totalWin, totalLost, totalBet})
-    })
-    data.sort((a, b) => b.totalBet - a.totalBet)
-    return data.slice(0, 5)
-}
+import {filterBetResult, getDistinctTeamName} from "../../../utils/BetHistoryUtil";
+import ChartTitle from "../ChartTitle";
 
 const calculateWinRateOfSingleTeam = (betHistoryList, team) => {
     const betsOfTeam = []
@@ -37,7 +21,7 @@ const calculateWinRateOfSingleTeam = (betHistoryList, team) => {
     const totalUnfinished = filterBetResult(betsOfTeam, [BET_RESULT.Unfinished]).length
     const totalWithoutDraw = betsOfTeam.length - totalDraw - totalUnfinished
     const winRate = totalWithoutDraw > 0 ? Math.round(totalWin * 100 / totalWithoutDraw) : undefined
-    return {winRate, totalWin, totalLost}
+    return {winRate, totalWin, totalLost, totalDraw, totalUnfinished}
 }
 
 const ChartWinRateByTeam = ({data, title}) => {
@@ -47,8 +31,6 @@ const ChartWinRateByTeam = ({data, title}) => {
         totalWin: 0,
         totalLost: 0
     })
-    const betGroupByTeam = groupBetHistoriesByTeam(data)
-    const topWinRateByTeam = calculateTopWinRateByTeam(betGroupByTeam)
 
     const onChangeTeam = useCallback((value) => {
         setSelectedTeam(value)
@@ -61,7 +43,7 @@ const ChartWinRateByTeam = ({data, title}) => {
     const teams = Array.from(getDistinctTeamName(data))
 
     return <>
-        <ChartTopWinRateByTeam title={title} data={topWinRateByTeam}/>
+        <ChartTitle text={title}/>
         <Row className={"row-chart-win-rate-by-team"}>
             <Row style={{width: '100%'}}>
                 <Col span={6} className={'label-team-select'}><p>Chọn Đội:</p></Col>
@@ -96,7 +78,7 @@ const ChartWinRateByTeam = ({data, title}) => {
                             categories: [selectedTeam],
                             labels: {
                                 style: {
-                                    fontSize: '12px'
+                                    fontSize: '14px'
                                 }
                             }
                         },
@@ -108,10 +90,9 @@ const ChartWinRateByTeam = ({data, title}) => {
                             width: 1,
                             colors: ['#fff']
                         },
-                        colors: ['#008000', '#ff0000'],
+                        colors: ['#008000', '#ff0000', '#1677ff', '#faad14'],
                         dataLabels: {
                             enabled: true,
-                            offsetY: 8,
                             style: {
                                 fontSize: '16px',
                                 colors: ['#fff']
@@ -126,6 +107,14 @@ const ChartWinRateByTeam = ({data, title}) => {
                         {
                             name: "Thua",
                             data: [winRate.totalLost]
+                        },
+                        {
+                            name: "Hoà",
+                            data: [winRate.totalDraw]
+                        },
+                        {
+                            name: "Chưa Hoàn Tất",
+                            data: [winRate.totalUnfinished]
                         }
                     ]}
                     type="bar"

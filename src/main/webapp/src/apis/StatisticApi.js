@@ -13,4 +13,13 @@ const getDetailStatistics = ({playerId = '', startDate = '', endDate = ''}) => {
     })
 }
 
-export {getAllStatistics, getDetailStatistics};
+const doStatistic = ({startDate, endDate, action}) =>
+    axiosClient.post(API_URL.Statistics, {}, {
+        params: {
+            startDate,
+            endDate,
+            action
+        }
+    })
+
+export {doStatistic, getAllStatistics, getDetailStatistics};

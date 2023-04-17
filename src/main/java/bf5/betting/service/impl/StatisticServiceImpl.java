@@ -1,18 +1,23 @@
 package bf5.betting.service.impl;
 
+import bf5.betting.config.StatisticConfig;
+import bf5.betting.constant.BetResult;
 import bf5.betting.constant.PaymentAction;
+import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.PlayerAssetHistory;
 import bf5.betting.entity.response.BetHistoryStatisticResponse;
+import bf5.betting.service.BetHistoryService;
+import bf5.betting.service.PlayerAssetHistoryService;
+import bf5.betting.service.PlayerService;
 import bf5.betting.service.StatisticService;
 import bf5.betting.util.DateTimeUtil;
+import bf5.betting.util.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -22,6 +27,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Log4j2
 public class StatisticServiceImpl implements StatisticService {
+    private final BetHistoryService betHistoryService;
+    private final PlayerAssetHistoryService assetHistoryService;
+    private final PlayerService playerService;
+    private final StatisticConfig statisticConfig;
 
     private static TreeMap<String, List<PlayerAssetHistory>> groupAssetHistoryByDate(List<PlayerAssetHistory> assetHistories) {
         TreeMap<String, List<PlayerAssetHistory>> mapAssetByDate = new TreeMap<>();
@@ -119,5 +128,51 @@ public class StatisticServiceImpl implements StatisticService {
         });
 
         return statisticList;
+    }
+
+    @Override
+    @Transactional
+    public void runStatisticForDateRange(String startDateStr, String endDateStr) {
+        Map<String, PlayerAssetHistory> nearestAssetHistories = this.assetHistoryService.getNearestAssetHistoryForPlayers(startDateStr);
+        Set<String> playerIds = this.playerService.getAllPlayer().keySet();
+        Map<String, Long> playerAssetMap = new HashMap<>();
+
+        playerIds.forEach(playerId -> {
+            if (nearestAssetHistories.containsKey(playerId)) {
+                playerAssetMap.put(playerId, nearestAssetHistories.get(playerId).getAssetAfter());
+            } else {
+                log.warn("\nCan not find nearest asset history for player {} on date {}", playerId, startDateStr);
+                playerAssetMap.put(playerId, statisticConfig.getPlayerBaseAsset().getOrDefault(playerId, 0L));
+            }
+        });
+
+        List<PlayerAssetHistory> assetHistories = new ArrayList<>();
+
+        playerIds.forEach(playerId -> {
+            List<BetHistory> betHistories = this.betHistoryService.getByPlayerIdAndDateRange(playerId, startDateStr, endDateStr)
+                    .stream()
+                    .filter(bet -> bet.getResult() != BetResult.NOT_FINISHED && bet.getResult() != BetResult.DRAW)
+                    .sorted(Comparator.comparingLong(o -> o.getResultSettledTime().getTime()))
+                    .collect(Collectors.toList());
+
+            for (BetHistory bet : betHistories) {
+                long assetAfter = playerAssetMap.get(bet.getPlayerId()) + bet.getActualProfit();
+                PlayerAssetHistory assetHistory = PlayerAssetHistory.builder()
+                        .playerId(bet.getPlayerId())
+                        .betId(bet.getBetId())
+                        .paymentTime(bet.getResultSettledTime())
+                        .action(bet.getActualProfit() > 0 ? PaymentAction.BET_WIN : PaymentAction.BET_LOST)
+                        .amount(bet.getActualProfit())
+                        .assetBefore(playerAssetMap.get(bet.getPlayerId()))
+                        .assetAfter(assetAfter)
+                        .build();
+                assetHistories.add(assetHistory);
+
+                playerAssetMap.put(bet.getPlayerId(), assetAfter);
+            }
+        });
+
+        log.info("Process inserting batch asset histories: {}", JsonUtil.toJsonString(assetHistories));
+        this.assetHistoryService.insertBatch(assetHistories);
     }
 }

@@ -17,6 +17,10 @@ import java.io.Serializable;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseResponse<T> implements Serializable {
+    public static BaseResponse SUCCESS = BaseResponse.builder()
+            .status("success")
+            .code(200)
+            .build();
     private String status;
     private Integer code;
     private T data;

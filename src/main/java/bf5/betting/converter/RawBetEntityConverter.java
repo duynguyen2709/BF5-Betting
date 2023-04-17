@@ -46,21 +46,21 @@ public class RawBetEntityConverter {
                     rawBet.setPotentialProfit((long) (bet.getSum() * ratio) - bet.getSum());
                     rawBet.setActualProfit(calculateActualProfit(bet));
                     rawBet.setResult(calculateBetHistoryResult(bet));
+                    if (rawBet.getResult() != BetResult.NOT_FINISHED) {
+                        rawBet.setResultSettledTime(BetHistoryUtil.getLatestResultSettledTime(bet.getEvents()));
+                    }
                     List<BetMatchDetail> matchDetails = extractMatchDetails(bet.getEvents(), bet.getId());
                     rawBet.setEvents(matchDetails);
                     if (allBetHistories.containsKey(bet.getId())) {
                         BetHistory insertedHistory = allBetHistories.get(bet.getId());
                         rawBet.setPlayerId(insertedHistory.getPlayerId());
                         rawBet.setRawStatus(RawBetStatus.INSERTED.name());
-
                         if (insertedHistory.getActualProfit() != null) {
                             rawBet.setRawStatus(RawBetStatus.SETTLED.name());
                         } else if (bet.getStatus() != 1 && isAllEventsFinished(bet.getEvents())) {
                             rawBet.setRawStatus(RawBetStatus.RESULT_READY_TO_BE_UPDATED.name());
                         }
-
                         setMatchDetailKeyId(insertedHistory, rawBet);
-
                     } else {
                         rawBet.setRawStatus(RawBetStatus.NEW.name());
                     }
@@ -82,18 +82,16 @@ public class RawBetEntityConverter {
 
     private void setMatchDetailKeyId(BetHistory insertedHistory, BetHistory rawBet) {
         Comparator<BetMatchDetail> comparator = (match1, match2) -> {
-            String key1 = String.format("%s_%s_%s_%s_%s",
+            String key1 = String.format("%s_%s_%s_%s",
                     match1.getMatchTime(),
                     match1.getFirstTeam(),
                     match1.getSecondTeam(),
-                    match1.getTournamentName(),
-                    match1.getEvent());
-            String key2 = String.format("%s_%s_%s_%s_%s",
+                    match1.getTournamentName());
+            String key2 = String.format("%s_%s_%s_%s",
                     match2.getMatchTime(),
                     match2.getFirstTeam(),
                     match2.getSecondTeam(),
-                    match2.getTournamentName(),
-                    match2.getEvent());
+                    match2.getTournamentName());
             return key1.compareTo(key2);
         };
 
@@ -110,6 +108,7 @@ public class RawBetEntityConverter {
                 .map(event -> {
                     BetMatchDetail matchDetail = new BetMatchDetail();
                     matchDetail.setBetId(betId);
+                    matchDetail.setMatchId(event.getGameId());
                     matchDetail.setMatchTimeWithTimestamp(new Timestamp(event.getGameStartDate() * 1000));
                     matchDetail.setFirstTeam(event.getOpp1Name());
                     matchDetail.setSecondTeam(event.getOpp2Name());

@@ -19,4 +19,10 @@ public interface PlayerAssetHistoryRepository extends JpaRepository<PlayerAssetH
     List<PlayerAssetHistory> findByPlayerIdAndDateRange(@Param("playerId") String playerId,
                                                         @Param("startDate") Date startDate,
                                                         @Param("endDate") Date endDate);
+
+    @Query(value = "select * from " +
+            "(select a.*, row_number() over (partition by playerId order by paymentTime desc) rn from PlayerAssetHistory a " +
+            "WHERE paymentTime < :date) a where rn = 1",
+            nativeQuery = true)
+    List<PlayerAssetHistory> findNearestToDateRangeGroupByPlayerId(@Param("date") Date date);
 }
