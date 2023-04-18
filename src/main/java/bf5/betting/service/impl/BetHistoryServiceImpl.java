@@ -50,15 +50,15 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @Override
     @TryCatchWrap
     @Transactional
-    public BetHistory insertBet(BetHistory entity) {
-        entity.updateResultSettledTime();
-        log.info("Process inserting bet from raw data: {}", JsonUtil.toJsonString(entity));
+    public BetHistory insertBet(BetHistory request) {
+        request.updateResultSettledTime();
+        log.info("Process inserting bet from raw data: {}", JsonUtil.toJsonString(request));
 
-        BetHistory betHistory = betHistoryRepository.save(entity);
+        BetHistory betHistory = betHistoryRepository.save(request);
         // Asset Histories must be updated before Players' profit to get most recent states of assets
-        this.assetHistoryService.updateAssetFromBetHistory(betHistory);
-        this.playerService.updatePlayerProfitFromBetHistory(betHistory);
-        this.teamDataService.insertTeamDataIfNotAvailable(betHistory);
+        this.assetHistoryService.updateAssetFromBetHistory(request);
+        this.playerService.updatePlayerProfitFromBetHistory(request);
+        this.teamDataService.insertTeamDataIfNotAvailable(request);
         return betHistory;
     }
 
@@ -69,12 +69,12 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         betHistories.forEach(BetHistory::updateResultSettledTime);
         log.info("Process inserting batch bets from raw data: {}", JsonUtil.toJsonString(betHistories));
 
-        betHistories = this.betHistoryRepository.saveAll(betHistories);
+        List<BetHistory> newBetHistories = this.betHistoryRepository.saveAll(betHistories);
         // Asset Histories must be updated before Players' profit to get most recent states of assets
         this.assetHistoryService.updateAssetFromBetHistoryListInBatch(betHistories);
         this.playerService.updatePlayerProfitFromListBetHistoryInBatch(betHistories);
         this.teamDataService.insertTeamDataIfNotAvailable(betHistories);
-        return betHistories;
+        return newBetHistories;
     }
 
     @Override
