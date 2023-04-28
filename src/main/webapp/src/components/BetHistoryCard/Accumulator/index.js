@@ -1,6 +1,6 @@
 import React from "react";
 import { Card, Divider } from "antd";
-import { BET_RESULT } from "../../../common/Constant";
+import { BET_RESULT, BET_TYPE } from "../../../common/Constant";
 import { parseBetEvent } from "../../../utils/BetHistoryUtil";
 import BetResultTag from "../../BetResultTag";
 import { BetHistoryCardTitle, BetHistoryDetailRow } from "../Common";
@@ -66,6 +66,19 @@ const AccumulatorBetHistoryCard = ({
 };
 
 const AccumulatorBetHistoryCardWrapper = ({ data, isHistoryViewMode }) => {
+  const betTypeText = () => {
+    switch (data.betType) {
+      case BET_TYPE.Accumulator:
+        return "Cược Xiên";
+      case BET_TYPE.Lucky:
+        return "Cược May Mắn";
+      case BET_TYPE.System:
+        return `Cược Hệ Thống (${data.metadata?.combination})`;
+      default:
+        return null;
+    }
+  };
+
   return (
     <>
       {data?.events.map((event, index) => (
@@ -87,7 +100,7 @@ const AccumulatorBetHistoryCardWrapper = ({ data, isHistoryViewMode }) => {
           marginBottom: "0.5rem",
         }}
       >
-        <BetHistoryDetailRow left={"Loại Cược:"} right={"Cược Xiên"} />
+        <BetHistoryDetailRow left={"Loại Cược:"} right={betTypeText()} />
         {isHistoryViewMode && (
           <>
             <BetHistoryDetailRow

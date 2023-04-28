@@ -4,6 +4,7 @@ package bf5.betting.util;
 import bf5.betting.constant.BetResult;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.response.GetRawBetResponse;
+import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -16,20 +17,17 @@ import java.util.stream.Collectors;
  **/
 public class BetHistoryUtil {
 
-    public static String parseEvent(String rawEvent) {
-        if (rawEvent.equals("W1")) {
-            return "Handicap 1 (-0.5)";
+    public static String parseEventDetail(GetRawBetResponse.RawBetEvent event) {
+        String rawEvent = event.getEventTypeTitle();
+        if (StringUtils.isNotBlank(event.getGameTypeTitle())) {
+            rawEvent = String.format("%s: %s", event.getGameTypeTitle(), rawEvent);
         }
-        if (rawEvent.equals("W2")) {
-            return "Handicap 2 (-0.5)";
-        }
-        if (rawEvent.equals("1X")) {
-            return "Handicap 1 (0.5)";
-        }
-        if (rawEvent.equals("2X")) {
-            return "Handicap 2 (0.5)";
-        }
-        return rawEvent;
+
+        return rawEvent
+                .replace("W1", "Handicap 1 (-0.5)")
+                .replace("W2", "Handicap 2 (-0.5)")
+                .replace("1X", "Handicap 1 (0.5)")
+                .replace("2X", "Handicap 2 (0.5)");
     }
 
     public static List<BetHistory> sortByStatusAndBetTimeDesc(List<BetHistory> betHistoryList) {

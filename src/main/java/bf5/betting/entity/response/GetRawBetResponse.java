@@ -60,6 +60,8 @@ public class GetRawBetResponse implements Serializable {
         private long gameId;
         @JsonProperty("event_type_title")
         private String eventTypeTitle; // event
+        @JsonProperty("game_type_title")
+        private String gameTypeTitle; // event
         @JsonProperty("calculation_date")
         private Long calculationDate; // resultSettledTime
         @JsonProperty("game_start_date")

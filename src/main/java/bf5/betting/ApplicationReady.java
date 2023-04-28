@@ -1,6 +1,5 @@
 package bf5.betting;
 
-import bf5.betting.util.SubsetUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -26,22 +25,6 @@ public class ApplicationReady {
     @EventListener(ApplicationReadyEvent.class)
     public void init() {
         showConfiguration();
-
-        List<Double> ratioList = new ArrayList<>();
-        ratioList.add(1.87);
-        ratioList.add(1.81);
-        ratioList.add(1.95);
-        ratioList.add(1.836);
-        ratioList.add(1.81);
-        ratioList.add(1.97);
-        int combination = 4;
-        List<List<Double>> ratioSubsetsOfCombination = SubsetUtil.generateSubsetOfSize(ratioList, combination);
-        double sumRatioOfCombinations = ratioSubsetsOfCombination.stream()
-                .mapToDouble(subset -> subset.stream()
-                        .reduce(1.0, (ratio1, ratio2) -> ratio1 * ratio2))
-                .sum();
-        log.info((double)Math.round((sumRatioOfCombinations / ratioSubsetsOfCombination.size()) * 100000d) / 100000d);
-
     }
 
     private void showConfiguration() {

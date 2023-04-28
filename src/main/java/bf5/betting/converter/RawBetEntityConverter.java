@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -136,7 +135,7 @@ public class RawBetEntityConverter {
                     if (event.getOpp2Images() != null && event.getOpp2Images().size() > 0)
                         matchDetail.setSecondTeamLogoUrl(String.format(TEAM_AVATAR_FORMAT_URL, event.getOpp2Images().get(0)));
                     matchDetail.setTournamentName(event.getChampName());
-                    matchDetail.setEvent(BetHistoryUtil.parseEvent(event.getEventTypeTitle()));
+                    matchDetail.setEvent(BetHistoryUtil.parseEventDetail(event));
                     matchDetail.setFirstHalfOnly(event.getPeriodName().equals("1 Half") ? true : null);
                     matchDetail.setScore(event.getScore());
                     matchDetail.setRatio(event.getCoef());
@@ -173,12 +172,23 @@ public class RawBetEntityConverter {
         if (isFullLost)
             return BetResult.LOST;
 
-        boolean isSingleBet = bet.getTypeTitle().equals(BetType.SINGLE.getTypeTitle());
-        if (isSingleBet) {
-            return BetResult.fromRawBetResult(bet.getEvents().get(0).getResultType());
-        } else {
-            if (bet.getStatus() == 4)
-                return BetResult.WIN;
+        BetType betType = BetType.fromRawValue(bet.getTypeTitle());
+        switch (betType) {
+            case SINGLE:
+                return BetResult.fromRawBetResult(bet.getEvents().get(0).getResultType());
+            case ACCUMULATOR:
+                if (bet.getStatus() == 4)
+                    return BetResult.WIN;
+                break;
+            case SYSTEM:
+            case LUCKY:
+                if (bet.getStatus() == 4) {
+                    if (bet.getWinSum() > bet.getSum())
+                        return BetResult.WIN;
+                    else
+                        return BetResult.LOST;
+                }
+                break;
         }
 
         return BetResult.NOT_FINISHED;

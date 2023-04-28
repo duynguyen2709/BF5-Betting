@@ -27,7 +27,9 @@ const parseBetEvent = (betHistory) => {
     .replace("Total Under", "Xỉu")
     .replace("Total <", "Xỉu")
     .replace(" - Yes", "")
-    .replace(" And ", " & ");
+    .replace(" And ", " & ")
+    .replace("Both Teams To Score", "Cả 2 Đội Cùng Ghi Bàn")
+    .replace("Corners:", "Phạt Góc:");
   const firstHalfText = firstHalfOnly ? "Hiệp 1: " : "";
   return `${firstHalfText}${parsedEvent}`;
 };
