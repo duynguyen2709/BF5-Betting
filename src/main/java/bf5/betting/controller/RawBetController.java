@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeAsc;
+import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeDesc;
 
 /**
  * @author duynguyen
@@ -28,7 +28,7 @@ public class RawBetController {
                                                  @RequestParam("startDate") String startDate,
                                                  @RequestParam("endDate") String endDate) {
         List<BetHistory> betHistories = rawBetService.getAllBetWithConvert(sessionToken, startDate, endDate);
-        return BaseResponse.success(sortByStatusAndBetTimeAsc(betHistories));
+        return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistories));
     }
 
     @PutMapping("/{betId}/result")

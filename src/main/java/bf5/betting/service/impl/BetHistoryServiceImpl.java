@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -67,6 +68,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     @Transactional
     public List<BetHistory> insertBetInBatch(List<BetHistory> betHistories) {
         betHistories.forEach(BetHistory::updateResultSettledTime);
+        betHistories.sort(Comparator.comparing(BetHistory::getBetId));
         log.info("Process inserting batch bets from raw data: {}", JsonUtil.toJsonString(betHistories));
 
         List<BetHistory> newBetHistories = this.betHistoryRepository.saveAll(betHistories);

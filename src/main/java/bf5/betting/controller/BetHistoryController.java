@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
-import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeAsc;
+import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeDesc;
 
 /**
  * @author duynguyen
@@ -36,7 +36,7 @@ public class BetHistoryController {
             } else {
                 betHistoryList = this.betHistoryService.getByPlayerIdAndDateRange(playerId, startDate, endDate);
             }
-            return BaseResponse.success(sortByStatusAndBetTimeAsc(betHistoryList));
+            return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistoryList));
         } finally {
             if (StringUtils.isNotBlank(playerId)) {
                 RequestUtil.logUserAction(request,

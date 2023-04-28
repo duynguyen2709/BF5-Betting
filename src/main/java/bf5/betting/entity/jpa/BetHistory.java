@@ -3,15 +3,18 @@ package bf5.betting.entity.jpa;
 import bf5.betting.constant.BetResult;
 import bf5.betting.constant.BetType;
 import bf5.betting.util.DateTimeUtil;
+import bf5.betting.util.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author duynguyen
@@ -28,6 +31,8 @@ public class BetHistory {
     private String playerId;
     @Column
     private BetType betType;
+    @Column
+    private String metadata;
     @Column
     private Timestamp betTime;
     @Column
@@ -71,5 +76,17 @@ public class BetHistory {
             return;
         }
         this.resultSettledTime = new Timestamp(System.currentTimeMillis());
+    }
+
+    public Map<String, Object> getMetadata() {
+        if (StringUtils.isBlank(this.metadata))
+            return null;
+
+        return JsonUtil.fromJsonStringToMap(this.metadata, String.class, Object.class);
+    }
+
+    public void setMetadata(Map<String, Object> _metadata) {
+        if (_metadata != null && _metadata.size() > 0)
+            this.metadata = JsonUtil.toJsonString(_metadata);
     }
 }

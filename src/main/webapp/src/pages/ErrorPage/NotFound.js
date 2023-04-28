@@ -1,7 +1,7 @@
 import React from "react";
-import {Link} from "react-router-dom";
-import {Button, Col, Row} from "antd";
-import {ROUTES} from "../../common/Constant";
+import { Link } from "react-router-dom";
+import { Button, Col, Row } from "antd";
+import { ROUTES } from "../../common/Constant";
 import NotFoundImage from "../../images/illustrations/404.svg";
 import "./index.scss";
 

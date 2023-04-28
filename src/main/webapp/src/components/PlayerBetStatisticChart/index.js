@@ -5,4 +5,11 @@ import ChartWinRateByDate from "./ChartWinRateByDate";
 import ChartWinRateByTeam from "./ChartWinRateByTeam";
 import ChartAssetByDate from "./ChartAssetByDate";
 
-export {ChartTitle, ChartTopWinRateByTournament, ChartTopWinRateByTeam, ChartWinRateByTeam, ChartWinRateByDate, ChartAssetByDate}
+export {
+  ChartTitle,
+  ChartTopWinRateByTournament,
+  ChartTopWinRateByTeam,
+  ChartWinRateByTeam,
+  ChartWinRateByDate,
+  ChartAssetByDate,
+};

@@ -1,3 +1,3 @@
-import usePlayerContextHook from './usePlayerContextHook'
+import usePlayerContextHook from "./usePlayerContextHook";
 
-export {usePlayerContextHook}
+export { usePlayerContextHook };

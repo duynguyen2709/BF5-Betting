@@ -8,15 +8,17 @@ import bf5.betting.entity.jpa.BetMatchDetail;
 import bf5.betting.entity.response.GetRawBetResponse;
 import bf5.betting.service.BetHistoryService;
 import bf5.betting.util.BetHistoryUtil;
+import bf5.betting.util.JsonUtil;
+import bf5.betting.util.SubsetUtil;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -24,6 +26,7 @@ import java.util.stream.Collectors;
  **/
 @Component
 @AllArgsConstructor
+@Log4j2
 public class RawBetEntityConverter {
     private static final String TEAM_AVATAR_FORMAT_URL = "https://v2l.cdnsfree.com/sfiles/logo_teams/%s";
 
@@ -36,37 +39,53 @@ public class RawBetEntityConverter {
 
         return bets.stream()
                 .map(bet -> {
-                    BetHistory rawBet = new BetHistory();
-                    rawBet.setBetId(bet.getId());
-                    rawBet.setBetType(BetType.fromValue(bet.getTypeTitle()));
-                    rawBet.setBetTimeWithTimestamp(new Timestamp(bet.getDate() * 1000));
-                    rawBet.setBetAmount(bet.getSum());
-                    double ratio = calculateRatio(bet);
-                    rawBet.setRatio(ratio);
-                    rawBet.setPotentialProfit((long) (bet.getSum() * ratio) - bet.getSum());
-                    rawBet.setActualProfit(calculateActualProfit(bet));
-                    rawBet.setResult(calculateBetHistoryResult(bet));
-                    if (rawBet.getResult() != BetResult.NOT_FINISHED) {
-                        rawBet.setResultSettledTime(BetHistoryUtil.getLatestResultSettledTime(bet.getEvents()));
-                    }
-                    List<BetMatchDetail> matchDetails = extractMatchDetails(bet.getEvents(), bet.getId());
-                    rawBet.setEvents(matchDetails);
-                    if (allBetHistories.containsKey(bet.getId())) {
-                        BetHistory insertedHistory = allBetHistories.get(bet.getId());
-                        rawBet.setPlayerId(insertedHistory.getPlayerId());
-                        rawBet.setRawStatus(RawBetStatus.INSERTED.name());
-                        if (insertedHistory.getActualProfit() != null) {
-                            rawBet.setRawStatus(RawBetStatus.SETTLED.name());
-                        } else if (bet.getStatus() != 1 && isAllEventsFinished(bet.getEvents())) {
-                            rawBet.setRawStatus(RawBetStatus.RESULT_READY_TO_BE_UPDATED.name());
+                    try {
+                        BetHistory rawBet = new BetHistory();
+                        rawBet.setBetId(bet.getId());
+                        rawBet.setBetType(BetType.fromRawValue(bet.getTypeTitle()));
+                        rawBet.setMetadata(getBetMetadata(bet));
+                        rawBet.setBetTimeWithTimestamp(new Timestamp(bet.getDate() * 1000));
+                        rawBet.setBetAmount(bet.getSum());
+                        double ratio = calculateRatio(bet);
+                        rawBet.setRatio(ratio);
+                        rawBet.setPotentialProfit((long) (bet.getSum() * ratio) - bet.getSum());
+                        rawBet.setActualProfit(calculateActualProfit(bet));
+                        rawBet.setResult(calculateBetHistoryResult(bet));
+                        if (rawBet.getResult() != BetResult.NOT_FINISHED) {
+                            rawBet.setResultSettledTime(BetHistoryUtil.getLatestResultSettledTime(bet.getEvents()));
                         }
-                        setMatchDetailKeyId(insertedHistory, rawBet);
-                    } else {
-                        rawBet.setRawStatus(RawBetStatus.NEW.name());
+                        List<BetMatchDetail> matchDetails = extractMatchDetails(bet.getEvents(), bet.getId());
+                        rawBet.setEvents(matchDetails);
+                        if (allBetHistories.containsKey(bet.getId())) {
+                            BetHistory insertedHistory = allBetHistories.get(bet.getId());
+                            rawBet.setPlayerId(insertedHistory.getPlayerId());
+                            rawBet.setRawStatus(RawBetStatus.INSERTED.name());
+                            if (insertedHistory.getActualProfit() != null) {
+                                rawBet.setRawStatus(RawBetStatus.SETTLED.name());
+                            } else if (bet.getStatus() != 1 && isAllEventsFinished(bet.getEvents())) {
+                                rawBet.setRawStatus(RawBetStatus.RESULT_READY_TO_BE_UPDATED.name());
+                            }
+                            setMatchDetailKeyId(insertedHistory, rawBet);
+                        } else {
+                            rawBet.setRawStatus(RawBetStatus.NEW.name());
+                        }
+                        return rawBet;
+                    } catch (Exception ex) {
+                        log.error("[convertToPlayerBetHistory] RawBet: {}, exception: {}",
+                                JsonUtil.toJsonString(bet), ex.getMessage(), ex);
+                        return null;
                     }
-                    return rawBet;
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    private Map<String, Object> getBetMetadata(GetRawBetResponse.RawBetEntity bet) {
+        Map<String, Object> metadata = new HashMap<>();
+        if (StringUtils.isNotBlank(bet.getFormattedSystemType())) {
+            metadata.put("combination", bet.getFormattedSystemType());
+        }
+        return metadata;
     }
 
     private boolean isAllEventsFinished(List<GetRawBetResponse.RawBetEvent> events) {
@@ -135,7 +154,13 @@ public class RawBetEntityConverter {
         if (isFullLost)
             return (-1) * bet.getSum();
 
-        return bet.getWinSum() - bet.getSum();
+        if (bet.getWinSum() != null)
+            return bet.getWinSum() - bet.getSum();
+
+        if (bet.getOutSum() != null)
+            return bet.getOutSum() - bet.getSum();
+
+        return bet.getSum();
     }
 
     private BetResult calculateBetHistoryResult(GetRawBetResponse.RawBetEntity bet) {
@@ -143,11 +168,12 @@ public class RawBetEntityConverter {
         if (isNotFinished)
             return BetResult.NOT_FINISHED;
 
-        boolean isFullLost = bet.getStatus() == 2;
+        // TODO: Handle bet sold
+        boolean isFullLost = bet.getStatus() == 2 || bet.getStatus() == 8; // status = 8 => bet sold
         if (isFullLost)
             return BetResult.LOST;
 
-        boolean isSingleBet = bet.getTypeTitle().equalsIgnoreCase(BetType.SINGLE.name());
+        boolean isSingleBet = bet.getTypeTitle().equals(BetType.SINGLE.getTypeTitle());
         if (isSingleBet) {
             return BetResult.fromRawBetResult(bet.getEvents().get(0).getResultType());
         } else {
@@ -166,10 +192,32 @@ public class RawBetEntityConverter {
     }
 
     private double calculateRatio(GetRawBetResponse.RawBetEntity bet) {
-        boolean isSingleBet = bet.getTypeTitle().equalsIgnoreCase(BetType.SINGLE.name());
-        if (isSingleBet) {
-            return bet.getEvents().get(0).getCoef();
+        List<Double> ratioList = bet.getEvents().stream()
+                .map(GetRawBetResponse.RawBetEvent::getCoef)
+                .collect(Collectors.toList());
+        BetType betType = BetType.fromRawValue(bet.getTypeTitle());
+        switch (betType) {
+            case SINGLE:
+                return bet.getEvents().get(0).getCoef();
+            case ACCUMULATOR:
+                return bet.getCoef();
+            case LUCKY:
+                List<List<Double>> ratioSubsets = SubsetUtil.generateAllSubsets(ratioList);
+                double sumRatio = ratioSubsets.stream()
+                        .mapToDouble(subset -> subset.stream()
+                                .reduce(1.0, (ratio1, ratio2) -> ratio1 * ratio2))
+                        .sum();
+                return (double)Math.round((sumRatio / ratioSubsets.size()) * 100000d) / 100000d;
+            case SYSTEM:
+                int combination = Integer.parseInt(bet.getFormattedSystemType().split("/")[0]);
+                List<List<Double>> ratioSubsetsOfCombination = SubsetUtil.generateSubsetOfSize(ratioList, combination);
+                double sumRatioOfCombinations = ratioSubsetsOfCombination.stream()
+                        .mapToDouble(subset -> subset.stream()
+                                .reduce(1.0, (ratio1, ratio2) -> ratio1 * ratio2))
+                        .sum();
+                return (double)Math.round((sumRatioOfCombinations / ratioSubsetsOfCombination.size()) * 100000d) / 100000d;
+            default:
+                return 1.0;
         }
-        return bet.getCoef();
     }
 }

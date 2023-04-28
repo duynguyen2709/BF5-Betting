@@ -1,108 +1,124 @@
 import Chart from "react-apexcharts";
 import React from "react";
-import {BET_RESULT} from "../../../common/Constant";
-import {filterBetResult, groupBetHistoriesByTeam} from "../../../utils/BetHistoryUtil";
+import { BET_RESULT } from "../../../common/Constant";
+import {
+  filterBetResult,
+  groupBetHistoriesByTeam,
+} from "../../../utils/BetHistoryUtil";
 import ChartTitle from "../ChartTitle";
-import {Divider} from "antd";
+import { Divider } from "antd";
 
 const calculateTopWinRateByTeam = (betGroupByTeam) => {
-    const data = []
-    betGroupByTeam.forEach((group, team) => {
-        const totalBet = group.length
-        const totalWin = filterBetResult(group, [BET_RESULT.Win, BET_RESULT.HalfWin]).length
-        const totalLost = filterBetResult(group, [BET_RESULT.Lost, BET_RESULT.HalfLost]).length
-        const totalDraw = filterBetResult(group, [BET_RESULT.Draw]).length
-        const totalUnfinished = filterBetResult(group, [BET_RESULT.Unfinished]).length
-        const totalWithoutDraw = group.length - totalDraw - totalUnfinished
-        const winRate = totalWithoutDraw > 0 ? Math.round(totalWin * 100 / totalWithoutDraw) : undefined
+  const data = [];
+  betGroupByTeam.forEach((group, team) => {
+    const totalBet = group.length;
+    const totalWin = filterBetResult(group, [
+      BET_RESULT.Win,
+      BET_RESULT.HalfWin,
+    ]).length;
+    const totalLost = filterBetResult(group, [
+      BET_RESULT.Lost,
+      BET_RESULT.HalfLost,
+    ]).length;
+    const totalDraw = filterBetResult(group, [BET_RESULT.Draw]).length;
+    const totalUnfinished = filterBetResult(group, [
+      BET_RESULT.Unfinished,
+    ]).length;
+    const totalWithoutDraw = group.length - totalDraw - totalUnfinished;
+    const winRate =
+      totalWithoutDraw > 0
+        ? Math.round((totalWin * 100) / totalWithoutDraw)
+        : undefined;
 
-        if (totalUnfinished < totalBet) {
-            data.push({team, winRate, totalWin, totalLost, totalBet})
-        }
-    })
-    data.sort((a, b) => b.totalBet - a.totalBet)
-    return data.slice(0, 5)
-}
-
-const ChartTopWinRateByTeam = ({data, title, width = "350"}) => {
-    const betGroupByTeam = groupBetHistoriesByTeam(data)
-    const topWinRateByTeam = calculateTopWinRateByTeam(betGroupByTeam)
-
-    if (topWinRateByTeam.length === 0) {
-        return null
+    if (totalUnfinished < totalBet) {
+      data.push({ team, winRate, totalWin, totalLost, totalBet });
     }
-    return <>
-        <ChartTitle text={title}/>
-        <Chart
-            options={{
-                chart: {
-                    toolbar: {
-                        show: false,
-                    },
-                },
-                plotOptions: {
-                    bar: {
-                        horizontal: true,
-                        barHeight: '100%',
-                        dataLabels: {
-                            position: 'top',
-                        },
-                    }
-                },
-                xaxis: {
-                    categories: topWinRateByTeam.map(ele => ele.team),
-                    labels: {
-                        style: {
-                            fontSize: '12px'
-                        }
-                    }
-                },
-                yaxis: {
-                    forceNiceScale: true,
-                    decimalsInFloat: 0,
-                    labels: {
-                        style: {
-                            fontSize: '12px'
-                        }
-                    }
-                },
-                stroke: {
-                    colors: ["transparent"],
-                    width: 2
-                },
-                colors: ['#008000', '#ff0000'],
-                dataLabels: {
-                    enabled: true,
-                    offsetX: -2,
-                    offsetY: -1,
-                    style: {
-                        fontSize: '11px',
-                        colors: ['#fff']
-                    }
-                },
-                grid: {
-                    borderColor: '#e7e7e7',
-                    row: {
-                        colors: ['#f3f3f3', 'transparent'],
-                        opacity: 0.5
-                    },
-                },
-            }}
-            series={[
-                {
-                    name: "Thắng",
-                    data: topWinRateByTeam.map(ele => ele.totalWin)
-                },
-                {
-                    name: "Thua",
-                    data: topWinRateByTeam.map(ele => ele.totalLost)
-                }
-            ]}
-            type="bar"
-            width={width}
-        />
-        <Divider style={{margin: '1rem 0'}}/>
-    </>
-}
+  });
+  data.sort((a, b) => b.totalBet - a.totalBet);
+  return data.slice(0, 5);
+};
 
-export default ChartTopWinRateByTeam
+const ChartTopWinRateByTeam = ({ data, title, width = "350" }) => {
+  const betGroupByTeam = groupBetHistoriesByTeam(data);
+  const topWinRateByTeam = calculateTopWinRateByTeam(betGroupByTeam);
+
+  if (topWinRateByTeam.length === 0) {
+    return null;
+  }
+  return (
+    <>
+      <ChartTitle text={title} />
+      <Chart
+        options={{
+          chart: {
+            toolbar: {
+              show: false,
+            },
+          },
+          plotOptions: {
+            bar: {
+              horizontal: true,
+              barHeight: "100%",
+              dataLabels: {
+                position: "top",
+              },
+            },
+          },
+          xaxis: {
+            categories: topWinRateByTeam.map((ele) => ele.team),
+            labels: {
+              style: {
+                fontSize: "12px",
+              },
+            },
+          },
+          yaxis: {
+            forceNiceScale: true,
+            decimalsInFloat: 0,
+            labels: {
+              style: {
+                fontSize: "12px",
+              },
+            },
+          },
+          stroke: {
+            colors: ["transparent"],
+            width: 2,
+          },
+          colors: ["#008000", "#ff0000"],
+          dataLabels: {
+            enabled: true,
+            offsetX: -2,
+            offsetY: -1,
+            style: {
+              fontSize: "11px",
+              colors: ["#fff"],
+            },
+          },
+          grid: {
+            borderColor: "#e7e7e7",
+            row: {
+              colors: ["#f3f3f3", "transparent"],
+              opacity: 0.5,
+            },
+          },
+        }}
+        series={[
+          {
+            name: "Thắng",
+            data: topWinRateByTeam.map((ele) => ele.totalWin),
+          },
+          {
+            name: "Thua",
+            data: topWinRateByTeam.map((ele) => ele.totalLost),
+          },
+        ]}
+        type="bar"
+        width={width}
+      />
+      <Divider style={{ margin: "1rem 0" }} />
+    </>
+  );
+};
+
+export default ChartTopWinRateByTeam;

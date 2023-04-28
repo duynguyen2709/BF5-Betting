@@ -39,9 +39,13 @@ public class GetRawBetResponse implements Serializable {
         private int status;
         @JsonProperty("type_title")
         private String typeTitle; // Single / Accumulator
+        @JsonProperty("formatted_system_type")
+        private String formattedSystemType; // "4\/6"
         private long sum; // betAmount
         @JsonProperty("win_sum")
         private Long winSum; // actualProfit
+        @JsonProperty("out_sum")
+        private Long outSum; // sell bet
         @JsonProperty("possible_win_sum")
         private Long possibleWinSum; // possibleWinSum - sum = potentialProfit
         private List<RawBetEvent> events;

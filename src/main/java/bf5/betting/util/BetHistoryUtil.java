@@ -32,7 +32,7 @@ public class BetHistoryUtil {
         return rawEvent;
     }
 
-    public static List<BetHistory> sortByStatusAndBetTimeAsc(List<BetHistory> betHistoryList) {
+    public static List<BetHistory> sortByStatusAndBetTimeDesc(List<BetHistory> betHistoryList) {
         List<BetHistory> unfinishedBets = new ArrayList<>();
         List<BetHistory> finishedBets = new ArrayList<>();
         betHistoryList.forEach(betHistory -> {
@@ -43,8 +43,9 @@ public class BetHistoryUtil {
             }
         });
 
-        unfinishedBets.sort(Comparator.comparingLong(BetHistory::getBetTimeMs));
-        finishedBets.sort(Comparator.comparingLong(BetHistory::getBetTimeMs));
+        Comparator<BetHistory> betTimeDescComparator = (o1, o2) -> Long.compare(o2.getBetTimeMs(), o1.getBetTimeMs());
+        unfinishedBets.sort(betTimeDescComparator);
+        finishedBets.sort(betTimeDescComparator);
 
         List<BetHistory> result = new ArrayList<>(unfinishedBets);
         result.addAll(finishedBets);
