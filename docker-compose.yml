@@ -1,0 +1,42 @@
+version: "3.8"
+
+services:
+  betting_db:
+    image: mysql
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=XxeblIl0&C&zcG@t
+      - MYSQL_DATABASE=Bf5Betting
+      - TZ=Asia/Ho_Chi_Minh
+    ports:
+      - "3306:3306"
+    volumes:
+      - db:/var/lib/mysql
+    networks:
+      betting-net:
+
+  betting_webapp:
+    depends_on:
+      - betting_db
+    image: duyna5/bf5-betting
+    restart: on-failure
+    environment:
+      - TZ=Asia/Ho_Chi_Minh
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=XxeblIl0&C&zcG@t
+      - MYSQL_HOST=betting_db:3306
+      - MYSQL_DATABASE=Bf5Betting
+    ports:
+      - "8080:8080"
+    volumes:
+      - .m2:/root/.m2
+    networks:
+      betting-net:
+    stdin_open: true
+    tty: true
+
+networks:
+  betting-net:
+
+volumes:
+  db:

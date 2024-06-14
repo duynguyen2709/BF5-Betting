@@ -13,7 +13,7 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
   datasource:
-    url: jdbc:mysql://${MYSQL_HOST}:3306/Bf5Betting?allowPublicKeyRetrieval=true&useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=GMT%2B7
+    url: jdbc:mysql://${MYSQL_HOST}/${MYSQL_DATABASE}?allowPublicKeyRetrieval=true&useSSL=false&zeroDateTimeBehavior=convertToNull&useUnicode=yes&characterEncoding=UTF-8&useLegacyDatetimeCode=false&serverTimezone=GMT%2B7
     username: ${MYSQL_USERNAME}
     password: ${MYSQL_PASSWORD}
     hikari:
@@ -32,7 +32,9 @@ spring:
 
 statistic:
   player-base-asset:
-    100004056801368: 88260 # Thanh Duy
+    100004056801368: 0 # Thanh Duy
     100004533095969: 0 # Trung Anh
     100010972726703: 0 # Tân
     100002362515754: 0 # Duy Nguyễn
+    100004614064009: 0 # Bruno
+    100003664809869: 0 # Rys
