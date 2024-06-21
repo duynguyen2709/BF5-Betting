@@ -59,7 +59,7 @@ public class TeamDataServiceImpl implements TeamDataService {
     public void insertTeamDataIfNotAvailable(BetHistory betHistory) {
         Map<String, TeamData> newTeamData = new HashMap<>();
         addTeamDataIfNotAvailable(newTeamData, betHistory);
-        if (newTeamData.size() > 0) {
+        if (!newTeamData.isEmpty()) {
             this.insertBatch(newTeamData.values());
         }
     }
@@ -70,18 +70,21 @@ public class TeamDataServiceImpl implements TeamDataService {
     public void insertTeamDataIfNotAvailable(List<BetHistory> betHistories) {
         Map<String, TeamData> newTeamData = new HashMap<>();
         betHistories.forEach(bet -> addTeamDataIfNotAvailable(newTeamData, bet));
-        if (newTeamData.size() > 0) {
+        if (!newTeamData.isEmpty()) {
             this.insertBatch(newTeamData.values());
         }
     }
 
     private void addTeamDataIfNotAvailable(Map<String, TeamData> newTeamData, BetHistory bet) {
+        final String defaultLogo = "https://v2l.cdnsfree.com/sfiles/logo_teams/teamdefault.png";
         bet.getEvents().forEach(event -> {
             if (Objects.isNull(this.getTeamLogoUrl(event.getFirstTeam()))) {
-                newTeamData.put(event.getFirstTeam(), new TeamData(event.getFirstTeam(), event.getFirstTeamLogoUrl()));
+                String url = StringUtils.isBlank(event.getFirstTeamLogoUrl()) ? defaultLogo : event.getFirstTeamLogoUrl();
+                newTeamData.put(event.getFirstTeam(), new TeamData(event.getFirstTeam(), url));
             }
             if (Objects.isNull(this.getTeamLogoUrl(event.getSecondTeam()))) {
-                newTeamData.put(event.getSecondTeam(), new TeamData(event.getSecondTeam(), event.getSecondTeamLogoUrl()));
+                String url = StringUtils.isBlank(event.getSecondTeamLogoUrl()) ? defaultLogo : event.getSecondTeamLogoUrl();
+                newTeamData.put(event.getSecondTeam(), new TeamData(event.getSecondTeam(), url));
             }
         });
     }

@@ -6,7 +6,6 @@ const API_URL = {
 };
 
 const ROUTES = {
-  Index: { path: "/index.html" },
   Base: { path: "/" },
   Admin: { path: "/admin" },
 };

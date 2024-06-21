@@ -14,6 +14,7 @@ import bf5.betting.util.DateTimeUtil;
 import bf5.betting.util.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +37,20 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     private final PlayerAssetHistoryService assetHistoryService;
 
     @Override
+    public List<BetHistory> getRecentUnfinishedBets() {
+        Date startDate = DateTimeUtil.getYesterday();
+        Date afterEndDate = DateTimeUtil.getNextDate(DateTimeUtil.getDateStringFromToday(0));
+        return withTeamDataWrapper(betHistoryRepository.findByResultAndDateRange(BetResult.NOT_FINISHED, startDate, afterEndDate));
+    }
+
+    @Override
     @TryCatchWrap
     public List<BetHistory> getAllBetHistory() {
         return withTeamDataWrapper(betHistoryRepository.findAll());
     }
 
     @Override
+    @TryCatchWrap
     public List<BetHistory> getByPlayerIdAndDateRange(String playerId, String startDateStr, String endDate) {
         Date startDate = DateTimeUtil.stringToDate(startDateStr, DateTimeUtil.SYSTEM_DATE_ONLY_FORMAT);
         Date afterEndDate = DateTimeUtil.getNextDate(endDate);

@@ -34,7 +34,8 @@ CREATE TABLE `BetHistory` (
   `betTime` timestamp NOT NULL,
   `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`betId`),
-  KEY `idx_playerId_betTime` (`playerId`,`betTime`)
+  KEY `idx_playerId_betTime` (`playerId`,`betTime`),
+  KEY `idx_result_betTime` (`result`,`betTime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

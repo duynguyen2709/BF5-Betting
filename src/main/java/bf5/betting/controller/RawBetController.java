@@ -31,6 +31,12 @@ public class RawBetController {
         return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistories));
     }
 
+    @GetMapping("/quick")
+    BaseResponse<List<BetHistory>> getQuickRawBets(@RequestParam(value = "sessionToken", required = false) String sessionToken) {
+        List<BetHistory> betHistories = rawBetService.quickGetLast30MinutesBets(sessionToken);
+        return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistories));
+    }
+
     @PutMapping("/{betId}/result")
     public BaseResponse<BetHistory> updateResultFromRaw(@PathVariable("betId") long betId, @RequestBody BetHistory request) {
         request.setBetId(betId);

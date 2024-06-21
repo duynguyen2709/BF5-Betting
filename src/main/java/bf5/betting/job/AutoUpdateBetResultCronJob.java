@@ -43,7 +43,7 @@ public class AutoUpdateBetResultCronJob {
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(this::run,
                 0,
-                TimeUnit.HOURS.toSeconds(2),
+                TimeUnit.MINUTES.toSeconds(15),
                 TimeUnit.SECONDS);
     }
 

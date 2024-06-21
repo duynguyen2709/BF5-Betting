@@ -1,0 +1,36 @@
+.card-player {
+  margin-right: 1rem;
+  margin-left: 1rem;
+}
+
+.header-row {
+  display: flex;
+  flex-direction: row;
+  margin: -4px 0;
+
+  .header-avatar {
+    padding-right: 16px;
+    box-sizing: border-box;
+  }
+
+  .header-detail {
+    flex: 1 1;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    .header-player-name {
+      color: rgba(0, 0, 0, .85);
+      font-size: 16px;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+    }
+
+    .ant-statistic-content {
+      font-size: 18px;
+    }
+  }
+}

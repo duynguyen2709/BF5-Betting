@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeDesc;
 
@@ -23,6 +24,15 @@ import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeDesc;
 @AllArgsConstructor
 public class BetHistoryController {
     private final BetHistoryService betHistoryService;
+
+    @GetMapping("/recent")
+    public BaseResponse<Map<String, List<BetHistory>>> getRecentUnfinishedBets() {
+        List<BetHistory> betHistoryList = this.betHistoryService.getRecentUnfinishedBets();
+        Map<String, List<BetHistory>> betGroupByPlayerId = betHistoryList.stream()
+                .collect(Collectors.groupingBy(BetHistory::getPlayerId));
+        return BaseResponse.success(betGroupByPlayerId);
+    }
+
 
     @GetMapping("")
     public BaseResponse<List<BetHistory>> getAll(@RequestParam(name = "playerId", required = false) String playerId,

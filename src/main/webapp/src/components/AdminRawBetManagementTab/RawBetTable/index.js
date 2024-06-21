@@ -69,7 +69,7 @@ const RawBetTable = ({
   const hasScoreColumn = hasAtLeastOneMatchWithScore(data);
   let index = 4;
   if (hasScoreColumn) {
-    columns.splice(index++, 0, {
+    columns.splice(index, 0, {
       title: "Tỉ Số",
       key: "score",
       width: 80,
@@ -96,6 +96,7 @@ const RawBetTable = ({
     title: "Hành Động",
     key: "action",
     width: 120,
+    fixed: "right",
     render: (_, record) => {
       return (
         <>
@@ -134,6 +135,9 @@ const RawBetTable = ({
         defaultPageSize: 10,
         showSizeChanger: true,
         showTotal: (total) => `Tổng: ${total} cược`,
+      }}
+      scroll={{
+        x: 2000,
       }}
     />
   );

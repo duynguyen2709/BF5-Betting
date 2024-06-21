@@ -21,4 +21,6 @@ public interface BetHistoryService {
     BetHistory updateBetResultFromRaw(BetHistory request);
 
     List<BetHistory> updateBatchBetResultFromRaw(List<BetHistory> request);
+
+    List<BetHistory> getRecentUnfinishedBets();
 }

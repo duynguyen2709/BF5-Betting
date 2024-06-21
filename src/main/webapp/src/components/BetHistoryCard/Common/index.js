@@ -46,8 +46,8 @@ export const BetHistoryCardTitle = ({ data }) => {
         <p className={"bet-history-tournament-name"}>{data.tournamentName}</p>
         <p className={"bet-history-match-time"}>{data.matchTime}</p>
       </Row>
-      <Row>
-        <Col span={11} className={"team-data"}>
+      <Row justify="center" style={{ width: "100%" }}>
+        <Col span={data.secondTeam ? 11 : undefined} className={"team-data"}>
           {data.firstTeamLogoUrl && (
             <img
               alt={"first-team-logo"}
@@ -57,19 +57,23 @@ export const BetHistoryCardTitle = ({ data }) => {
           )}
           <b className={"team-name"}>{data.firstTeam}</b>
         </Col>
-        <Col span={1} className={"team-data"}>
-          <h1 className={"team-data-divider"}>:</h1>
-        </Col>
-        <Col offset={1} span={11} className={"team-data"}>
-          {data.secondTeamLogoUrl && (
-            <img
-              alt={"second-team-logo"}
-              src={data.secondTeamLogoUrl}
-              className={"team-logo"}
-            />
-          )}
-          <b className={"team-name"}>{data.secondTeam}</b>
-        </Col>
+        {data.secondTeam && (
+          <>
+            <Col span={1} className={"team-data"}>
+              <h1 className={"team-data-divider"}>:</h1>
+            </Col>
+            <Col offset={1} span={11} className={"team-data"}>
+              {data.secondTeamLogoUrl && (
+                <img
+                  alt={"second-team-logo"}
+                  src={data.secondTeamLogoUrl}
+                  className={"team-logo"}
+                />
+              )}
+              <b className={"team-name"}>{data.secondTeam}</b>
+            </Col>
+          </>
+        )}
       </Row>
     </>
   );

@@ -2,6 +2,8 @@ import { API_URL } from "../common/Constant";
 import axiosClient from "../utils/ApiUtil";
 
 const getAllBetHistory = () => axiosClient.get(API_URL.BetHistory);
+const getRecentBetHistory = () =>
+  axiosClient.get(`${API_URL.BetHistory}/recent`);
 
 const getBetHistory = ({ playerId = "", startDate = "", endDate = "" }) => {
   return axiosClient.get(API_URL.BetHistory, {
@@ -24,6 +26,7 @@ const updateBetResult = (data) => {
 };
 
 export {
+  getRecentBetHistory,
   getAllBetHistory,
   getBetHistory,
   insertBetHistory,

@@ -11,7 +11,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path={ROUTES.Admin.path} element={<AdminPage />} />
+        <Route path={ROUTES.Admin.path} exact element={<AdminPage />} />
         <Route path={ROUTES.Base.path} exact element={<HistoryPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

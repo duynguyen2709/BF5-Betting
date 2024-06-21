@@ -14,11 +14,34 @@
 }
 
 .list-player-asset-wrapper {
-  .ant-card-body {
-    padding: 1rem;
+  margin: 0 1rem;
 
-    .ant-statistic-content {
-      font-size: 18px;
+  .ant-collapse-header {
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+  }
+
+  .ant-collapse-content {
+    background: #e9f5ff;
+
+    .ant-collapse-content-box {
+      padding: 0 !important;
+
+      .card-bet-history-wrapper {
+        padding: 0;
+
+        .card-bet-history, .bet-history-tournament-name, .bet-history-match-time, .bet-history-detail-text,  .team-name, .ant-tag {
+          font-size: 11px !important;
+        }
+
+        .bet-history-tournament-name, .bet-history-match-time {
+          letter-spacing: -0.03rem;
+        }
+
+        .team-logo {
+          width: 1.6rem;
+        }
+      }
     }
   }
 }

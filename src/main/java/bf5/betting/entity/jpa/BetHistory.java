@@ -86,7 +86,7 @@ public class BetHistory {
     }
 
     public void setMetadata(Map<String, Object> _metadata) {
-        if (_metadata != null && _metadata.size() > 0)
+        if (_metadata != null && !_metadata.isEmpty())
             this.metadata = JsonUtil.toJsonString(_metadata);
     }
 }

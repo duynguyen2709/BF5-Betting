@@ -10,5 +10,7 @@ import java.util.List;
 public interface RawBetService {
     List<BetHistory> getAllBetWithConvert(String sessionToken, String startDate, String endDate);
 
+    List<BetHistory> quickGetLast30MinutesBets(String sessionToken);
+
     List<BetHistory> getListBetForAutoUpdater();
 }

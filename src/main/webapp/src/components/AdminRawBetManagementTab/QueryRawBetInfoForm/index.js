@@ -25,8 +25,7 @@ const getLastQuerySessionToken = () => {
   return data ? JSON.parse(data).sessionToken : "";
 };
 
-const QueryRawBetInfoForm = ({ onSubmit }) => {
-  const [form] = Form.useForm();
+const QueryRawBetInfoForm = ({ onSubmit, onQuickQuery, form }) => {
   return (
     <Form
       style={{ marginBottom: "1rem" }}
@@ -50,8 +49,16 @@ const QueryRawBetInfoForm = ({ onSubmit }) => {
         <RangePicker disabledDate={disabledDate} allowClear={false} />
       </Form.Item>
       <Form.Item>
-        <Button type="primary" htmlType="submit" ghost>
+        <Button type="primary" htmlType="submit">
           Lấy Dữ Liệu
+        </Button>
+        <Button
+          type="primary"
+          ghost
+          onClick={onQuickQuery}
+          style={{ marginLeft: "16px" }}
+        >
+          Tìm Nhanh
         </Button>
       </Form.Item>
     </Form>

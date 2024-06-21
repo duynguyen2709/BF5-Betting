@@ -34,7 +34,7 @@ import static bf5.betting.constant.Constant.ERROR_MISSING_SESSION_TOKEN_PARAM;
 @AllArgsConstructor
 @Log4j2
 public class RawBetServiceImpl implements RawBetService {
-    private static final String API_URL = "https://1x88.net/api/internal/v1/betHistory/getBetHistoryList";
+    private static final String API_URL = "https://1xbet-viet.com/api/internal/v1/betHistory/getBetHistoryList";
 
     public static String LAST_ACTIVE_SESSION_TOKEN = "";
 
@@ -60,7 +60,40 @@ public class RawBetServiceImpl implements RawBetService {
         final String nonEmptySessionToken = sessionToken;
         List<GetRawBetResponse.RawBetEntity> bets = cache.get(cacheKey, s -> {
             try {
-                return getFromApi(nonEmptySessionToken, startDate, endDate);
+                return getFromApiByDate(nonEmptySessionToken, startDate, endDate);
+            } catch (Exception ex) {
+                log.error(ex);
+                if (ex instanceof HttpResponseException) {
+                    LAST_ACTIVE_SESSION_TOKEN = "";
+                    HttpResponseException castedException = (HttpResponseException) ex;
+                    throw new UncheckedHttpResponseException(castedException);
+                }
+                throw new RuntimeException(ex);
+            }
+        });
+        return entityConverter.convertToPlayerBetHistory(bets);
+    }
+
+    @SneakyThrows
+    @Override
+    @TryCatchWrap
+    public List<BetHistory> quickGetLast30MinutesBets(String sessionToken) {
+        if (StringUtils.isBlank(sessionToken)) {
+            if (StringUtils.isBlank(LAST_ACTIVE_SESSION_TOKEN)) {
+                throw new IllegalArgumentException(ERROR_MISSING_SESSION_TOKEN_PARAM);
+            } else {
+                sessionToken = LAST_ACTIVE_SESSION_TOKEN;
+            }
+        }
+
+        long endTime = System.currentTimeMillis();
+        long startTime = endTime - TimeUnit.MINUTES.toMillis(30);
+
+        final String cacheKey = String.format("QUICK-%s-%s", startTime, endTime);
+        final String nonEmptySessionToken = sessionToken;
+        List<GetRawBetResponse.RawBetEntity> bets = cache.get(cacheKey, s -> {
+            try {
+                return getFromApi(nonEmptySessionToken, startTime / 1000, endTime / 1000);
             } catch (Exception ex) {
                 log.error(ex);
                 if (ex instanceof HttpResponseException) {
@@ -84,7 +117,7 @@ public class RawBetServiceImpl implements RawBetService {
         try {
             String today = DateTimeUtil.getDateStringFromToday(0);
             String yesterday = DateTimeUtil.getDateStringFromToday(-1);
-            return entityConverter.convertToPlayerBetHistory(getFromApi(LAST_ACTIVE_SESSION_TOKEN, yesterday, today));
+            return entityConverter.convertToPlayerBetHistory(getFromApiByDate(LAST_ACTIVE_SESSION_TOKEN, yesterday, today));
         } catch (Exception ex) {
             if (ex instanceof HttpResponseException) {
                 LAST_ACTIVE_SESSION_TOKEN = "";
@@ -95,9 +128,13 @@ public class RawBetServiceImpl implements RawBetService {
         }
     }
 
-    private List<GetRawBetResponse.RawBetEntity> getFromApi(String sessionToken, String startDate, String endDate) throws IOException {
+    private List<GetRawBetResponse.RawBetEntity> getFromApiByDate(String sessionToken, String startDate, String endDate) throws IOException {
         long startTime = DateTimeUtil.getStartOfDateTimestamp(startDate, DateTimeUtil.SYSTEM_DATE_ONLY_FORMAT) / 1000;
         long endTime = DateTimeUtil.getEndOfDateTimestamp(endDate, DateTimeUtil.SYSTEM_DATE_ONLY_FORMAT) / 1000;
+        return getFromApi(sessionToken, startTime, endTime);
+    }
+
+    private List<GetRawBetResponse.RawBetEntity> getFromApi(String sessionToken, long startTime, long endTime) throws IOException {
         GetRawBetRequest request = GetRawBetRequest.build(startTime, endTime);
         Request httpRequest = Request.post(API_URL)
                 .bodyString(JsonUtil.toJsonString(request), ContentType.APPLICATION_JSON)
@@ -119,9 +156,6 @@ public class RawBetServiceImpl implements RawBetService {
                 .setHeader("sec-fetch-mode", "cors")
                 .setHeader("sec-fetch-site", "same-origin")
                 .setHeader("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
-
-        log.info("Process query raw bet data from 1xBet with params: sessionToken [{}], startDate [{}], endDate [{}]",
-                sessionToken, startDate, endDate);
 
         long now = System.currentTimeMillis();
         String rawResponse = httpRequest.execute().returnContent().asString();

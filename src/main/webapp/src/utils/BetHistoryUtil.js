@@ -98,7 +98,10 @@ const buildCommonTableColumn = (players) => {
                     arrayLength={record.events.length}
                     index={index}
                   >
-                    <Col span={11} className={"team-data"}>
+                    <Col
+                      span={event.secondTeam ? 11 : undefined}
+                      className={"team-data"}
+                    >
                       {event.firstTeamLogoUrl && (
                         <img
                           alt={"first-team-logo"}
@@ -108,19 +111,23 @@ const buildCommonTableColumn = (players) => {
                       )}
                       <b className={"team-name"}>{event.firstTeam}</b>
                     </Col>
-                    <Col span={1} className={"team-data"}>
-                      <h1 className={"team-data-divider"}>:</h1>
-                    </Col>
-                    <Col span={11} className={"team-data"}>
-                      {event.secondTeamLogoUrl && (
-                        <img
-                          alt={"second-team-logo"}
-                          src={event.secondTeamLogoUrl}
-                          className={"team-logo"}
-                        />
-                      )}
-                      <b className={"team-name"}>{event.secondTeam}</b>
-                    </Col>
+                    {event.secondTeam && (
+                      <>
+                        <Col span={1} className={"team-data"}>
+                          <h1 className={"team-data-divider"}>:</h1>
+                        </Col>
+                        <Col span={11} className={"team-data"}>
+                          {event.secondTeamLogoUrl && (
+                            <img
+                              alt={"second-team-logo"}
+                              src={event.secondTeamLogoUrl}
+                              className={"team-logo"}
+                            />
+                          )}
+                          <b className={"team-name"}>{event.secondTeam}</b>
+                        </Col>
+                      </>
+                    )}
                   </VerticalCenterRowCellWithDivider>
                 </>
               );
@@ -172,7 +179,7 @@ const buildCommonTableColumn = (players) => {
         {
           title: "Cược",
           key: "result",
-          width: 80,
+          width: 150,
           render: (_, record) => <BetResultTag result={record.result} />,
           filters: Object.values(BET_RESULT).map((ele) => ({
             key: ele.result,
@@ -189,31 +196,12 @@ const buildCommonTableColumn = (players) => {
       ],
     },
     {
-      title: "Loại Cược",
-      key: "betType",
-      width: 130,
-      render: (_, record) => {
-        switch (record.betType) {
-          case BET_TYPE.Single:
-            return <b>Cược Đơn</b>;
-          case BET_TYPE.Accumulator:
-            return <b>Cược Xiên</b>;
-          case BET_TYPE.Lucky:
-            return <b>Cược May Mắn</b>;
-          case BET_TYPE.System:
-            return <b>{`Cược Hệ Thống (${record.metadata?.combination})`}</b>;
-          default:
-            return null;
-        }
-      },
-    },
-    {
       title: "Tiền Cược",
       children: [
         {
           title: "Tiền Gốc",
           key: "betAmount",
-          width: 80,
+          width: 100,
           render: (_, record) => <MoneyTextCell value={record.betAmount} />,
         },
         {
@@ -251,16 +239,35 @@ const buildCommonTableColumn = (players) => {
         {
           title: "Lợi Nhuận",
           key: "actualProfit",
-          width: 90,
+          width: 100,
           render: (_, record) => <MoneyTextCell value={record.actualProfit} />,
         },
       ],
     },
     {
+      title: "Loại Cược",
+      key: "betType",
+      width: 130,
+      render: (_, record) => {
+        switch (record.betType) {
+          case BET_TYPE.Single:
+            return <b>Cược Đơn</b>;
+          case BET_TYPE.Accumulator:
+            return <b>Cược Xiên</b>;
+          case BET_TYPE.Lucky:
+            return <b>Cược May Mắn</b>;
+          case BET_TYPE.System:
+            return <b>{`Cược Hệ Thống (${record.metadata?.combination})`}</b>;
+          default:
+            return null;
+        }
+      },
+    },
+    {
       title: "Thời Gian Cược",
       key: "betTime",
       dataIndex: "betTime",
-      width: 60,
+      width: 100,
     },
   ];
 };

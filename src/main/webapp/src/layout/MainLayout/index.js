@@ -27,11 +27,7 @@ const MainLayout = ({ component }) => {
     >
       <Layout className="main-layout">
         <Header className="main-header">
-          <img
-            src={"/bf5-betting-logo.png"}
-            alt={"bf5-betting-logo"}
-            style={{ height: "48px" }}
-          />
+          <img src={"/logo.png"} alt={"logo"} style={{ height: "48px" }} />
         </Header>
         <Content className="main-content">{component}</Content>
       </Layout>

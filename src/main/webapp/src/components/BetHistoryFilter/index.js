@@ -1,14 +1,5 @@
 import React, { useCallback } from "react";
-import {
-  Badge,
-  Button,
-  Col,
-  DatePicker,
-  Form,
-  message,
-  Row,
-  Select,
-} from "antd";
+import { Button, Col, DatePicker, Form, message, Row, Select } from "antd";
 import {
   BarChartOutlined,
   DownloadOutlined,
@@ -56,6 +47,8 @@ const BetHistoryFilter = ({ onSubmitFilter, onClickExport }) => {
       QUERY_HISTORY_ACTION.Statistic
     );
   }, [form, handleSubmitViewHistory]);
+
+  const playerId = Form.useWatch("playerId", form);
 
   return (
     <Form
@@ -133,22 +126,30 @@ const BetHistoryFilter = ({ onSubmitFilter, onClickExport }) => {
                 htmlType="submit"
                 className={"button-submit-filter"}
                 icon={<ProfileOutlined style={{ fontSize: "16px" }} />}
+                disabled={!playerId}
               >
                 Danh Sách Cược
               </Button>
             </Col>
             <Col span={12}>
-              <Badge dot>
-                <Button
-                  type="primary"
-                  className={"button-submit-statistic"}
-                  style={{ float: "right" }}
-                  onClick={handleSubmitStatistic}
-                  icon={<BarChartOutlined style={{ fontSize: "16px" }} />}
-                >
-                  Thống Kê
-                </Button>
-              </Badge>
+              <Button
+                type="primary"
+                className={"button-submit-statistic"}
+                style={{
+                  float: "right",
+                  ...(playerId
+                    ? {
+                        borderColor: "#52c41a",
+                        background: "#389e0d",
+                      }
+                    : {}),
+                }}
+                onClick={handleSubmitStatistic}
+                icon={<BarChartOutlined style={{ fontSize: "16px" }} />}
+                disabled={!playerId}
+              >
+                Thống Kê
+              </Button>
             </Col>
           </Row>
         </Form.Item>

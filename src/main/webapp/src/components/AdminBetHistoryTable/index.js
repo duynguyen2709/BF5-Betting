@@ -84,6 +84,9 @@ const AdminBetHistoryTable = ({ data, players, onUpdateSuccess }) => {
           showSizeChanger: true,
           showTotal: (total) => `Tổng: ${total} cược`,
         }}
+        scroll={{
+          x: 2000,
+        }}
       />
     </>
   );

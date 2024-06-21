@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
-import { Col, message, Row } from "antd";
+import { Col, Form, message, Row } from "antd";
 import {
+  getQuickRawBetData,
   getRawBetData,
   updateBatchResultFromRaw,
   updateResultFromRaw,
@@ -27,6 +28,7 @@ const AdminRawBetManagementTab = ({ onSuccessAction }) => {
   const [currentAddBet, setCurrentAddBet] = useState(undefined);
   const [currentBatchAddBet, setCurrentBatchAddBet] = useState([]);
   const { players } = usePlayerContextHook();
+  const [form] = Form.useForm();
 
   const queryRawBetList = useCallback(() => {
     setRawBetList([]);
@@ -39,14 +41,32 @@ const AdminRawBetManagementTab = ({ onSuccessAction }) => {
       .finally(() => setIsFetching(false));
   }, []);
 
+  const quickQueryRawBetList = useCallback(() => {
+    setRawBetList([]);
+    setIsFetching(true);
+    const queryParams = JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_KEY.RawBetQueryParams)
+    );
+    getQuickRawBetData(queryParams)
+      .then((data) => setRawBetList(data))
+      .finally(() => setIsFetching(false));
+  }, []);
+
   const handleProcessRawBetSuccess = useCallback(() => {
     setCurrentBatchAddBet([]);
     setCurrentAddBet(undefined);
     setModalAddBatchOpen(false);
     setModalAddSingleOpen(false);
-    queryRawBetList();
+    const { mode } = JSON.parse(
+      localStorage.getItem(LOCAL_STORAGE_KEY.RawBetQueryParams)
+    );
+    if (mode === "QUICK") {
+      quickQueryRawBetList();
+    } else {
+      queryRawBetList();
+    }
     onSuccessAction();
-  }, [queryRawBetList, onSuccessAction]);
+  }, [queryRawBetList, quickQueryRawBetList, onSuccessAction]);
 
   const handleFetchRawBetList = useCallback(
     (values) => {
@@ -55,6 +75,7 @@ const AdminRawBetManagementTab = ({ onSuccessAction }) => {
         sessionToken,
         startDate: dateRange[0].format("YYYY-MM-DD"),
         endDate: dateRange[1].format("YYYY-MM-DD"),
+        mode: "NORMAL",
       };
       localStorage.setItem(
         LOCAL_STORAGE_KEY.RawBetQueryParams,
@@ -64,6 +85,19 @@ const AdminRawBetManagementTab = ({ onSuccessAction }) => {
     },
     [queryRawBetList]
   );
+
+  const handleQuickFetchRawBetList = useCallback(() => {
+    const sessionToken = form.getFieldValue("sessionToken");
+    const queryParams = {
+      sessionToken,
+      mode: "QUICK",
+    };
+    localStorage.setItem(
+      LOCAL_STORAGE_KEY.RawBetQueryParams,
+      JSON.stringify(queryParams)
+    );
+    quickQueryRawBetList();
+  }, [form, quickQueryRawBetList]);
 
   const handleOpenModalAddSingleBet = useCallback((record) => {
     setCurrentAddBet(record);
@@ -118,7 +152,11 @@ const AdminRawBetManagementTab = ({ onSuccessAction }) => {
         />
       )}
       <Row justify={"space-between"}>
-        <QueryRawBetInfoForm onSubmit={handleFetchRawBetList} />
+        <QueryRawBetInfoForm
+          onSubmit={handleFetchRawBetList}
+          onQuickQuery={handleQuickFetchRawBetList}
+          form={form}
+        />
         <Col span={8} style={{ display: "flex", justifyContent: "flex-end" }}>
           <BatchInsertRawBetButton
             disabled={currentBatchAddBet.length === 0}

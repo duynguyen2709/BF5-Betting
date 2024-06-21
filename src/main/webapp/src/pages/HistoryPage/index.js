@@ -1,4 +1,5 @@
 import React, { useCallback, useRef, useState } from "react";
+import { Badge, Collapse } from "antd";
 import { exportComponentAsJPEG } from "react-component-export-image";
 import { getBetHistory } from "../../apis/BetHistoryApi";
 import { getDetailStatistics } from "../../apis/StatisticApi";
@@ -8,9 +9,14 @@ import HistoryCardWrapper from "../../components/HistoryCardWrapper";
 
 import "./index.scss";
 import PlayerStatisticCard from "../../components/PlayerStatisticCard";
-import PlayerCard from "../../components/PlayerCard";
 import { usePlayerContextHook } from "../../hooks";
 import CenterLoadingSpinner from "../../components/CenterLoadingSpinner";
+import { useRecentBets } from "../../hooks/useRecentBets";
+import RecentUnfinishedBets from "../../components/RecentUnfinishedBets";
+import PlayerRecentBetsCollapsibleCard from "../../components/PlayerRecentBetsCollapsibleCard";
+import { DownCircleTwoTone, RightCircleTwoTone } from "@ant-design/icons";
+
+const { Panel } = Collapse;
 
 const TAB_KEYS = {
   History: {
@@ -48,6 +54,8 @@ const HistoryPage = () => {
   );
   const { players } = usePlayerContextHook();
   const playersWithSortedProfit = sortPlayerByProfitDesc(players);
+
+  const { playerRecentBets, recentBetLoading } = useRecentBets();
 
   const handleSubmitFilter = useCallback((fieldsValue, queryMode) => {
     setLoading(true);
@@ -103,20 +111,72 @@ const HistoryPage = () => {
   const isStatisticMode =
     hasFetched && queryMode === QUERY_HISTORY_ACTION.Statistic;
 
+  const combinedLoading = loading || recentBetLoading;
+
   return (
     <>
       <BetHistoryFilter
         onSubmitFilter={handleSubmitFilter}
         onClickExport={handleClickExport}
       />
-      {!hasFetched && (
-        <div className={"list-player-asset-wrapper"}>
-          {playersWithSortedProfit.map((player) => (
-            <PlayerCard key={player.playerId} data={player} />
-          ))}
+      {!hasFetched && !combinedLoading && (
+        <div className="list-player-asset-wrapper">
+          <Collapse
+            expandIconPosition="end"
+            expandIcon={(panelProps) => {
+              const Icon = panelProps.isActive
+                ? DownCircleTwoTone
+                : RightCircleTwoTone;
+              return (
+                <Icon
+                  width={20}
+                  height={20}
+                  style={{ fontSize: "20px" }}
+                  twoToneColor="#52c41a"
+                />
+              );
+            }}
+          >
+            {playersWithSortedProfit.map((player) => {
+              const hasBets =
+                (playerRecentBets[player.playerId] &&
+                  playerRecentBets[player.playerId].length > 0) ||
+                false;
+
+              return (
+                <Panel
+                  showArrow={hasBets}
+                  collapsible={hasBets}
+                  header={<PlayerRecentBetsCollapsibleCard data={player} />}
+                  key={player.playerId}
+                  extra={
+                    hasBets ? (
+                      <div
+                        style={{
+                          position: "absolute",
+                          right: "8px",
+                          top: "18px",
+                        }}
+                      >
+                        <Badge
+                          count={playerRecentBets[player.playerId].length}
+                          color="#fe6300"
+                          size="small"
+                        />
+                      </div>
+                    ) : undefined
+                  }
+                >
+                  <RecentUnfinishedBets
+                    data={playerRecentBets[player.playerId]}
+                  />
+                </Panel>
+              );
+            })}
+          </Collapse>
         </div>
       )}
-      {loading && <CenterLoadingSpinner />}
+      {combinedLoading && <CenterLoadingSpinner />}
       {isHistoryViewMode && (
         <HistoryCardWrapper
           data={data}
