@@ -26,4 +26,6 @@ public class Player {
     private String avatarUrl;
     @Column
     private long totalProfit;
+    @Column
+    private String telegramId;
 }

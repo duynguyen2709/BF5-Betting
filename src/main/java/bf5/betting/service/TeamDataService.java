@@ -12,6 +12,8 @@ import java.util.List;
 public interface TeamDataService {
     String getTeamLogoUrl(String teamName);
 
+    String getTeamVnName(String teamName);
+
     List<TeamData> insertBatch(Collection<TeamData> teams);
 
     void insertTeamDataIfNotAvailable(BetHistory betHistory);

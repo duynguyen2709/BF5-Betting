@@ -3,6 +3,7 @@ const API_URL = {
   RawBet: "/bets/raw",
   Players: "/players",
   Statistics: "/statistics",
+  Unlock: "/unlock",
 };
 
 const ROUTES = {
@@ -79,7 +80,11 @@ const QUERY_HISTORY_ACTION = {
   Statistic: "STATISTIC",
 };
 
+const UNLOCK_DATA_KEY = "UNLOCKED_USER_ID";
+const ADMIN_USER_ID = "100002362515754";
+
 export {
+  ADMIN_USER_ID,
   API_URL,
   BET_RESULT,
   BET_GROUP_TYPE_KEY,
@@ -89,4 +94,5 @@ export {
   RAW_BET_STATUS,
   MESSAGE,
   QUERY_HISTORY_ACTION,
+  UNLOCK_DATA_KEY,
 };

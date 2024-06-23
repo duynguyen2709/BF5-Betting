@@ -45,6 +45,15 @@ public class TeamDataServiceImpl implements TeamDataService {
     }
 
     @Override
+    public String getTeamVnName(String teamName) {
+        if (StringUtils.isBlank(teamName)) {
+            return null;
+        }
+        TeamData team = this.teamDataCacheMap.get(teamName);
+        return Objects.isNull(team) ? null : team.getVnTeamName();
+    }
+
+    @Override
     @TryCatchWrap
     @Transactional
     public List<TeamData> insertBatch(Collection<TeamData> teams) {
@@ -80,11 +89,11 @@ public class TeamDataServiceImpl implements TeamDataService {
         bet.getEvents().forEach(event -> {
             if (Objects.isNull(this.getTeamLogoUrl(event.getFirstTeam()))) {
                 String url = StringUtils.isBlank(event.getFirstTeamLogoUrl()) ? defaultLogo : event.getFirstTeamLogoUrl();
-                newTeamData.put(event.getFirstTeam(), new TeamData(event.getFirstTeam(), url));
+                newTeamData.put(event.getFirstTeam(), new TeamData(event.getFirstTeam(), url, ""));
             }
             if (Objects.isNull(this.getTeamLogoUrl(event.getSecondTeam()))) {
                 String url = StringUtils.isBlank(event.getSecondTeamLogoUrl()) ? defaultLogo : event.getSecondTeamLogoUrl();
-                newTeamData.put(event.getSecondTeam(), new TeamData(event.getSecondTeam(), url));
+                newTeamData.put(event.getSecondTeam(), new TeamData(event.getSecondTeam(), url, ""));
             }
         });
     }

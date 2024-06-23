@@ -6,22 +6,16 @@ import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.BetMatchDetail;
 import bf5.betting.exception.EntityNotFoundException;
 import bf5.betting.repository.BetHistoryRepository;
-import bf5.betting.service.BetHistoryService;
-import bf5.betting.service.PlayerAssetHistoryService;
-import bf5.betting.service.PlayerService;
-import bf5.betting.service.TeamDataService;
+import bf5.betting.service.*;
 import bf5.betting.util.DateTimeUtil;
 import bf5.betting.util.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.apache.commons.lang3.time.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +29,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     private final TeamDataService teamDataService;
     private final PlayerService playerService;
     private final PlayerAssetHistoryService assetHistoryService;
+    private final TelegramNotiService telegramNotiService;
 
     @Override
     public List<BetHistory> getRecentUnfinishedBets() {
@@ -69,6 +64,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         this.assetHistoryService.updateAssetFromBetHistory(request);
         this.playerService.updatePlayerProfitFromBetHistory(request);
         this.teamDataService.insertTeamDataIfNotAvailable(request);
+        this.telegramNotiService.sendNotificationForNewBetAdded(request.getPlayerId(), Collections.singletonList(withTeamDataWrapper(betHistory)));
         return betHistory;
     }
 
@@ -85,6 +81,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         this.assetHistoryService.updateAssetFromBetHistoryListInBatch(betHistories);
         this.playerService.updatePlayerProfitFromListBetHistoryInBatch(betHistories);
         this.teamDataService.insertTeamDataIfNotAvailable(betHistories);
+        this.telegramNotiService.sendNotificationForNewBetAdded(betHistories.get(0).getPlayerId(), withTeamDataWrapper(betHistories));
         return newBetHistories;
     }
 
@@ -185,6 +182,16 @@ public class BetHistoryServiceImpl implements BetHistoryService {
         betHistory.getEvents().forEach(event -> {
             event.setFirstTeamLogoUrl(teamDataService.getTeamLogoUrl(event.getFirstTeam()));
             event.setSecondTeamLogoUrl(teamDataService.getTeamLogoUrl(event.getSecondTeam()));
+
+            String firstTeamVnName = teamDataService.getTeamVnName(event.getFirstTeam());
+            if (StringUtils.isNotBlank(firstTeamVnName)) {
+                event.setFirstTeam(firstTeamVnName);
+            }
+
+            String secondTeamVnName = teamDataService.getTeamVnName(event.getSecondTeam());
+            if (StringUtils.isNotBlank(secondTeamVnName)) {
+                event.setSecondTeam(secondTeamVnName);
+            }
         });
         return betHistory;
     }

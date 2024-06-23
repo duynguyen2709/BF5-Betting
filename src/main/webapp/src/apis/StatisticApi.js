@@ -1,7 +1,12 @@
-import { API_URL } from "../common/Constant";
+import { ADMIN_USER_ID, API_URL, UNLOCK_DATA_KEY } from "../common/Constant";
 import axiosClient from "../utils/ApiUtil";
 
-const getAllStatistics = () => axiosClient.get(API_URL.Statistics);
+const getAllStatistics = () =>
+  axiosClient.get(API_URL.Statistics, {
+    headers: {
+      "X-User-Id": localStorage.getItem(UNLOCK_DATA_KEY) || ADMIN_USER_ID,
+    },
+  });
 
 const getDetailStatistics = ({
   playerId = "",
@@ -9,6 +14,9 @@ const getDetailStatistics = ({
   endDate = "",
 }) => {
   return axiosClient.get(`${API_URL.Statistics}/detail`, {
+    headers: {
+      "X-User-Id": localStorage.getItem(UNLOCK_DATA_KEY) || ADMIN_USER_ID,
+    },
     params: {
       playerId,
       startDate,
@@ -22,6 +30,9 @@ const doStatistic = ({ startDate, endDate, action }) =>
     API_URL.Statistics,
     {},
     {
+      headers: {
+        "X-User-Id": localStorage.getItem(UNLOCK_DATA_KEY) || ADMIN_USER_ID,
+      },
       params: {
         startDate,
         endDate,

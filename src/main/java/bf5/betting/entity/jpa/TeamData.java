@@ -22,4 +22,6 @@ public class TeamData {
     private String teamName;
     @Column
     private String logoUrl;
+    @Column
+    private String vnTeamName;
 }

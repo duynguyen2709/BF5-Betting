@@ -3,6 +3,7 @@ package bf5.betting.util;
 
 import bf5.betting.constant.BetResult;
 import bf5.betting.entity.jpa.BetHistory;
+import bf5.betting.entity.jpa.BetMatchDetail;
 import bf5.betting.entity.response.GetRawBetResponse;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,6 +17,33 @@ import java.util.stream.Collectors;
  * @author duynguyen
  **/
 public class BetHistoryUtil {
+
+    public static String formatVnBetEvent(BetMatchDetail detail) {
+        String event = detail.getEvent();
+        boolean firstHalfOnly = Boolean.TRUE.equals(detail.getFirstHalfOnly());
+
+        String parsedEvent = event
+                .replaceAll("Handicap 1", detail.getFirstTeam())
+                .replaceAll("Team 1", detail.getFirstTeam())
+                .replaceAll("Handicap 2", detail.getSecondTeam())
+                .replaceAll("Team 2", detail.getSecondTeam())
+                .replaceAll("W1", detail.getFirstTeam() + " (-0.5)")
+                .replaceAll("W2", detail.getSecondTeam() + " (-0.5)")
+                .replaceAll("1X", detail.getFirstTeam() + " (+0.5)")
+                .replaceAll("2X", detail.getSecondTeam() + " (+0.5)")
+                .replaceAll("To Win", "Thắng")
+                .replaceAll("Not To Lose", "(+0.5)")
+                .replaceAll("Total Over", "Tài")
+                .replaceAll("Total >", "Tài")
+                .replaceAll("Total Under", "Xỉu")
+                .replaceAll("Total <", "Xỉu")
+                .replaceAll(" - Yes", "")
+                .replaceAll(" And ", " & ")
+                .replaceAll("Both Teams To Score", "Cả 2 Đội Cùng Ghi Bàn")
+                .replaceAll("Corners:", "Phạt Góc:");
+        String firstHalfText = firstHalfOnly ? "Hiệp 1: " : "";
+        return firstHalfText + parsedEvent;
+    }
 
     public static String parseEventDetail(GetRawBetResponse.RawBetEvent event) {
         String rawEvent = event.getEventTypeTitle();

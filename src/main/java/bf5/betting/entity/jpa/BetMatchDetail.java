@@ -45,8 +45,8 @@ public class BetMatchDetail {
     @Column
     private BetResult result;
 
-    private transient String secondTeamLogoUrl;
     private transient String firstTeamLogoUrl;
+    private transient String secondTeamLogoUrl;
 
     public String getMatchTime() {
         return DateTimeUtil.timestampToReadableString(this.matchTime);

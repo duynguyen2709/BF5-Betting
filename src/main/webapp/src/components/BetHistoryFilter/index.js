@@ -59,7 +59,6 @@ const BetHistoryFilter = ({ onSubmitFilter, onClickExport }) => {
       initialValues={{
         startDate: moment().subtract(1, "day"),
         endDate: moment(),
-        playerId: playerList.length > 0 ? playerList[0].playerId : null,
       }}
     >
       <Col
