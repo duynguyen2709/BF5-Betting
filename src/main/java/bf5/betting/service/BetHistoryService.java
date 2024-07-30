@@ -10,6 +10,8 @@ import java.util.List;
 public interface BetHistoryService {
     List<BetHistory> getAllBetHistory();
 
+    List<BetHistory> getByBetIds(List<Long> betIds);
+
     List<BetHistory> getByPlayerIdAndDateRange(String playerId, String startDate, String endDate);
 
     BetHistory insertBet(BetHistory entity);

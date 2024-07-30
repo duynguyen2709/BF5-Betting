@@ -76,6 +76,7 @@ const AdminPage = () => {
                 <AdminPlayerAssetHistoryTable
                   onStatisticSuccess={handleRunStatisticSuccess}
                   data={assetHistoryList}
+                  refetch={fetchAllAssetHistories}
                 />
               ),
             },

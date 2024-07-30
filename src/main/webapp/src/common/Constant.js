@@ -19,6 +19,7 @@ const MESSAGE = {
   EmptyBetToBeUpdated: "Không có cược cần cập nhật",
   UpdateBetSuccess: "Cập nhật cược thành công",
   RunStatisticSuccess: "Chạy thống kê thành công",
+  AddPaymentHistorySuccess: "Thêm dữ liệu thanh toán thành công",
   StartDateMustBeBeforeOrEqualError:
     "Ngày bắt đầu phải trước hoặc bằng ngày kết thúc",
 };

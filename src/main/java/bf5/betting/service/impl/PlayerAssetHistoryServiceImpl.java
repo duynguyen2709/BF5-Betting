@@ -6,6 +6,7 @@ import bf5.betting.constant.PaymentAction;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.Player;
 import bf5.betting.entity.jpa.PlayerAssetHistory;
+import bf5.betting.entity.request.AddPlayerAssetHistoryRequest;
 import bf5.betting.repository.PlayerAssetHistoryRepository;
 import bf5.betting.service.PlayerAssetHistoryService;
 import bf5.betting.service.PlayerService;
@@ -15,6 +16,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -127,5 +129,31 @@ public class PlayerAssetHistoryServiceImpl implements PlayerAssetHistoryService 
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
         this.repository.deleteAllInBatch(assetHistories);
+    }
+
+    @Override
+    @TryCatchWrap
+    @Transactional
+    public PlayerAssetHistory insertPaymentHistory(AddPlayerAssetHistoryRequest request) {
+        Map<String, Player> playerCacheMap = this.playerService.getAllPlayer();
+        String playerId = request.getPlayerId();
+        long actualAmount = request.getAction().equals(PaymentAction.CASHOUT.name()) ? -request.getAmount() : request.getAmount();
+        long assetBefore = playerCacheMap.get(playerId).getTotalProfit();
+        long assetAfter = assetBefore + actualAmount;
+
+        Player player = playerCacheMap.get(playerId);
+        player.setTotalProfit(assetAfter);
+        playerService.updatePlayerData(player);
+
+        PlayerAssetHistory assetHistory = PlayerAssetHistory.builder()
+                .playerId(playerId)
+                .paymentTime(new Timestamp(System.currentTimeMillis()))
+                .action(PaymentAction.valueOf(request.getAction()))
+                .paymentMethod(request.getPaymentMethod())
+                .amount(actualAmount)
+                .assetBefore(assetBefore)
+                .assetAfter(assetAfter)
+                .build();
+        return this.repository.save(assetHistory);
     }
 }

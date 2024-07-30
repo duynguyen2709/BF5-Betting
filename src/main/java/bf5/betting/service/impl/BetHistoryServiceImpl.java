@@ -45,6 +45,11 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     }
 
     @Override
+    public List<BetHistory> getByBetIds(List<Long> betIds) {
+        return withTeamDataWrapper(betHistoryRepository.findAllById(betIds));
+    }
+
+    @Override
     @TryCatchWrap
     public List<BetHistory> getByPlayerIdAndDateRange(String playerId, String startDateStr, String endDate) {
         Date startDate = DateTimeUtil.stringToDate(startDateStr, DateTimeUtil.SYSTEM_DATE_ONLY_FORMAT);
@@ -121,9 +126,15 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     public List<BetHistory> updateBatchBetResultFromRaw(List<BetHistory> request) {
         List<BetHistory> betHistories = new ArrayList<>();
         for (BetHistory updateRequest : request) {
-            validateBetResult(updateRequest);
+            if (!validateRawBetResult(updateRequest)) {
+                log.warn("Result NOT_FINISHED Invalid. Bet entity: {}", JsonUtil.toJsonString(updateRequest));
+                continue;
+            }
             BetHistory betHistory = buildBetHistoryWithResult(updateRequest, true);
             betHistories.add(betHistory);
+        }
+        if (betHistories.isEmpty()) {
+            return betHistories;
         }
 
         log.info("Process updating batch bets from raw data: {}", JsonUtil.toJsonString(betHistories));
@@ -142,6 +153,15 @@ public class BetHistoryServiceImpl implements BetHistoryService {
                                 .clazz(BetHistory.class)
                                 .id(updateRequest.getBetId())
                                 .build());
+    }
+
+    private boolean validateRawBetResult(BetHistory request) {
+        if (request.getResult() == BetResult.NOT_FINISHED) {
+            return false;
+        }
+        return request.getEvents()
+                .stream()
+                .anyMatch(event -> event.getResult() == BetResult.NOT_FINISHED);
     }
 
     private void validateBetResult(BetHistory request) {

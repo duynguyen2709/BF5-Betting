@@ -1,9 +1,12 @@
-import React, { useCallback } from "react";
-import { Avatar, Row, Table, Tag } from "antd";
+import React, { useCallback, useState } from "react";
+import { Avatar, Button, message, Row, Table, Tag } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 import { usePlayerContextHook } from "../../hooks";
 import MoneyTextCell from "../MoneyTextCell";
 import AssetHistoryStatisticForm from "./AssetHistoryStatisticForm";
 import { doStatistic } from "../../apis/StatisticApi";
+import AddPlayerAssetHistoryModal from "./AddPlayerAssetHistoryModal";
+import { MESSAGE } from "../../common/Constant";
 
 const PaymentActionTag = ({ action }) => {
   switch (action) {
@@ -18,8 +21,20 @@ const PaymentActionTag = ({ action }) => {
   }
 };
 
-const AdminPlayerAssetHistoryTable = ({ data, onStatisticSuccess }) => {
+const AdminPlayerAssetHistoryTable = ({
+  data,
+  onStatisticSuccess,
+  refetch,
+}) => {
   const { players } = usePlayerContextHook();
+  const [modalAddOpen, setModalAddOpen] = useState(false);
+
+  const toggleModalAdd = () => setModalAddOpen((prevState) => !prevState);
+
+  const handleAddSuccess = () => {
+    message.success(MESSAGE.AddPaymentHistorySuccess);
+    refetch();
+  };
 
   const columns = [
     {
@@ -117,7 +132,23 @@ const AdminPlayerAssetHistoryTable = ({ data, onStatisticSuccess }) => {
 
   return (
     <>
-      <AssetHistoryStatisticForm onSubmit={handleSubmitStatistic} />
+      {modalAddOpen && (
+        <AddPlayerAssetHistoryModal
+          isOpen={modalAddOpen}
+          onClose={toggleModalAdd}
+          onUpdateSuccess={handleAddSuccess}
+        />
+      )}
+      <Row justify="space-between">
+        <AssetHistoryStatisticForm onSubmit={handleSubmitStatistic} />
+        <Button
+          type={"primary"}
+          icon={<PlusOutlined />}
+          onClick={toggleModalAdd}
+        >
+          Thêm Mới
+        </Button>
+      </Row>
       <Table
         size="middle"
         className="table-player-asset-history"

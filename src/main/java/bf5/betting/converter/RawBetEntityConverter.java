@@ -32,7 +32,12 @@ public class RawBetEntityConverter {
     private final BetHistoryService betHistoryService;
 
     public List<BetHistory> convertToPlayerBetHistory(List<GetRawBetResponse.RawBetEntity> bets) {
-        Map<Long, BetHistory> allBetHistories = betHistoryService.getAllBetHistory()
+        if (bets == null || bets.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<Long> betIds = bets.stream().map(GetRawBetResponse.RawBetEntity::getId).collect(Collectors.toList());
+        Map<Long, BetHistory> insertedBetHistories = betHistoryService.getByBetIds(betIds)
                 .stream()
                 .collect(Collectors.toMap(BetHistory::getBetId, Function.identity()));
 
@@ -55,8 +60,8 @@ public class RawBetEntityConverter {
                         }
                         List<BetMatchDetail> matchDetails = extractMatchDetails(bet.getEvents(), bet.getId());
                         rawBet.setEvents(matchDetails);
-                        if (allBetHistories.containsKey(bet.getId())) {
-                            BetHistory insertedHistory = allBetHistories.get(bet.getId());
+                        if (insertedBetHistories.containsKey(bet.getId())) {
+                            BetHistory insertedHistory = insertedBetHistories.get(bet.getId());
                             rawBet.setPlayerId(insertedHistory.getPlayerId());
                             rawBet.setRawStatus(RawBetStatus.INSERTED.name());
                             if (insertedHistory.getActualProfit() != null) {
@@ -217,7 +222,7 @@ public class RawBetEntityConverter {
                         .mapToDouble(subset -> subset.stream()
                                 .reduce(1.0, (ratio1, ratio2) -> ratio1 * ratio2))
                         .sum();
-                return (double)Math.round((sumRatio / ratioSubsets.size()) * 100000d) / 100000d;
+                return (double) Math.round((sumRatio / ratioSubsets.size()) * 100000d) / 100000d;
             case SYSTEM:
                 int combination = Integer.parseInt(bet.getFormattedSystemType().split("/")[0]);
                 List<List<Double>> ratioSubsetsOfCombination = SubsetUtil.generateSubsetOfSize(ratioList, combination);
@@ -225,7 +230,7 @@ public class RawBetEntityConverter {
                         .mapToDouble(subset -> subset.stream()
                                 .reduce(1.0, (ratio1, ratio2) -> ratio1 * ratio2))
                         .sum();
-                return (double)Math.round((sumRatioOfCombinations / ratioSubsetsOfCombination.size()) * 100000d) / 100000d;
+                return (double) Math.round((sumRatioOfCombinations / ratioSubsetsOfCombination.size()) * 100000d) / 100000d;
             default:
                 return 1.0;
         }

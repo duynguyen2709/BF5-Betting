@@ -41,4 +41,16 @@ const doStatistic = ({ startDate, endDate, action }) =>
     }
   );
 
-export { doStatistic, getAllStatistics, getDetailStatistics };
+const addPaymentHistory = (data) =>
+  axiosClient.post(API_URL.Statistics + "/asset", data, {
+    headers: {
+      "X-User-Id": localStorage.getItem(UNLOCK_DATA_KEY) || ADMIN_USER_ID,
+    },
+  });
+
+export {
+  addPaymentHistory,
+  doStatistic,
+  getAllStatistics,
+  getDetailStatistics,
+};

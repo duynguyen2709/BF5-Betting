@@ -3,6 +3,7 @@ package bf5.betting.controller;
 import bf5.betting.constant.UserAction;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.PlayerAssetHistory;
+import bf5.betting.entity.request.AddPlayerAssetHistoryRequest;
 import bf5.betting.entity.response.BaseResponse;
 import bf5.betting.entity.response.BetHistoryStatisticResponse;
 import bf5.betting.service.BetHistoryService;
@@ -77,5 +78,10 @@ public class StatisticController {
             this.statisticService.runStatisticForDateRange(startDate, endDate);
         }
         return BaseResponse.SUCCESS;
+    }
+
+    @PostMapping("/asset")
+    public BaseResponse<PlayerAssetHistory> insert(@RequestBody AddPlayerAssetHistoryRequest request) {
+        return BaseResponse.success(assetHistoryService.insertPaymentHistory(request));
     }
 }

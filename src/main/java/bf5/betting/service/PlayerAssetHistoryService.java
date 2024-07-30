@@ -2,6 +2,7 @@ package bf5.betting.service;
 
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.PlayerAssetHistory;
+import bf5.betting.entity.request.AddPlayerAssetHistoryRequest;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,4 +25,6 @@ public interface PlayerAssetHistoryService {
     Map<String, PlayerAssetHistory> getNearestAssetHistoryForPlayers(String date);
 
     void deleteByDateRange(String startDateStr, String endDateStr);
+
+    PlayerAssetHistory insertPaymentHistory(AddPlayerAssetHistoryRequest request);
 }
