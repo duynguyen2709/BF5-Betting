@@ -156,12 +156,10 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     }
 
     private boolean validateRawBetResult(BetHistory request) {
-        if (request.getResult() == BetResult.NOT_FINISHED) {
-            return false;
-        }
-        return request.getEvents()
-                .stream()
-                .anyMatch(event -> event.getResult() == BetResult.NOT_FINISHED);
+        return request.getResult() != BetResult.NOT_FINISHED &&
+                request.getEvents()
+                        .stream()
+                        .allMatch(event -> event.getResult() != BetResult.NOT_FINISHED);
     }
 
     private void validateBetResult(BetHistory request) {
