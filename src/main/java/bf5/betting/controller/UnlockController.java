@@ -19,21 +19,21 @@ import java.util.Map;
 @AllArgsConstructor
 public class UnlockController {
 
-    private static final Map<String, String> allowedKeys = new HashMap<>();
+  private static final Map<String, String> allowedKeys = new HashMap<>();
 
-    static {
-        allowedKeys.put("27091998", "100002362515754");
-        allowedKeys.put("12011998", "100004056801368");
-        allowedKeys.put("30081998", "100004533095969");
-        allowedKeys.put("13121998", "100004614064009");
-        allowedKeys.put("08101998", "100010972726703");
-    }
+  static {
+    allowedKeys.put("27091998", "100002362515754");
+    allowedKeys.put("12011998", "100004056801368");
+    allowedKeys.put("30081998", "100004533095969");
+    allowedKeys.put("13121998", "100004614064009");
+    allowedKeys.put("08101998", "100010972726703");
+  }
 
-    @PostMapping("")
-    public BaseResponse unlock(@RequestBody UnlockRequest request) {
-        if (!allowedKeys.containsKey(request.getKey())) {
-            return BaseResponse.failed(401, "Mật khẩu không hợp lệ. Vui lòng thử lại");
-        }
-        return BaseResponse.success(allowedKeys.get(request.getKey()));
+  @PostMapping("")
+  public BaseResponse unlock(@RequestBody UnlockRequest request) {
+    if (!allowedKeys.containsKey(request.getKey())) {
+      return BaseResponse.failed(401, "Mật khẩu không hợp lệ. Vui lòng thử lại");
     }
+    return BaseResponse.success(allowedKeys.get(request.getKey()));
+  }
 }

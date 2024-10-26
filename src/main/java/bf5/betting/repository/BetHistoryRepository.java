@@ -16,13 +16,13 @@ import java.util.List;
 @Repository
 public interface BetHistoryRepository extends JpaRepository<BetHistory, Long> {
 
-    @Query("select a from BetHistory a where a.playerId = :playerId AND (a.betTime >= :startDate AND a.betTime < :afterEndDate)")
-    List<BetHistory> findByPlayerIdAndDateRange(@Param("playerId") String playerId,
-                                                @Param("startDate") Date startDate,
-                                                @Param("afterEndDate") Date afterEndDate);
+  @Query("select a from BetHistory a where a.playerId = :playerId AND (a.betTime >= :startDate AND a.betTime < :afterEndDate)")
+  List<BetHistory> findByPlayerIdAndDateRange(@Param("playerId") String playerId,
+      @Param("startDate") Date startDate,
+      @Param("afterEndDate") Date afterEndDate);
 
-    @Query("select a from BetHistory a where a.result = :result AND (a.betTime >= :startDate AND a.betTime < :afterEndDate)")
-    List<BetHistory> findByResultAndDateRange(@Param("result") BetResult result,
-                                                @Param("startDate") Date startDate,
-                                                @Param("afterEndDate") Date afterEndDate);
+  @Query("select a from BetHistory a where a.result = :result AND (a.betTime >= :startDate AND a.betTime < :afterEndDate)")
+  List<BetHistory> findByResultAndDateRange(@Param("result") BetResult result,
+      @Param("startDate") Date startDate,
+      @Param("afterEndDate") Date afterEndDate);
 }

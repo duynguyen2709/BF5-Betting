@@ -14,8 +14,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BetHistoryUpdateResultRequest implements Serializable {
-    private long betId;
-    private String score;
-    private BetResult result;
-    private Long actualProfit;
+
+  private long betId;
+  private String score;
+  private BetResult result;
+  private Long actualProfit;
 }

@@ -21,32 +21,34 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = {ConstraintViolationException.class, IllegalArgumentException.class})
-    public ResponseEntity<BaseResponse<Object>> handleConstraintViolation(IllegalArgumentException ex) {
-        return response(HttpStatus.BAD_REQUEST, ex);
-    }
+  @ExceptionHandler(value = {ConstraintViolationException.class, IllegalArgumentException.class})
+  public ResponseEntity<BaseResponse<Object>> handleConstraintViolation(
+      IllegalArgumentException ex) {
+    return response(HttpStatus.BAD_REQUEST, ex);
+  }
 
-    @ExceptionHandler(value = {UncheckedHttpResponseException.class})
-    public ResponseEntity<BaseResponse<Object>> handleHttpResponseException(UncheckedHttpResponseException ex) {
-        return response(HttpStatus.valueOf(ex.getStatusCode()), ex);
-    }
+  @ExceptionHandler(value = {UncheckedHttpResponseException.class})
+  public ResponseEntity<BaseResponse<Object>> handleHttpResponseException(
+      UncheckedHttpResponseException ex) {
+    return response(HttpStatus.valueOf(ex.getStatusCode()), ex);
+  }
 
-    @ExceptionHandler(value = {EntityNotFoundException.class})
-    public ResponseEntity<BaseResponse<Object>> handleNotFound(EntityNotFoundException ex) {
-        return response(HttpStatus.NOT_FOUND, ex);
-    }
+  @ExceptionHandler(value = {EntityNotFoundException.class})
+  public ResponseEntity<BaseResponse<Object>> handleNotFound(EntityNotFoundException ex) {
+    return response(HttpStatus.NOT_FOUND, ex);
+  }
 
-    @ExceptionHandler(value = {Exception.class})
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseEntity<BaseResponse<Object>> handle(Exception ex) {
-        return response(HttpStatus.INTERNAL_SERVER_ERROR, ex);
-    }
+  @ExceptionHandler(value = {Exception.class})
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public ResponseEntity<BaseResponse<Object>> handle(Exception ex) {
+    return response(HttpStatus.INTERNAL_SERVER_ERROR, ex);
+  }
 
-    private ResponseEntity<BaseResponse<Object>> response(HttpStatus status, Exception ex) {
-        log.error("An exception occurred, ex: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(status)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(BaseResponse.failed(status.value(), ex.getMessage()));
-    }
+  private ResponseEntity<BaseResponse<Object>> response(HttpStatus status, Exception ex) {
+    log.error("An exception occurred, ex: {}", ex.getMessage(), ex);
+    return ResponseEntity.status(status)
+        .contentType(MediaType.APPLICATION_JSON)
+        .body(BaseResponse.failed(status.value(), ex.getMessage()));
+  }
 
 }

@@ -12,19 +12,21 @@ import java.util.Map;
  * @author duynguyen
  **/
 public interface PlayerAssetHistoryService {
-    List<PlayerAssetHistory> insertBatch(Collection<PlayerAssetHistory> list);
 
-    PlayerAssetHistory updateAssetFromBetHistory(BetHistory betHistory);
+  List<PlayerAssetHistory> insertBatch(Collection<PlayerAssetHistory> list);
 
-    List<PlayerAssetHistory> updateAssetFromBetHistoryListInBatch(List<BetHistory> betHistories);
+  PlayerAssetHistory updateAssetFromBetHistory(BetHistory betHistory);
 
-    List<PlayerAssetHistory> getAll();
+  List<PlayerAssetHistory> updateAssetFromBetHistoryListInBatch(List<BetHistory> betHistories);
 
-    List<PlayerAssetHistory> getByPlayerIdAndDateRange(String playerId, String startDateStr, String endDateStr);
+  List<PlayerAssetHistory> getAll();
 
-    Map<String, PlayerAssetHistory> getNearestAssetHistoryForPlayers(String date);
+  List<PlayerAssetHistory> getByPlayerIdAndDateRange(String playerId, String startDateStr,
+      String endDateStr);
 
-    void deleteByDateRange(String startDateStr, String endDateStr);
+  Map<String, PlayerAssetHistory> getNearestAssetHistoryForPlayers(String date);
 
-    PlayerAssetHistory insertPaymentHistory(AddPlayerAssetHistoryRequest request);
+  void deleteByDateRange(String startDateStr, String endDateStr);
+
+  PlayerAssetHistory insertPaymentHistory(AddPlayerAssetHistoryRequest request);
 }

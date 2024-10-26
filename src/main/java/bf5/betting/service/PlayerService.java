@@ -11,13 +11,16 @@ import java.util.Map;
  * @author duynguyen
  **/
 public interface PlayerService {
-    Map<String, Player> getAllPlayer();
 
-    Player updatePlayerData(Player player);
+  Map<String, Player> getAllPlayer();
 
-    Player updatePlayerProfitFromBetHistory(BetHistory betHistory);
+  Player updatePlayerData(Player player);
 
-    List<Player> updatePlayerProfitFromListBetHistoryInBatch(List<BetHistory> betHistories);
+  Player updatePlayerProfitFromBetHistory(BetHistory betHistory);
 
-    List<Player> updatePlayerDataBatch(Collection<Player> players);
+  List<Player> updatePlayerProfitFromListBetHistoryInBatch(List<BetHistory> betHistories);
+
+  List<Player> updatePlayerDataBatch(Collection<Player> players);
+
+  String getPlayerNameById(String id);
 }

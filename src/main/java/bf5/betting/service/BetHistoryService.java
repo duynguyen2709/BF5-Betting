@@ -8,21 +8,22 @@ import java.util.List;
  * @author duynguyen
  **/
 public interface BetHistoryService {
-    List<BetHistory> getAllBetHistory();
 
-    List<BetHistory> getByBetIds(List<Long> betIds);
+  List<BetHistory> getAllBetHistory();
 
-    List<BetHistory> getByPlayerIdAndDateRange(String playerId, String startDate, String endDate);
+  List<BetHistory> getByBetIds(List<Long> betIds);
 
-    BetHistory insertBet(BetHistory entity);
+  List<BetHistory> getByPlayerIdAndDateRange(String playerId, String startDate, String endDate);
 
-    List<BetHistory> insertBetInBatch(List<BetHistory> request);
+  BetHistory insertBet(BetHistory entity);
 
-    BetHistory updateBetResult(BetHistory request);
+  List<BetHistory> insertBetInBatch(List<BetHistory> request);
 
-    BetHistory updateBetResultFromRaw(BetHistory request);
+  BetHistory updateBetResult(BetHistory request);
 
-    List<BetHistory> updateBatchBetResultFromRaw(List<BetHistory> request);
+  BetHistory updateBetResultFromRaw(BetHistory request);
 
-    List<BetHistory> getRecentUnfinishedBets();
+  List<BetHistory> updateBatchBetResultFromRaw(List<BetHistory> request);
+
+  List<BetHistory> getRecentUnfinishedBets();
 }

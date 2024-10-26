@@ -25,68 +25,71 @@ import java.util.Map;
 @Entity(name = "BetHistory")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BetHistory {
-    @Id
-    private long betId;
-    @Column
-    private String playerId;
-    @Column
-    private BetType betType;
-    @Column
-    private String metadata;
-    @Column
-    private Timestamp betTime;
-    @Column
-    private long betAmount;
-    @Column
-    private double ratio;
-    @Column
-    private long potentialProfit;
-    @Column
-    private BetResult result;
-    @Column
-    private Timestamp resultSettledTime;
-    @Column
-    private Long actualProfit;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "betId", nullable = false, updatable = false, insertable = false)
-    private List<BetMatchDetail> events;
+  @Id
+  private long betId;
+  @Column
+  private String playerId;
+  @Column
+  private BetType betType;
+  @Column
+  private String metadata;
+  @Column
+  private Timestamp betTime;
+  @Column
+  private long betAmount;
+  @Column
+  private double ratio;
+  @Column
+  private long potentialProfit;
+  @Column
+  private BetResult result;
+  @Column
+  private Timestamp resultSettledTime;
+  @Column
+  private Long actualProfit;
 
-    private transient String rawStatus;
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JoinColumn(name = "betId", nullable = false, updatable = false, insertable = false)
+  private List<BetMatchDetail> events;
 
-    public String getBetTime() {
-        return DateTimeUtil.timestampToReadableString(this.betTime);
+  private transient String rawStatus;
+
+  public String getBetTime() {
+    return DateTimeUtil.timestampToReadableString(this.betTime);
+  }
+
+  public void setBetTime(String timeStr) {
+    this.betTime = DateTimeUtil.stringToTimestamp(timeStr);
+  }
+
+  public void setBetTimeWithTimestamp(Timestamp time) {
+    this.betTime = time;
+  }
+
+  @JsonIgnore
+  public long getBetTimeMs() {
+    return this.betTime.getTime();
+  }
+
+  public void updateResultSettledTime() {
+    if (this.getResultSettledTime() != null || this.getResult() == BetResult.NOT_FINISHED) {
+      return;
+    }
+    this.resultSettledTime = new Timestamp(System.currentTimeMillis());
+  }
+
+  public Map<String, Object> getMetadata() {
+    if (StringUtils.isBlank(this.metadata)) {
+      return null;
     }
 
-    public void setBetTime(String timeStr) {
-        this.betTime = DateTimeUtil.stringToTimestamp(timeStr);
-    }
+    return JsonUtil.fromJsonStringToMap(this.metadata, String.class, Object.class);
+  }
 
-    public void setBetTimeWithTimestamp(Timestamp time) {
-        this.betTime = time;
+  public void setMetadata(Map<String, Object> _metadata) {
+    if (_metadata != null && !_metadata.isEmpty()) {
+      this.metadata = JsonUtil.toJsonString(_metadata);
     }
-
-    @JsonIgnore
-    public long getBetTimeMs() {
-        return this.betTime.getTime();
-    }
-
-    public void updateResultSettledTime() {
-        if (this.getResultSettledTime() != null || this.getResult() == BetResult.NOT_FINISHED) {
-            return;
-        }
-        this.resultSettledTime = new Timestamp(System.currentTimeMillis());
-    }
-
-    public Map<String, Object> getMetadata() {
-        if (StringUtils.isBlank(this.metadata))
-            return null;
-
-        return JsonUtil.fromJsonStringToMap(this.metadata, String.class, Object.class);
-    }
-
-    public void setMetadata(Map<String, Object> _metadata) {
-        if (_metadata != null && !_metadata.isEmpty())
-            this.metadata = JsonUtil.toJsonString(_metadata);
-    }
+  }
 }

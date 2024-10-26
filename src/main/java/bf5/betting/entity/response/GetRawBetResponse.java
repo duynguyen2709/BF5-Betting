@@ -17,74 +17,78 @@ import java.util.List;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GetRawBetResponse implements Serializable {
-    private boolean success;
-    private RawBetResponseData data;
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class RawBetResponseData implements Serializable {
-        private List<RawBetEntity> bets;
-    }
+  private boolean success;
+  private RawBetResponseData data;
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class RawBetEntity implements Serializable {
-        private long id; // betID
-        private long date; // date * 1000 = betTime
-        private double coef; // ratio
-        private int status;
-        @JsonProperty("type_title")
-        private String typeTitle; // Single / Accumulator
-        @JsonProperty("formatted_system_type")
-        private String formattedSystemType; // "4\/6"
-        private long sum; // betAmount
-        @JsonProperty("win_sum")
-        private Long winSum; // actualProfit
-        @JsonProperty("out_sum")
-        private Long outSum; // sell bet
-        @JsonProperty("possible_win_sum")
-        private Long possibleWinSum; // possibleWinSum - sum = potentialProfit
-        private List<RawBetEvent> events;
-    }
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public static class RawBetResponseData implements Serializable {
 
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class RawBetEvent implements Serializable {
-        @JsonProperty("game_id")
-        private long gameId;
-        @JsonProperty("event_type_title")
-        private String eventTypeTitle; // event
-        @JsonProperty("game_type_title")
-        private String gameTypeTitle; // event
-        @JsonProperty("calculation_date")
-        private Long calculationDate; // resultSettledTime
-        @JsonProperty("game_start_date")
-        private long gameStartDate; // gameStartDate * 1000 = matchTime
-        @JsonProperty("champ_name")
-        private String champName; // tournamentName
-        @JsonProperty("period_name")
-        private String periodName; // periodName == '1 Half' => firstHalfOnly = true
-        private double coef;
-        private String score;
-        @JsonProperty("is_finished")
-        private Boolean isFinished;
-        @JsonProperty("opp1_name")
-        private String opp1Name;
-        @JsonProperty("opp1_images")
-        private List<String> opp1Images;
-        @JsonProperty("opp2_name")
-        private String opp2Name;
-        @JsonProperty("opp2_images")
-        private List<String> opp2Images;
-        @JsonProperty("result_type")
-        private Integer resultType;
-    }
+    private List<RawBetEntity> bets;
+  }
+
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public static class RawBetEntity implements Serializable {
+
+    private long id; // betID
+    private long date; // date * 1000 = betTime
+    private double coef; // ratio
+    private int status;
+    @JsonProperty("type_title")
+    private String typeTitle; // Single / Accumulator
+    @JsonProperty("formatted_system_type")
+    private String formattedSystemType; // "4\/6"
+    private long sum; // betAmount
+    @JsonProperty("win_sum")
+    private Long winSum; // actualProfit
+    @JsonProperty("out_sum")
+    private Long outSum; // sell bet
+    @JsonProperty("possible_win_sum")
+    private Long possibleWinSum; // possibleWinSum - sum = potentialProfit
+    private List<RawBetEvent> events;
+  }
+
+  @Data
+  @AllArgsConstructor
+  @NoArgsConstructor
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public static class RawBetEvent implements Serializable {
+
+    @JsonProperty("game_id")
+    private long gameId;
+    @JsonProperty("event_type_title")
+    private String eventTypeTitle; // event
+    @JsonProperty("game_type_title")
+    private String gameTypeTitle; // event
+    @JsonProperty("calculation_date")
+    private Long calculationDate; // resultSettledTime
+    @JsonProperty("game_start_date")
+    private long gameStartDate; // gameStartDate * 1000 = matchTime
+    @JsonProperty("champ_name")
+    private String champName; // tournamentName
+    @JsonProperty("period_name")
+    private String periodName; // periodName == '1 Half' => firstHalfOnly = true
+    private double coef;
+    private String score;
+    @JsonProperty("is_finished")
+    private Boolean isFinished;
+    @JsonProperty("opp1_name")
+    private String opp1Name;
+    @JsonProperty("opp1_images")
+    private List<String> opp1Images;
+    @JsonProperty("opp2_name")
+    private String opp2Name;
+    @JsonProperty("opp2_images")
+    private List<String> opp2Images;
+    @JsonProperty("result_type")
+    private Integer resultType;
+  }
 }
 
 /*

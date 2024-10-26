@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface BetMatchDetailRepository extends JpaRepository<BetMatchDetail, Integer> {
+
 }

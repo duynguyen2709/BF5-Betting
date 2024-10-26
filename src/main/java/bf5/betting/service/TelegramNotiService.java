@@ -9,5 +9,9 @@ import java.util.List;
  **/
 public interface TelegramNotiService {
 
-    void sendNotificationForNewBetAdded(String userId, List<BetHistory> betHistoryList);
+  void sendNotificationForNewBetAdded(String userId, List<BetHistory> betHistoryList);
+
+  void sendNotiForBetResultUpdated(List<BetHistory> betHistoryList);
+
+  void sendExceptionAlert(String error);
 }

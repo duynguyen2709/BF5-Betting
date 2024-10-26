@@ -20,31 +20,37 @@ import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeDesc;
 @AllArgsConstructor
 @Log4j2
 public class RawBetController {
-    private final RawBetService rawBetService;
-    private final BetHistoryService betHistoryService;
 
-    @GetMapping("")
-    BaseResponse<List<BetHistory>> getRawBetInfo(@RequestParam(value = "sessionToken", required = false) String sessionToken,
-                                                 @RequestParam("startDate") String startDate,
-                                                 @RequestParam("endDate") String endDate) {
-        List<BetHistory> betHistories = rawBetService.getAllBetWithConvert(sessionToken, startDate, endDate);
-        return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistories));
-    }
+  private final RawBetService rawBetService;
+  private final BetHistoryService betHistoryService;
 
-    @GetMapping("/quick")
-    BaseResponse<List<BetHistory>> getQuickRawBets(@RequestParam(value = "sessionToken", required = false) String sessionToken) {
-        List<BetHistory> betHistories = rawBetService.quickGetLast30MinutesBets(sessionToken);
-        return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistories));
-    }
+  @GetMapping("")
+  BaseResponse<List<BetHistory>> getRawBetInfo(
+      @RequestParam(value = "sessionToken", required = false) String sessionToken,
+      @RequestParam("startDate") String startDate,
+      @RequestParam("endDate") String endDate) {
+    List<BetHistory> betHistories = rawBetService.getAllBetWithConvert(sessionToken, startDate,
+        endDate);
+    return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistories));
+  }
 
-    @PutMapping("/{betId}/result")
-    public BaseResponse<BetHistory> updateResultFromRaw(@PathVariable("betId") long betId, @RequestBody BetHistory request) {
-        request.setBetId(betId);
-        return BaseResponse.success(betHistoryService.updateBetResultFromRaw(request));
-    }
+  @GetMapping("/quick")
+  BaseResponse<List<BetHistory>> getQuickRawBets(
+      @RequestParam(value = "sessionToken", required = false) String sessionToken) {
+    List<BetHistory> betHistories = rawBetService.quickGetLast30MinutesBets(sessionToken);
+    return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistories));
+  }
 
-    @PutMapping("/result/batch")
-    public BaseResponse<List<BetHistory>> updateBatchResultFromRaw(@RequestBody List<BetHistory> request) {
-        return BaseResponse.success(betHistoryService.updateBatchBetResultFromRaw(request));
-    }
+  @PutMapping("/{betId}/result")
+  public BaseResponse<BetHistory> updateResultFromRaw(@PathVariable("betId") long betId,
+      @RequestBody BetHistory request) {
+    request.setBetId(betId);
+    return BaseResponse.success(betHistoryService.updateBetResultFromRaw(request));
+  }
+
+  @PutMapping("/result/batch")
+  public BaseResponse<List<BetHistory>> updateBatchResultFromRaw(
+      @RequestBody List<BetHistory> request) {
+    return BaseResponse.success(betHistoryService.updateBatchBetResultFromRaw(request));
+  }
 }

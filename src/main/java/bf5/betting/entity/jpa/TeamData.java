@@ -18,10 +18,11 @@ import javax.persistence.Id;
 @Entity(name = "TeamData")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TeamData {
-    @Id
-    private String teamName;
-    @Column
-    private String logoUrl;
-    @Column
-    private String vnTeamName;
+
+  @Id
+  private String teamName;
+  @Column
+  private String logoUrl;
+  @Column
+  private String vnTeamName;
 }

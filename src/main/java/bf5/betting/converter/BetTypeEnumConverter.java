@@ -14,21 +14,21 @@ import java.util.stream.Stream;
 @Converter(autoApply = true)
 public class BetTypeEnumConverter implements AttributeConverter<BetType, String> {
 
-    @Override
-    public String convertToDatabaseColumn(BetType type) {
-        return Optional.ofNullable(type)
-                .map(e -> e.name().toUpperCase())
-                .orElse(null);
-    }
+  @Override
+  public String convertToDatabaseColumn(BetType type) {
+    return Optional.ofNullable(type)
+        .map(e -> e.name().toUpperCase())
+        .orElse(null);
+  }
 
-    @Override
-    public BetType convertToEntityAttribute(String type) {
-        return Stream.of(BetType.values())
-                .filter(c -> c.name().equalsIgnoreCase(type))
-                .findFirst()
-                .orElseThrow(() -> EntityNotFoundException.builder()
-                        .clazz(BetType.class)
-                        .id(type)
-                        .build());
-    }
+  @Override
+  public BetType convertToEntityAttribute(String type) {
+    return Stream.of(BetType.values())
+        .filter(c -> c.name().equalsIgnoreCase(type))
+        .findFirst()
+        .orElseThrow(() -> EntityNotFoundException.builder()
+            .clazz(BetType.class)
+            .id(type)
+            .build());
+  }
 }

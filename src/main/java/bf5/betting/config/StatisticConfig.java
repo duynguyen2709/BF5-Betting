@@ -18,5 +18,6 @@ import java.util.Map;
 @Configuration
 @ConfigurationProperties(prefix = "statistic")
 public class StatisticConfig implements Serializable {
-    private Map<String, Long> playerBaseAsset;
+
+  private Map<String, Long> playerBaseAsset;
 }

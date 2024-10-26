@@ -10,13 +10,14 @@ import java.util.List;
  * @author duynguyen
  **/
 public interface TeamDataService {
-    String getTeamLogoUrl(String teamName);
 
-    String getTeamVnName(String teamName);
+  String getTeamLogoUrl(String teamName);
 
-    List<TeamData> insertBatch(Collection<TeamData> teams);
+  String getTeamVnName(String teamName);
 
-    void insertTeamDataIfNotAvailable(BetHistory betHistory);
+  List<TeamData> insertBatch(Collection<TeamData> teams);
 
-    void insertTeamDataIfNotAvailable(List<BetHistory> betHistories);
+  void insertTeamDataIfNotAvailable(BetHistory betHistory);
+
+  void insertTeamDataIfNotAvailable(List<BetHistory> betHistories);
 }

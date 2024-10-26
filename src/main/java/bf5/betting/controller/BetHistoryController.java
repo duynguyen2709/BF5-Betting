@@ -23,53 +23,57 @@ import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeDesc;
 @RequestMapping("/api/bets")
 @AllArgsConstructor
 public class BetHistoryController {
-    private final BetHistoryService betHistoryService;
 
-    @GetMapping("/recent")
-    public BaseResponse<Map<String, List<BetHistory>>> getRecentUnfinishedBets() {
-        List<BetHistory> betHistoryList = this.betHistoryService.getRecentUnfinishedBets();
-        Map<String, List<BetHistory>> betGroupByPlayerId = betHistoryList.stream()
-                .collect(Collectors.groupingBy(BetHistory::getPlayerId));
-        return BaseResponse.success(betGroupByPlayerId);
+  private final BetHistoryService betHistoryService;
+
+  @GetMapping("/recent")
+  public BaseResponse<Map<String, List<BetHistory>>> getRecentUnfinishedBets() {
+    List<BetHistory> betHistoryList = this.betHistoryService.getRecentUnfinishedBets();
+    Map<String, List<BetHistory>> betGroupByPlayerId = betHistoryList.stream()
+        .collect(Collectors.groupingBy(BetHistory::getPlayerId));
+    return BaseResponse.success(betGroupByPlayerId);
+  }
+
+
+  @GetMapping("")
+  public BaseResponse<List<BetHistory>> getAll(
+      @RequestParam(name = "playerId", required = false) String playerId,
+      @RequestParam(name = "startDate", required = false) String startDate,
+      @RequestParam(name = "endDate", required = false) String endDate,
+      HttpServletRequest request) {
+    try {
+      List<BetHistory> betHistoryList;
+      if (StringUtils.isBlank(playerId)) {
+        betHistoryList = this.betHistoryService.getAllBetHistory();
+      } else {
+        betHistoryList = this.betHistoryService.getByPlayerIdAndDateRange(playerId, startDate,
+            endDate);
+      }
+      return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistoryList));
+    } finally {
+      if (StringUtils.isNotBlank(playerId)) {
+        RequestUtil.logUserAction(request,
+            UserAction.VIEW_HISTORY,
+            Map.of("playerId", playerId, "startDate", startDate, "endDate", endDate)
+        );
+      }
     }
+  }
 
+  @PostMapping("")
+  public BaseResponse<BetHistory> insert(@RequestBody BetHistory request) {
+    return BaseResponse.success(betHistoryService.insertBet(request));
+  }
 
-    @GetMapping("")
-    public BaseResponse<List<BetHistory>> getAll(@RequestParam(name = "playerId", required = false) String playerId,
-                                                 @RequestParam(name = "startDate", required = false) String startDate,
-                                                 @RequestParam(name = "endDate", required = false) String endDate,
-                                                 HttpServletRequest request) {
-        try {
-            List<BetHistory> betHistoryList;
-            if (StringUtils.isBlank(playerId)) {
-                betHistoryList = this.betHistoryService.getAllBetHistory();
-            } else {
-                betHistoryList = this.betHistoryService.getByPlayerIdAndDateRange(playerId, startDate, endDate);
-            }
-            return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistoryList));
-        } finally {
-            if (StringUtils.isNotBlank(playerId)) {
-                RequestUtil.logUserAction(request,
-                        UserAction.VIEW_HISTORY,
-                        Map.of("playerId", playerId, "startDate", startDate, "endDate", endDate)
-                );
-            }
-        }
-    }
+  @PostMapping("/batch")
+  public BaseResponse<List<BetHistory>> insertInBatch(@RequestBody List<BetHistory> request) {
+    return BaseResponse.success(betHistoryService.insertBetInBatch(request));
+  }
 
-    @PostMapping("")
-    public BaseResponse<BetHistory> insert(@RequestBody BetHistory request) {
-        return BaseResponse.success(betHistoryService.insertBet(request));
-    }
-
-    @PostMapping("/batch")
-    public BaseResponse<List<BetHistory>> insertInBatch(@RequestBody List<BetHistory> request) {
-        return BaseResponse.success(betHistoryService.insertBetInBatch(request));
-    }
-
-    @PutMapping("/{betId}/result")
-    public BaseResponse<BetHistory> updateResult(@PathVariable("betId") long betId, @RequestBody BetHistory request) {
-        request.setBetId(betId);
-        return BaseResponse.success(betHistoryService.updateBetResult(request));
-    }
+  @PutMapping("/{betId}/result")
+  public BaseResponse<BetHistory> updateResult(@PathVariable("betId") long betId,
+      @RequestBody BetHistory request) {
+    request.setBetId(betId);
+    return BaseResponse.success(betHistoryService.updateBetResult(request));
+  }
 }

@@ -20,21 +20,23 @@ import java.util.List;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class BetHistoryStatisticResponse implements Serializable {
-    private String playerId;
-    private String startDate;
-    private String endDate;
-    private List<AssetByDate> assetByDateList;
-    private List<BetHistory> betHistoryList;
+
+  private String playerId;
+  private String startDate;
+  private String endDate;
+  private List<AssetByDate> assetByDateList;
+  private List<BetHistory> betHistoryList;
 
 
-    @Data
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class AssetByDate implements Serializable {
-        private String paymentTime;
-        private long assetBefore;
-        private long assetAfter;
-        private PaymentAction action;
-    }
+  @Data
+  @Builder
+  @AllArgsConstructor
+  @NoArgsConstructor
+  public static class AssetByDate implements Serializable {
+
+    private String paymentTime;
+    private long assetBefore;
+    private long assetAfter;
+    private PaymentAction action;
+  }
 }

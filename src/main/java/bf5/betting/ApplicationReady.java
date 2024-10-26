@@ -20,35 +20,36 @@ import java.util.Map;
 @Log4j2
 @Component
 public class ApplicationReady {
-    private final ConfigurableEnvironment configurableEnvironment;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void init() {
-        showConfiguration();
-    }
+  private final ConfigurableEnvironment configurableEnvironment;
 
-    private void showConfiguration() {
-        log.info("##################### Show Configuration #####################");
-        List<MapPropertySource> propertySources = new ArrayList<>();
-        configurableEnvironment.getPropertySources().forEach((it) -> {
-            if (it instanceof MapPropertySource && it.getName().contains("application.yaml")) {
-                propertySources.add((MapPropertySource) it);
-            }
+  @EventListener(ApplicationReadyEvent.class)
+  public void init() {
+    showConfiguration();
+  }
+
+  private void showConfiguration() {
+    log.info("##################### Show Configuration #####################");
+    List<MapPropertySource> propertySources = new ArrayList<>();
+    configurableEnvironment.getPropertySources().forEach((it) -> {
+      if (it instanceof MapPropertySource && it.getName().contains("application.yaml")) {
+        propertySources.add((MapPropertySource) it);
+      }
+    });
+
+    propertySources.stream().map((propertySource) ->
+            ((Map) propertySource.getSource()).keySet())
+        .flatMap(Collection::stream)
+        .distinct()
+        .sorted()
+        .forEach((key) -> {
+          try {
+            log.info(key + "=" + configurableEnvironment.getProperty(String.valueOf(key)));
+          } catch (Exception var3) {
+            log.warn("{} -> {}", key, var3.getMessage());
+          }
         });
-
-        propertySources.stream().map((propertySource) ->
-                        ((Map) propertySource.getSource()).keySet())
-                .flatMap(Collection::stream)
-                .distinct()
-                .sorted()
-                .forEach((key) -> {
-                    try {
-                        log.info(key + "=" + configurableEnvironment.getProperty(String.valueOf(key)));
-                    } catch (Exception var3) {
-                        log.warn("{} -> {}", key, var3.getMessage());
-                    }
-                });
-        log.info("##################### End show Configuration #####################");
-    }
+    log.info("##################### End show Configuration #####################");
+  }
 
 }

@@ -23,67 +23,73 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Log4j2
 public class PlayerServiceImpl implements PlayerService {
-    private final PlayerRepository playerRepository;
-    private Map<String, Player> playerCacheMap;
 
-    @PostConstruct
-    void init() {
-        this.playerCacheMap = playerRepository.findAll()
-                .stream()
-                .collect(Collectors.toMap(Player::getPlayerId, Function.identity()));
+  private final PlayerRepository playerRepository;
+  private Map<String, Player> playerCacheMap;
 
-        log.info("Load PlayerCache Done: {}", JsonUtil.toJsonString(this.playerCacheMap));
+  @PostConstruct
+  void init() {
+    this.playerCacheMap = playerRepository.findAll()
+        .stream()
+        .collect(Collectors.toMap(Player::getPlayerId, Function.identity()));
+
+    log.info("Load PlayerCache Done: {}", JsonUtil.toJsonString(this.playerCacheMap));
+  }
+
+  @Override
+  public Map<String, Player> getAllPlayer() {
+    return this.playerCacheMap;
+  }
+
+  @Override
+  @TryCatchWrap
+  @Transactional
+  public Player updatePlayerData(Player player) {
+    Player newPlayer = this.playerRepository.save(player);
+    this.playerCacheMap.put(player.getPlayerId(), newPlayer);
+    return newPlayer;
+  }
+
+  @Override
+  @TryCatchWrap
+  @Transactional
+  public Player updatePlayerProfitFromBetHistory(BetHistory betHistory) {
+    if (Objects.isNull(betHistory.getActualProfit())) {
+      return null;
     }
+    Player player = this.playerCacheMap.get(betHistory.getPlayerId());
+    long newTotalProfit = player.getTotalProfit() + betHistory.getActualProfit();
+    player.setTotalProfit(newTotalProfit);
+    return this.updatePlayerData(player);
+  }
 
-    @Override
-    public Map<String, Player> getAllPlayer() {
-        return this.playerCacheMap;
+  @Override
+  public List<Player> updatePlayerProfitFromListBetHistoryInBatch(List<BetHistory> betHistories) {
+    if (betHistories.isEmpty()) {
+      return new ArrayList<>();
     }
-
-    @Override
-    @TryCatchWrap
-    @Transactional
-    public Player updatePlayerData(Player player) {
-        Player newPlayer = this.playerRepository.save(player);
-        this.playerCacheMap.put(player.getPlayerId(), newPlayer);
-        return newPlayer;
-    }
-
-    @Override
-    @TryCatchWrap
-    @Transactional
-    public Player updatePlayerProfitFromBetHistory(BetHistory betHistory) {
-        if (Objects.isNull(betHistory.getActualProfit())) {
-            return null;
-        }
+    betHistories.forEach(betHistory -> {
+      if (betHistory.getActualProfit() != null) {
         Player player = this.playerCacheMap.get(betHistory.getPlayerId());
         long newTotalProfit = player.getTotalProfit() + betHistory.getActualProfit();
         player.setTotalProfit(newTotalProfit);
-        return this.updatePlayerData(player);
-    }
+        this.playerCacheMap.put(betHistory.getPlayerId(), player);
+      }
+    });
+    return this.updatePlayerDataBatch(this.playerCacheMap.values());
+  }
 
-    @Override
-    public List<Player> updatePlayerProfitFromListBetHistoryInBatch(List<BetHistory> betHistories) {
-        if (betHistories.isEmpty()) {
-            return new ArrayList<>();
-        }
-        betHistories.forEach(betHistory -> {
-            if (betHistory.getActualProfit() != null) {
-                Player player = this.playerCacheMap.get(betHistory.getPlayerId());
-                long newTotalProfit = player.getTotalProfit() + betHistory.getActualProfit();
-                player.setTotalProfit(newTotalProfit);
-                this.playerCacheMap.put(betHistory.getPlayerId(), player);
-            }
-        });
-        return this.updatePlayerDataBatch(this.playerCacheMap.values());
-    }
+  @Override
+  @TryCatchWrap
+  @Transactional
+  public List<Player> updatePlayerDataBatch(Collection<Player> players) {
+    List<Player> newPlayers = this.playerRepository.saveAll(players);
+    newPlayers.forEach(player -> this.playerCacheMap.put(player.getPlayerId(), player));
+    return newPlayers;
+  }
 
-    @Override
-    @TryCatchWrap
-    @Transactional
-    public List<Player> updatePlayerDataBatch(Collection<Player> players) {
-        List<Player> newPlayers = this.playerRepository.saveAll(players);
-        newPlayers.forEach(player -> this.playerCacheMap.put(player.getPlayerId(), player));
-        return newPlayers;
-    }
+  @Override
+  public String getPlayerNameById(String id) {
+    return this.playerCacheMap.get(id).getPlayerName();
+  }
 }

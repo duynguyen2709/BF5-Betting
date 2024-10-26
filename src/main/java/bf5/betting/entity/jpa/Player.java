@@ -18,14 +18,15 @@ import javax.persistence.Id;
 @Entity(name = "Player")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Player {
-    @Id
-    private String playerId;
-    @Column
-    private String playerName;
-    @Column
-    private String avatarUrl;
-    @Column
-    private long totalProfit;
-    @Column
-    private String telegramId;
+
+  @Id
+  private String playerId;
+  @Column
+  private String playerName;
+  @Column
+  private String avatarUrl;
+  @Column
+  private long totalProfit;
+  @Column
+  private String telegramId;
 }

@@ -13,8 +13,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AddPlayerAssetHistoryRequest implements Serializable {
-    private String playerId;
-    private String action;
-    private String paymentMethod;
-    private long amount;
+
+  private String playerId;
+  private String action;
+  private String paymentMethod;
+  private long amount;
 }

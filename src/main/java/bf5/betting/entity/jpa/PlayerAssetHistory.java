@@ -21,37 +21,38 @@ import java.sql.Timestamp;
 @Entity(name = "PlayerAssetHistory")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PlayerAssetHistory {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    @Column
-    private String playerId;
-    @Column
-    private Long betId;
-    @Column
-    private Timestamp paymentTime;
-    @Column
-    private PaymentAction action;
-    @Column
-    private String paymentMethod;
-    @Column
-    private long amount;
-    @Column
-    private long assetBefore;
-    @Column
-    private long assetAfter;
-    @Column(insertable = false, updatable = false)
-    private Timestamp updatedAt;
 
-    public String getUpdatedAt() {
-        return DateTimeUtil.timestampToReadableString(this.updatedAt);
-    }
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private int id;
+  @Column
+  private String playerId;
+  @Column
+  private Long betId;
+  @Column
+  private Timestamp paymentTime;
+  @Column
+  private PaymentAction action;
+  @Column
+  private String paymentMethod;
+  @Column
+  private long amount;
+  @Column
+  private long assetBefore;
+  @Column
+  private long assetAfter;
+  @Column(insertable = false, updatable = false)
+  private Timestamp updatedAt;
 
-    public String getPaymentTime() {
-        return DateTimeUtil.timestampToReadableString(this.paymentTime);
-    }
+  public String getUpdatedAt() {
+    return DateTimeUtil.timestampToReadableString(this.updatedAt);
+  }
 
-    public Timestamp getRawPaymentTime() {
-        return this.paymentTime;
-    }
+  public String getPaymentTime() {
+    return DateTimeUtil.timestampToReadableString(this.paymentTime);
+  }
+
+  public Timestamp getRawPaymentTime() {
+    return this.paymentTime;
+  }
 }

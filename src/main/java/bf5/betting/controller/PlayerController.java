@@ -17,10 +17,11 @@ import java.util.Map;
 @RequestMapping("/api/players")
 @AllArgsConstructor
 public class PlayerController {
-    private final PlayerService playerService;
 
-    @GetMapping("")
-    public BaseResponse<Map<String, Player>> getAll() {
-        return BaseResponse.success(playerService.getAllPlayer());
-    }
+  private final PlayerService playerService;
+
+  @GetMapping("")
+  public BaseResponse<Map<String, Player>> getAll() {
+    return BaseResponse.success(playerService.getAllPlayer());
+  }
 }

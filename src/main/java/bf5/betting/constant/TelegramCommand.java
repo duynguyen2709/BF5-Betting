@@ -9,7 +9,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum TelegramCommand {
-    QUICK_ADD("/qadd");
+  QUICK_ADD("/qadd"),
+  QUICK_UPDATE("/qupd"),
+  TOKEN("/token");
 
-    private final String command;
+  private final String command;
 }
