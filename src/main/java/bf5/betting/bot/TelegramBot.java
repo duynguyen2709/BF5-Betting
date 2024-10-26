@@ -152,6 +152,9 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
       } else if (messageText.equals(TelegramCommand.TOKEN.getCommand())) {
         replyMessageText = rawBetService.getLastActiveToken();
+        if (replyMessageText.isEmpty()) {
+          replyMessageText = "Token rỗng";
+        }
       } else if (messageText.equals(TelegramCommand.QUICK_UPDATE.getCommand())) {
         String today = DateTimeUtil.getDateStringFromToday(0);
         String yesterday = DateTimeUtil.getDateStringFromToday(-1);
