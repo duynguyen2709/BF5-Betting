@@ -122,6 +122,8 @@ public class TelegramBot extends TelegramLongPollingBot {
       }
     } else if (update.hasMessage() && update.getMessage().hasText()) {
       String messageText = update.getMessage().getText();
+      log.info("[TelegramBot] Received message: {}", messageText);
+
       long chatId = update.getMessage().getChatId();
 
       String replyMessageText = "";

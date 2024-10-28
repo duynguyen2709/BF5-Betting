@@ -2,6 +2,7 @@ package bf5.betting.job;
 
 import bf5.betting.constant.BetResult;
 import bf5.betting.entity.jpa.BetHistory;
+import bf5.betting.exception.UncheckedHttpResponseException;
 import bf5.betting.repository.BetHistoryRepository;
 import bf5.betting.service.BetHistoryService;
 import bf5.betting.service.RawBetService;
@@ -36,11 +37,6 @@ public class AutoUpdateBetResultCronJob {
   private final BetHistoryRepository betHistoryRepository;
   private final TelegramNotiService telegramNotiService;
 
-  private final Cache<Long, Boolean> updatedBetsCache = Caffeine.newBuilder()
-      .expireAfterWrite(36, TimeUnit.HOURS)
-      .build();
-
-
   @PostConstruct
   void scheduleJob() {
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -59,7 +55,7 @@ public class AutoUpdateBetResultCronJob {
       // Get list raw bets that finished
       List<BetHistory> rawBetsReadyForUpdate = rawBetService.getListBetForAutoUpdater()
           .stream()
-          .filter(this::isRawBetFinishedAndNotProcessed)
+          .filter(bet -> bet.getResult() != BetResult.NOT_FINISHED)
           .collect(Collectors.toList());
       if (rawBetsReadyForUpdate.isEmpty()) {
         log.info("List raw bets ready for update is empty => Skipped this run");
@@ -67,15 +63,15 @@ public class AutoUpdateBetResultCronJob {
       }
 
       List<BetHistory> toBeUpdatedBetHistories = filterUnfinishedBetsInDatabase(rawBetsReadyForUpdate);
-
       if (toBeUpdatedBetHistories.isEmpty()) {
         log.info("List raw bet history to be updated is empty => Skipped this run");
         return;
       }
 
       this.betHistoryService.updateBatchBetResultFromRaw(toBeUpdatedBetHistories);
-
-      updateCache(toBeUpdatedBetHistories);
+    } catch (UncheckedHttpResponseException tokenExpiredEx) {
+      telegramNotiService.sendExceptionAlert("Token Expired at " + DateTimeUtil.now());
+      throw tokenExpiredEx;
     } catch (Exception ex) {
       log.error("Exception occurred when running auto update bet results job: {}", ex.getMessage(),
           ex);
@@ -102,30 +98,18 @@ public class AutoUpdateBetResultCronJob {
         JsonUtil.toJsonString(unfinishedBetsInDatabase), unfinishedBetsInDatabase.size());
 
     if (rawBetIds.size() != unfinishedBetsInDatabase.size()) {
-      String error = String.format("List raw bets ready for update AND list actually needed to be updated are not match\n- Raw Bets: %s\n- Bets In Database: %s",
+      String error = String.format("Number of bets needed to be updated not match\n- Raw Bets:\n%s\n- Stored Bets:\n%s",
           rawBetIds.stream().map(id -> String.format("  + %s", id)).collect(
               Collectors.joining("\n")),
-          unfinishedBetsInDatabase.stream().map(id -> String.format("  + %s", id)).collect(
+          unfinishedBetsInDatabase.isEmpty() ? " *Empty*" : unfinishedBetsInDatabase.stream().map(id -> String.format("  + %s", id)).collect(
               Collectors.joining("\n")));
       log.error(error);
       telegramNotiService.sendExceptionAlert(error);
     }
-
     // List contains only unfinished bets in database that need to update result
     return rawBetList.stream()
         .filter(bet -> unfinishedBetsInDatabase.contains(bet.getBetId()))
         .collect(Collectors.toList());
   }
 
-  private boolean isRawBetFinishedAndNotProcessed(BetHistory rawBet) {
-    return (rawBet.getResult() != BetResult.NOT_FINISHED && Objects.isNull(
-        updatedBetsCache.getIfPresent(rawBet.getBetId())));
-  }
-
-  private void updateCache(List<BetHistory> betHistories) {
-    betHistories.forEach(bet -> {
-      updatedBetsCache.put(bet.getBetId(), true);
-      log.info("Add betId {} into updated cache", bet.getBetId());
-    });
-  }
 }
