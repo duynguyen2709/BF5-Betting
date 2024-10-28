@@ -97,7 +97,6 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
       }
       content.append("\n");
     }
-
     sendNotification(userId, content.toString());
   }
 
@@ -144,7 +143,7 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
         content.append("*").append(teamsKey).append("*").append(":").append(
             isAccumulatorBet ? String.format(" %s `%,d VNĐ`",
                 entry.getValue().get(0).getResult().getVnDescriptionText(),
-                entry.getValue().get(0).getActualProfit()) : "").append("\n");
+                Math.abs(entry.getValue().get(0).getActualProfit())) : "").append("\n");
 
         for (BetHistory betHistory : entry.getValue()) {
           for (BetMatchDetail detail : betHistory.getEvents()) {
@@ -152,15 +151,12 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
                 .append(formatVnBetEvent(detail)).append(
                     !isAccumulatorBet ? String.format("  || %s `%,d VNĐ`",
                         entry.getValue().get(0).getResult().getVnDescriptionText(),
-                        entry.getValue().get(0).getActualProfit()) : "").append("\n");
+                        Math.abs(entry.getValue().get(0).getActualProfit())) : "").append("\n");
           }
         }
-        content.append("\n");
       }
-
       content.append("-----------------------------------------------\n");
     }
-
     sendNotification(Constant.ADMIN_USER_ID, content.toString());
   }
 

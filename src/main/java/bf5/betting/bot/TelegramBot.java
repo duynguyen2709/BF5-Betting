@@ -157,9 +157,20 @@ public class TelegramBot extends TelegramLongPollingBot {
         if (replyMessageText.isEmpty()) {
           replyMessageText = "Token rỗng";
         }
-      } else if (messageText.equals(TelegramCommand.QUICK_UPDATE.getCommand())) {
+      } else if (messageText.startsWith(TelegramCommand.QUICK_UPDATE.getCommand())) {
+        String[] parts = messageText.split(" ");
+        int day = Optional.ofNullable(parts.length > 1 ? parts[1] : null)
+            .map(part -> {
+              try {
+                return Integer.parseInt(part);
+              } catch (NumberFormatException e) {
+                return null;
+              }
+            })
+            .orElse(1);
+
         String today = DateTimeUtil.getDateStringFromToday(0);
-        String yesterday = DateTimeUtil.getDateStringFromToday(-1);
+        String yesterday = DateTimeUtil.getDateStringFromToday(-1 * day);
         List<BetHistory> betHistories = rawBetService.getAllBetWithConvert(
             rawBetService.getLastActiveToken(), yesterday, today);
         List<BetHistory> betToBeUpdated = betHistories.stream()
