@@ -6,6 +6,7 @@ import bf5.betting.constant.UserAction;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.response.BaseResponse;
 import bf5.betting.service.BetHistoryService;
+import bf5.betting.util.BetHistoryUtil;
 import bf5.betting.util.RequestUtil;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +38,12 @@ public class BetHistoryController {
     List<BetHistory> betHistoryList = this.betHistoryService.getRecentUnfinishedBets();
     Map<String, List<BetHistory>> betGroupByPlayerId = betHistoryList.stream()
                                                                      .collect(Collectors.groupingBy(
-                                                                         BetHistory::getPlayerId));
+                                                                         BetHistory::getPlayerId,
+                                                                         Collectors.collectingAndThen(
+                                                                             Collectors.toList(),
+                                                                             BetHistoryUtil::sortByStatusAndBetTimeDesc
+                                                                                                     )
+                                                                                                   ));
     return BaseResponse.success(betGroupByPlayerId);
   }
 

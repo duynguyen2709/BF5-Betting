@@ -41,11 +41,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
   @Override
   public List<BetHistory> getRecentUnfinishedBets() {
-    Date startDate = DateTimeUtil.getYesterday();
-    Date afterEndDate = DateTimeUtil.getNextDate(DateTimeUtil.getDateStringFromToday(0));
-    return withTeamDataWrapper(
-        betHistoryRepository.findByResultAndDateRange(BetResult.NOT_FINISHED, startDate,
-                                                      afterEndDate));
+    return withTeamDataWrapper(betHistoryRepository.findByResult(BetResult.NOT_FINISHED));
   }
 
   @Override
