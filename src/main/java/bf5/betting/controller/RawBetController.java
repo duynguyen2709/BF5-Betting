@@ -1,16 +1,21 @@
 package bf5.betting.controller;
 
+import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeDesc;
+
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.response.BaseResponse;
 import bf5.betting.service.BetHistoryService;
 import bf5.betting.service.RawBetService;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeDesc;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author duynguyen
@@ -30,7 +35,7 @@ public class RawBetController {
       @RequestParam("startDate") String startDate,
       @RequestParam("endDate") String endDate) {
     List<BetHistory> betHistories = rawBetService.getAllBetWithConvert(sessionToken, startDate,
-        endDate);
+                                                                       endDate);
     return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistories));
   }
 

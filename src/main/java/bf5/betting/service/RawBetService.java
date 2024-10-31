@@ -1,7 +1,6 @@
 package bf5.betting.service;
 
 import bf5.betting.entity.jpa.BetHistory;
-
 import java.util.List;
 
 /**
@@ -14,6 +13,4 @@ public interface RawBetService {
   List<BetHistory> quickGetLast30MinutesBets(String sessionToken);
 
   List<BetHistory> getListBetForAutoUpdater();
-
-  String getLastActiveToken();
 }

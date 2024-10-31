@@ -5,13 +5,12 @@ import bf5.betting.constant.BetResult;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.BetMatchDetail;
 import bf5.betting.entity.response.GetRawBetResponse;
-import org.apache.commons.lang3.StringUtils;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author duynguyen
@@ -70,7 +69,7 @@ public class BetHistoryUtil {
     });
 
     Comparator<BetHistory> betTimeDescComparator = (o1, o2) -> Long.compare(o2.getBetTimeMs(),
-        o1.getBetTimeMs());
+                                                                            o1.getBetTimeMs());
     unfinishedBets.sort(betTimeDescComparator);
     finishedBets.sort(betTimeDescComparator);
 
@@ -81,11 +80,13 @@ public class BetHistoryUtil {
 
   public static Timestamp getLatestResultSettledTime(List<GetRawBetResponse.RawBetEvent> events) {
     List<GetRawBetResponse.RawBetEvent> sortedEvents = events.stream()
-        .filter(event -> event.getCalculationDate() != null)
-        .sorted((o1, o2) -> Long.compare(o2.getCalculationDate(), o1.getCalculationDate()))
-        .collect(Collectors.toList());
+                                                             .filter(event -> event.getCalculationDate() != null)
+                                                             .sorted((o1, o2) -> Long.compare(o2.getCalculationDate(),
+                                                                                              o1.getCalculationDate()))
+                                                             .collect(Collectors.toList());
     long resultSettledTime = !sortedEvents.isEmpty() ?
-        (sortedEvents.get(0).getCalculationDate() * 1000) : System.currentTimeMillis();
+        (sortedEvents.get(0)
+                     .getCalculationDate() * 1000) : System.currentTimeMillis();
     return new Timestamp(resultSettledTime);
   }
 }

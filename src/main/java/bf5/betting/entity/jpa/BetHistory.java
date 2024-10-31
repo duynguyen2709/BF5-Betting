@@ -6,15 +6,20 @@ import bf5.betting.util.DateTimeUtil;
 import bf5.betting.util.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-
-import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author duynguyen

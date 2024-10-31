@@ -1,8 +1,11 @@
 package bf5.betting.entity.jpa;
 
+import bf5.betting.constant.ServerConfigKey;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,18 +17,15 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "Player")
+@Entity(name = "ServerConfig")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Player {
+public class ServerConfig {
 
   @Id
-  private String playerId;
+  @Column(name = "configKey", nullable = false, columnDefinition = "VARCHAR")
+  @Enumerated(EnumType.STRING)
+  private ServerConfigKey configKey;
+
   @Column
-  private String playerName;
-  @Column
-  private String avatarUrl;
-  @Column
-  private long totalProfit;
-  @Column
-  private String telegramId;
+  private String configValue;
 }

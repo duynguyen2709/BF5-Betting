@@ -6,12 +6,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.extern.log4j.Log4j2;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author duynguyen
@@ -46,7 +45,7 @@ public class JsonUtil {
       return mapper.readValue(raw, clazz);
     } catch (Exception e) {
       log.error(String.format("[fromJsonString] raw=%s, class=%s ex", raw, clazz.getSimpleName()),
-          e);
+                e);
       return null;
     }
   }
@@ -54,7 +53,7 @@ public class JsonUtil {
   public static <T> List<T> fromJsonStringToList(String raw, Class<T> clazz) {
     try {
       CollectionType listType = mapper.getTypeFactory()
-          .constructCollectionType(ArrayList.class, clazz);
+                                      .constructCollectionType(ArrayList.class, clazz);
 
       return mapper.readValue(raw, listType);
     } catch (Exception e) {
@@ -75,7 +74,7 @@ public class JsonUtil {
       });
     } catch (JsonProcessingException e) {
       log.error(String.format("[fromJsonStringToMap] raw=%s, class=(%s;%s) ex",
-          raw, key.getSimpleName(), value.getSimpleName()), e);
+                              raw, key.getSimpleName(), value.getSimpleName()), e);
       return null;
     }
   }

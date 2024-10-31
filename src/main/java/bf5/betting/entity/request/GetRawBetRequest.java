@@ -1,11 +1,10 @@
 package bf5.betting.entity.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
-
-import java.io.Serializable;
-
 import static bf5.betting.constant.Constant._1xBet_ACCOUNT_ID;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serializable;
+import lombok.Data;
 
 /**
  * @author duynguyen

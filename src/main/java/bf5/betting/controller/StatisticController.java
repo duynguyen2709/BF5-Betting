@@ -10,12 +10,16 @@ import bf5.betting.service.BetHistoryService;
 import bf5.betting.service.PlayerAssetHistoryService;
 import bf5.betting.service.StatisticService;
 import bf5.betting.util.RequestUtil;
-import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author duynguyen
@@ -33,8 +37,10 @@ public class StatisticController {
   public BaseResponse<List<PlayerAssetHistory>> getAll() {
     List<PlayerAssetHistory> assetHistories = assetHistoryService.getAll();
     assetHistories.sort((o1, o2) -> {
-      long firstPaymentTime = o1.getRawPaymentTime().getTime();
-      long secondPaymentTime = o2.getRawPaymentTime().getTime();
+      long firstPaymentTime = o1.getRawPaymentTime()
+                                .getTime();
+      long secondPaymentTime = o2.getRawPaymentTime()
+                                 .getTime();
       if (firstPaymentTime != secondPaymentTime) {
         return Long.compare(secondPaymentTime, firstPaymentTime);
       }
@@ -51,25 +57,25 @@ public class StatisticController {
       HttpServletRequest request) {
     try {
       List<BetHistory> betHistories = this.betHistoryService.getByPlayerIdAndDateRange(playerId,
-          startDate, endDate);
+                                                                                       startDate, endDate);
       List<PlayerAssetHistory> assetHistories = this.assetHistoryService.getByPlayerIdAndDateRange(
           playerId, startDate, endDate);
       List<BetHistoryStatisticResponse.AssetByDate> assetByDateList = this.statisticService.statisticAssetByDate(
           assetHistories);
 
       BetHistoryStatisticResponse response = BetHistoryStatisticResponse.builder()
-          .playerId(playerId)
-          .startDate(startDate)
-          .endDate(endDate)
-          .betHistoryList(betHistories)
-          .assetByDateList(assetByDateList)
-          .build();
+                                                                        .playerId(playerId)
+                                                                        .startDate(startDate)
+                                                                        .endDate(endDate)
+                                                                        .betHistoryList(betHistories)
+                                                                        .assetByDateList(assetByDateList)
+                                                                        .build();
       return BaseResponse.success(response);
     } finally {
       RequestUtil.logUserAction(request,
-          UserAction.VIEW_STATISTIC,
-          Map.of("playerId", playerId, "startDate", startDate, "endDate", endDate)
-      );
+                                UserAction.VIEW_STATISTIC,
+                                Map.of("playerId", playerId, "startDate", startDate, "endDate", endDate)
+                               );
     }
   }
 

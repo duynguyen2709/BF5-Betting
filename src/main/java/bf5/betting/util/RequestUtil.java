@@ -1,12 +1,11 @@
 package bf5.betting.util;
 
 import bf5.betting.constant.UserAction;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpHeaders;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpHeaders;
 
 /**
  * @author duynguyen
