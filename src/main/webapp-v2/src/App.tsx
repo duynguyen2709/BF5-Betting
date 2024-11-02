@@ -1,6 +1,7 @@
 import './App.css'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Button, ConfigProvider } from 'antd'
+import { ConfigProvider } from 'antd'
+import AppRoutes from '@/containers/Routes.tsx'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -14,25 +15,19 @@ const queryClient = new QueryClient({
   }
 })
 
-const apiUrl = import.meta.env.VITE_API_URL
+const overrideTheme = {
+  token: {
+    colorPrimary: '#00b96b',
+    borderRadius: 8,
+    colorBgContainer: '#f6ffed'
+  }
+}
 
 export default function Home() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ConfigProvider
-        theme={{
-          token: {
-            // Seed Token
-            colorPrimary: '#00b96b',
-            borderRadius: 8,
-
-            // Alias Token
-            colorBgContainer: '#f6ffed'
-          }
-        }}
-      >
-        <Button type='primary'>Button</Button>
-        <p>API URL: {apiUrl}</p>
+      <ConfigProvider theme={overrideTheme}>
+        <AppRoutes />
       </ConfigProvider>
     </QueryClientProvider>
   )

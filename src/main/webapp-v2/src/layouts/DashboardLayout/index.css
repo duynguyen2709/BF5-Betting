@@ -1,0 +1,13 @@
+.main-layout {
+  .main-header {
+    padding: 0 1.5rem;
+
+    .main-header-logo {
+      height: 48px;
+    }
+  }
+
+  .main-content {
+    padding: 1rem 0.5rem 0.5rem;
+  }
+}
