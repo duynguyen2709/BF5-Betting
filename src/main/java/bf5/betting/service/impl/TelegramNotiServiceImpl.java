@@ -148,17 +148,15 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
                   .add(betHistory);
     }
 
-    StringBuilder content = new StringBuilder();
-    content.append(
-               String.format("*✅ Đã cập nhật kết quả cho %s phiếu cược*", betHistoryList.size()))
-           .append("\n")
-           .append("-----------------------------------------------")
-           .append("\n");
-
     for (Map.Entry<String, Map<String, List<BetHistory>>> playerEntry : mapBetOfPlayerByType.entrySet()) {
-      content.append("*")
-             .append(playerService.getPlayerNameById(playerEntry.getKey()))
-             .append("*")
+      StringBuilder content = new StringBuilder();
+      content.append(
+                 String.format("*✅ Đã cập nhật kết quả cho %s phiếu cược*", betHistoryList.size()))
+             .append("\n")
+             .append("-----------------------------------------------")
+             .append("\n");
+
+      content.append("{{playerName}}")
              .append("\n");
 
       Map<String, List<BetHistory>> mapBetByType = playerEntry.getValue();
@@ -199,8 +197,17 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
         }
       }
       content.append("-----------------------------------------------\n");
+
+      String playerId = playerEntry.getKey();
+      // Send to admin
+      this.sendNotification(Constant.ADMIN_USER_ID, content.toString()
+                                                           .replace("{{playerName}}", String.format("         *%s*",
+                                                                                                    playerService.getPlayerNameById(
+                                                                                                        playerId))));
+      // Send to player
+      this.sendNotification(playerId, content.toString()
+                                             .replace("{{playerName}}", ""));
     }
-    sendNotification(Constant.ADMIN_USER_ID, content.toString());
   }
 
   @Override

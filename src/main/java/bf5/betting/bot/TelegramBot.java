@@ -158,7 +158,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         try {
           SendMessage processingMessage = new SendMessage();
           processingMessage.setChatId(chatId);
-          processingMessage.setText("*Đang lấy danh sách phiếu cược gần đây*〰️〰️〰️");
+          processingMessage.setText("*Đang lấy danh sách phiếu cược gần đây*...");
+          processingMessage.setParseMode("Markdown");
           execute(processingMessage);
 
           List<BetHistory> rawBets = rawBetService.quickGetLast30MinutesBets(serverConfigService.getLastActiveToken());
