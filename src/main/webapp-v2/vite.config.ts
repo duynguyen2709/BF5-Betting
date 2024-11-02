@@ -8,6 +8,10 @@ export default defineConfig({
   server: {
     port: 3000
   },
+  build: {
+    outDir: '../resources/static',
+    emptyOutDir: true
+  },
   css: {
     devSourcemap: true
   },

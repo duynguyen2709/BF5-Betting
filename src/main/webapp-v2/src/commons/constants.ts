@@ -1,0 +1,1 @@
+export const UNLOCK_DATA_KEY = 'UNLOCKED_USER_ID'

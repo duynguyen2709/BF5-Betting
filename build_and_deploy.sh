@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Navigate to the specified directory
-cd src/main/webapp
+cd src/main/webapp-v2
 if [ $? -ne 0 ]; then
-  echo "Failed to change directory to src/main/webapp"
+  echo "Failed to change directory to src/main/webapp-v2"
   exit 1
 fi
 
