@@ -1,5 +1,7 @@
 package bf5.betting.service.impl;
 
+import static bf5.betting.util.BetHistoryUtil.formatVnBetEvent;
+
 import bf5.betting.annotation.TryCatchWrap;
 import bf5.betting.constant.BetType;
 import bf5.betting.constant.Constant;
@@ -10,6 +12,11 @@ import bf5.betting.entity.request.TelegramMessageRequest;
 import bf5.betting.service.PlayerService;
 import bf5.betting.service.TelegramNotiService;
 import bf5.betting.util.JsonUtil;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -19,10 +26,6 @@ import org.apache.hc.core5.http.ContentType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-
-import static bf5.betting.util.BetHistoryUtil.formatVnBetEvent;
-
 /**
  * @author duynguyen
  **/
@@ -31,14 +34,14 @@ import static bf5.betting.util.BetHistoryUtil.formatVnBetEvent;
 @Log4j2
 public class TelegramNotiServiceImpl implements TelegramNotiService {
 
-  private final PlayerService playerService;
-
   private static final String API_URL = "https://api.telegram.org/bot6784881463:AAGc5VmQNw_BEazOuTTV7DYpPFefMb_Ieks/sendMessage";
+  private final PlayerService playerService;
 
   @TryCatchWrap
   @SneakyThrows
   private void sendNotification(String userId, String text) {
-    Player player = playerService.getAllPlayer().get(userId);
+    Player player = playerService.getAllPlayer()
+                                 .get(userId);
     if (player == null) {
       log.error("Player info for user {} not found", userId);
       return;
@@ -51,9 +54,11 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
 
     TelegramMessageRequest request = TelegramMessageRequest.build(telegramId, text);
     Request httpRequest = Request.post(API_URL)
-        .bodyString(JsonUtil.toJsonString(request), ContentType.APPLICATION_JSON);
+                                 .bodyString(JsonUtil.toJsonString(request), ContentType.APPLICATION_JSON);
 
-    String rawResponse = httpRequest.execute().returnContent().asString();
+    String rawResponse = httpRequest.execute()
+                                    .returnContent()
+                                    .asString();
     log.info("[{}] Send Telegram message result: {}", player.getPlayerName(), rawResponse);
   }
 
@@ -65,39 +70,52 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
     for (BetHistory betHistory : betHistoryList) {
       if (betHistory.getBetType() == BetType.ACCUMULATOR) {
         mapBetByType.put(String.format("Cược xiên #%s", accumulatorBetIndex++),
-            Collections.singletonList(betHistory));
+                         Collections.singletonList(betHistory));
         continue;
       }
 
-      BetMatchDetail detail = betHistory.getEvents().get(0);
+      BetMatchDetail detail = betHistory.getEvents()
+                                        .get(0);
       String betKey = getTeamFaceToFace(detail);
 
       mapBetByType.putIfAbsent(betKey, new ArrayList<>());
-      mapBetByType.get(betKey).add(betHistory);
+      mapBetByType.get(betKey)
+                  .add(betHistory);
     }
 
     StringBuilder content = new StringBuilder();
     content.append(String.format("*✅ Đã thêm %s phiếu cược mới*", betHistoryList.size()))
-        .append("\n").append("-----------------------------------------------").append("\n");
+           .append("\n")
+           .append("-----------------------------------------------")
+           .append("\n");
 
     for (Map.Entry<String, List<BetHistory>> entry : mapBetByType.entrySet()) {
       String teamsKey = entry.getKey();
       boolean isAccumulatorBet = isAccumulator(teamsKey);
-      content.append("*").append(teamsKey).append("*").append(":").append(
-          isAccumulatorBet ? String.format(" `%,d VNĐ`", entry.getValue().get(0).getBetAmount())
-              : "").append("\n");
+      content.append("*")
+             .append(teamsKey)
+             .append("*")
+             .append(":")
+             .append(
+                 isAccumulatorBet ? String.format(" `%,d VNĐ`", entry.getValue()
+                                                                     .get(0)
+                                                                     .getBetAmount())
+                     : "")
+             .append("\n");
 
       for (BetHistory betHistory : entry.getValue()) {
         for (BetMatchDetail detail : betHistory.getEvents()) {
-          content.append("\\* ").append(isAccumulatorBet ? getTeamFaceToFace(detail) + ": " : "")
-              .append(formatVnBetEvent(detail)).append(
-                  !isAccumulatorBet ? String.format("  ||  `%,d VNĐ`",
-                      entry.getValue().get(0).getBetAmount()) : "").append("\n");
+          content.append("\\* ")
+                 .append(isAccumulatorBet ? getTeamFaceToFace(detail) + ": " : "")
+                 .append(formatVnBetEvent(detail))
+                 .append(
+                     !isAccumulatorBet ? String.format("  ||  `%,d VNĐ`",
+                                                       betHistory.getBetAmount()) : "")
+                 .append("\n");
         }
       }
       content.append("\n");
     }
-
     sendNotification(userId, content.toString());
   }
 
@@ -116,65 +134,94 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
       if (betHistory.getBetType() == BetType.ACCUMULATOR) {
         int index = accumulatorBetIndexMap.get(betHistory.getPlayerId()) + 1;
         mapBetByType.put(String.format("Cược xiên #%s", index),
-            Collections.singletonList(betHistory));
+                         Collections.singletonList(betHistory));
         accumulatorBetIndexMap.put(betHistory.getPlayerId(), index);
         continue;
       }
 
-      BetMatchDetail detail = betHistory.getEvents().get(0);
+      BetMatchDetail detail = betHistory.getEvents()
+                                        .get(0);
       String betKey = getTeamFaceToFace(detail);
 
       mapBetByType.putIfAbsent(betKey, new ArrayList<>());
-      mapBetByType.get(betKey).add(betHistory);
+      mapBetByType.get(betKey)
+                  .add(betHistory);
     }
 
-    StringBuilder content = new StringBuilder();
-    content.append(
-            String.format("*✅ Đã cập nhật kết quả cho %s phiếu cược*", betHistoryList.size()))
-        .append("\n").append("-----------------------------------------------").append("\n");
-
     for (Map.Entry<String, Map<String, List<BetHistory>>> playerEntry : mapBetOfPlayerByType.entrySet()) {
-      content.append("*").append(playerService.getPlayerNameById(playerEntry.getKey())).append("*")
-          .append("\n");
+      StringBuilder content = new StringBuilder();
+      content.append(
+                 String.format("*✅ Đã cập nhật kết quả cho %s phiếu cược*", betHistoryList.size()))
+             .append("\n")
+             .append("-----------------------------------------------")
+             .append("\n");
+
+      content.append("{{playerName}}")
+             .append("\n");
 
       Map<String, List<BetHistory>> mapBetByType = playerEntry.getValue();
       for (Map.Entry<String, List<BetHistory>> entry : mapBetByType.entrySet()) {
         String teamsKey = entry.getKey();
         boolean isAccumulatorBet = isAccumulator(teamsKey);
-        content.append("*").append(teamsKey).append("*").append(":").append(
-            isAccumulatorBet ? String.format(" %s `%,d VNĐ`",
-                entry.getValue().get(0).getResult().getVnDescriptionText(),
-                entry.getValue().get(0).getActualProfit()) : "").append("\n");
+        content.append("*")
+               .append(teamsKey)
+               .append("*")
+               .append(":")
+               .append(
+                   isAccumulatorBet ? String.format(" %s `%,d VNĐ`",
+                                                    entry.getValue()
+                                                         .get(0)
+                                                         .getResult()
+                                                         .getVnDescriptionText(),
+                                                    Math.abs(entry.getValue()
+                                                                  .get(0)
+                                                                  .getActualProfit())) : "")
+               .append("\n");
 
         for (BetHistory betHistory : entry.getValue()) {
           for (BetMatchDetail detail : betHistory.getEvents()) {
-            content.append("\\* ").append(isAccumulatorBet ? getTeamFaceToFace(detail) + ": " : "")
-                .append(formatVnBetEvent(detail)).append(
-                    !isAccumulatorBet ? String.format("  || %s `%,d VNĐ`",
-                        entry.getValue().get(0).getResult().getVnDescriptionText(),
-                        entry.getValue().get(0).getActualProfit()) : "").append("\n");
+            content.append("\\* ")
+                   .append(isAccumulatorBet ? getTeamFaceToFace(detail) + ": " : "")
+                   .append(formatVnBetEvent(detail))
+                   .append(
+                       !isAccumulatorBet ? String.format("  || %s `%,d VNĐ`",
+                                                         entry.getValue()
+                                                              .get(0)
+                                                              .getResult()
+                                                              .getVnDescriptionText(),
+                                                         Math.abs(entry.getValue()
+                                                                       .get(0)
+                                                                       .getActualProfit())) : "")
+                   .append("\n");
           }
         }
-        content.append("\n");
       }
-
       content.append("-----------------------------------------------\n");
-    }
 
-    sendNotification(Constant.ADMIN_USER_ID, content.toString());
+      String playerId = playerEntry.getKey();
+      // Send to admin
+      this.sendNotification(Constant.ADMIN_USER_ID, content.toString()
+                                                           .replace("{{playerName}}", String.format("         *%s*",
+                                                                                                    playerService.getPlayerNameById(
+                                                                                                        playerId))));
+      // Send to player
+      this.sendNotification(playerId, content.toString()
+                                             .replace("{{playerName}}", ""));
+    }
   }
 
   @Override
   @Async
   public void sendExceptionAlert(String error) {
-    this.sendNotification(Constant.ADMIN_USER_ID, error);
+    this.sendNotification(Constant.ADMIN_USER_ID, String.format("❗ *Đã xảy ra lỗi hệ thống* ❗\n%s", error));
   }
 
   private String getTeamFaceToFace(BetMatchDetail detail) {
     StringBuilder teams = new StringBuilder(detail.getFirstTeam());
     String secondTeam = detail.getSecondTeam();
     if (StringUtils.isNotBlank(secondTeam)) {
-      teams.append(" - ").append(secondTeam);
+      teams.append(" - ")
+           .append(secondTeam);
     }
     return teams.toString();
   }

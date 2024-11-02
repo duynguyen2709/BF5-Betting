@@ -1,20 +1,27 @@
 package bf5.betting.controller;
 
+import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeDesc;
+
 import bf5.betting.constant.UserAction;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.response.BaseResponse;
 import bf5.betting.service.BetHistoryService;
+import bf5.betting.util.BetHistoryUtil;
 import bf5.betting.util.RequestUtil;
-import lombok.AllArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static bf5.betting.util.BetHistoryUtil.sortByStatusAndBetTimeDesc;
+import javax.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author duynguyen
@@ -30,7 +37,13 @@ public class BetHistoryController {
   public BaseResponse<Map<String, List<BetHistory>>> getRecentUnfinishedBets() {
     List<BetHistory> betHistoryList = this.betHistoryService.getRecentUnfinishedBets();
     Map<String, List<BetHistory>> betGroupByPlayerId = betHistoryList.stream()
-        .collect(Collectors.groupingBy(BetHistory::getPlayerId));
+                                                                     .collect(Collectors.groupingBy(
+                                                                         BetHistory::getPlayerId,
+                                                                         Collectors.collectingAndThen(
+                                                                             Collectors.toList(),
+                                                                             BetHistoryUtil::sortByStatusAndBetTimeDesc
+                                                                                                     )
+                                                                                                   ));
     return BaseResponse.success(betGroupByPlayerId);
   }
 
@@ -47,15 +60,15 @@ public class BetHistoryController {
         betHistoryList = this.betHistoryService.getAllBetHistory();
       } else {
         betHistoryList = this.betHistoryService.getByPlayerIdAndDateRange(playerId, startDate,
-            endDate);
+                                                                          endDate);
       }
       return BaseResponse.success(sortByStatusAndBetTimeDesc(betHistoryList));
     } finally {
       if (StringUtils.isNotBlank(playerId)) {
         RequestUtil.logUserAction(request,
-            UserAction.VIEW_HISTORY,
-            Map.of("playerId", playerId, "startDate", startDate, "endDate", endDate)
-        );
+                                  UserAction.VIEW_HISTORY,
+                                  Map.of("playerId", playerId, "startDate", startDate, "endDate", endDate)
+                                 );
       }
     }
   }

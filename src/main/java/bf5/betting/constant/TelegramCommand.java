@@ -11,7 +11,8 @@ import lombok.Getter;
 public enum TelegramCommand {
   QUICK_ADD("/qadd"),
   QUICK_UPDATE("/qupd"),
-  TOKEN("/token");
+  TOKEN("/token"),
+  SET_TOKEN("/setup");
 
   private final String command;
 }

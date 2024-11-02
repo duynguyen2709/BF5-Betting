@@ -6,17 +6,24 @@ import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.BetMatchDetail;
 import bf5.betting.exception.EntityNotFoundException;
 import bf5.betting.repository.BetHistoryRepository;
-import bf5.betting.service.*;
+import bf5.betting.service.BetHistoryService;
+import bf5.betting.service.PlayerAssetHistoryService;
+import bf5.betting.service.PlayerService;
+import bf5.betting.service.TeamDataService;
+import bf5.betting.service.TelegramNotiService;
 import bf5.betting.util.DateTimeUtil;
 import bf5.betting.util.JsonUtil;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author duynguyen
@@ -34,11 +41,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
   @Override
   public List<BetHistory> getRecentUnfinishedBets() {
-    Date startDate = DateTimeUtil.getYesterday();
-    Date afterEndDate = DateTimeUtil.getNextDate(DateTimeUtil.getDateStringFromToday(0));
-    return withTeamDataWrapper(
-        betHistoryRepository.findByResultAndDateRange(BetResult.NOT_FINISHED, startDate,
-            afterEndDate));
+    return withTeamDataWrapper(betHistoryRepository.findByResult(BetResult.NOT_FINISHED));
   }
 
   @Override
@@ -75,7 +78,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     this.playerService.updatePlayerProfitFromBetHistory(request);
     this.teamDataService.insertTeamDataIfNotAvailable(request);
     this.telegramNotiService.sendNotificationForNewBetAdded(request.getPlayerId(),
-        Collections.singletonList(withTeamDataWrapper(betHistory)));
+                                                            Collections.singletonList(withTeamDataWrapper(betHistory)));
     return betHistory;
   }
 
@@ -92,8 +95,9 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     this.assetHistoryService.updateAssetFromBetHistoryListInBatch(betHistories);
     this.playerService.updatePlayerProfitFromListBetHistoryInBatch(betHistories);
     this.teamDataService.insertTeamDataIfNotAvailable(betHistories);
-    this.telegramNotiService.sendNotificationForNewBetAdded(betHistories.get(0).getPlayerId(),
-        withTeamDataWrapper(betHistories));
+    this.telegramNotiService.sendNotificationForNewBetAdded(betHistories.get(0)
+                                                                        .getPlayerId(),
+                                                            withTeamDataWrapper(betHistories));
     return newBetHistories;
   }
 
@@ -103,8 +107,8 @@ public class BetHistoryServiceImpl implements BetHistoryService {
   public BetHistory updateBetResult(BetHistory request) {
     validateBetResult(request);
     BetHistory betHistory = buildBetHistoryWithResult(request, false);
-
     log.info("Process updating bet: {}", JsonUtil.toJsonString(betHistory));
+
     betHistory = withTeamDataWrapper(betHistoryRepository.save(betHistory));
     // Asset Histories must be updated before Players' profit to get most recent states of assets
     this.assetHistoryService.updateAssetFromBetHistory(betHistory);
@@ -137,7 +141,7 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     for (BetHistory updateRequest : request) {
       if (!validateRawBetResult(updateRequest)) {
         log.warn("Result NOT_FINISHED Invalid. Bet entity: {}",
-            JsonUtil.toJsonString(updateRequest));
+                 JsonUtil.toJsonString(updateRequest));
         continue;
       }
       BetHistory betHistory = buildBetHistoryWithResult(updateRequest, true);
@@ -158,19 +162,19 @@ public class BetHistoryServiceImpl implements BetHistoryService {
 
   private BetHistory buildBetHistoryWithResult(BetHistory updateRequest, boolean isFromRaw) {
     return betHistoryRepository.findById(updateRequest.getBetId())
-        .map(entity -> setFinalBetHistoryResult(updateRequest, entity, isFromRaw))
-        .orElseThrow(() ->
-            EntityNotFoundException.builder()
-                .clazz(BetHistory.class)
-                .id(updateRequest.getBetId())
-                .build());
+                               .map(entity -> setFinalBetHistoryResult(updateRequest, entity, isFromRaw))
+                               .orElseThrow(() ->
+                                                EntityNotFoundException.builder()
+                                                                       .clazz(BetHistory.class)
+                                                                       .id(updateRequest.getBetId())
+                                                                       .build());
   }
 
   private boolean validateRawBetResult(BetHistory request) {
     return request.getResult() != BetResult.NOT_FINISHED &&
         request.getEvents()
-            .stream()
-            .allMatch(event -> event.getResult() != BetResult.NOT_FINISHED);
+               .stream()
+               .allMatch(event -> event.getResult() != BetResult.NOT_FINISHED);
   }
 
   private void validateBetResult(BetHistory request) {
@@ -204,24 +208,27 @@ public class BetHistoryServiceImpl implements BetHistoryService {
   }
 
   private List<BetHistory> withTeamDataWrapper(List<BetHistory> betHistoryList) {
-    return betHistoryList.stream().map(this::withTeamDataWrapper).collect(Collectors.toList());
+    return betHistoryList.stream()
+                         .map(this::withTeamDataWrapper)
+                         .collect(Collectors.toList());
   }
 
   private BetHistory withTeamDataWrapper(BetHistory betHistory) {
-    betHistory.getEvents().forEach(event -> {
-      event.setFirstTeamLogoUrl(teamDataService.getTeamLogoUrl(event.getFirstTeam()));
-      event.setSecondTeamLogoUrl(teamDataService.getTeamLogoUrl(event.getSecondTeam()));
+    betHistory.getEvents()
+              .forEach(event -> {
+                event.setFirstTeamLogoUrl(teamDataService.getTeamLogoUrl(event.getFirstTeam()));
+                event.setSecondTeamLogoUrl(teamDataService.getTeamLogoUrl(event.getSecondTeam()));
 
-      String firstTeamVnName = teamDataService.getTeamVnName(event.getFirstTeam());
-      if (StringUtils.isNotBlank(firstTeamVnName)) {
-        event.setFirstTeam(firstTeamVnName);
-      }
+                String firstTeamVnName = teamDataService.getTeamVnName(event.getFirstTeam());
+                if (StringUtils.isNotBlank(firstTeamVnName)) {
+                  event.setFirstTeam(firstTeamVnName);
+                }
 
-      String secondTeamVnName = teamDataService.getTeamVnName(event.getSecondTeam());
-      if (StringUtils.isNotBlank(secondTeamVnName)) {
-        event.setSecondTeam(secondTeamVnName);
-      }
-    });
+                String secondTeamVnName = teamDataService.getTeamVnName(event.getSecondTeam());
+                if (StringUtils.isNotBlank(secondTeamVnName)) {
+                  event.setSecondTeam(secondTeamVnName);
+                }
+              });
     return betHistory;
   }
 
@@ -230,17 +237,18 @@ public class BetHistoryServiceImpl implements BetHistoryService {
     oldEntity.setResult(updateRequestEntity.getResult());
     oldEntity.updateResultSettledTime();
     oldEntity.setActualProfit(isFromRaw ? updateRequestEntity.getActualProfit()
-        : calculateActualProfitManual(oldEntity, updateRequestEntity.getResult()));
+                                  : calculateActualProfitManual(oldEntity, updateRequestEntity.getResult()));
 
-    updateRequestEntity.getEvents().forEach(eventResult -> {
-      for (BetMatchDetail match : oldEntity.getEvents()) {
-        if (eventResult.getId() == match.getId()) {
-          match.setResult(eventResult.getResult());
-          match.setScore(eventResult.getScore());
-          break;
-        }
-      }
-    });
+    updateRequestEntity.getEvents()
+                       .forEach(eventResult -> {
+                         for (BetMatchDetail match : oldEntity.getEvents()) {
+                           if (eventResult.getId() == match.getId()) {
+                             match.setResult(eventResult.getResult());
+                             match.setScore(eventResult.getScore());
+                             break;
+                           }
+                         }
+                       });
     return oldEntity;
   }
 }

@@ -1,7 +1,5 @@
 package bf5.betting.util;
 
-import lombok.extern.log4j.Log4j2;
-
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -10,6 +8,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Objects;
+import lombok.extern.log4j.Log4j2;
 
 /**
  * @author duynguyen
@@ -53,7 +52,7 @@ public class DateTimeUtil {
       return dateTimeFormatter.parse(dateStr);
     } catch (Exception ex) {
       log.error("[stringToDate] raw = {}, format = {}, ex = {}", dateStr, format, ex.getMessage(),
-          ex);
+                ex);
       return null;
     }
   }
@@ -65,7 +64,7 @@ public class DateTimeUtil {
       return new Timestamp(parsedDate.getTime());
     } catch (Exception ex) {
       log.error("[stringToTimestamp] raw = {}, format = {}, ex = {}", timestampStr, format,
-          ex.getMessage(), ex);
+                ex.getMessage(), ex);
       return null;
     }
   }
@@ -73,13 +72,15 @@ public class DateTimeUtil {
   public static long getStartOfDateTimestamp(String dateStr, String format) {
     LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(format));
     LocalDateTime startOfDay = localDate.atStartOfDay();
-    return Timestamp.valueOf(startOfDay).getTime();
+    return Timestamp.valueOf(startOfDay)
+                    .getTime();
   }
 
   public static long getEndOfDateTimestamp(String dateStr, String format) {
     LocalDate localDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern(format));
     LocalDateTime endOfDay = localDate.atTime(LocalTime.MAX);
-    return Timestamp.valueOf(endOfDay).getTime();
+    return Timestamp.valueOf(endOfDay)
+                    .getTime();
   }
 
   public static Date getNextDate(String dateStr) {

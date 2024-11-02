@@ -12,13 +12,18 @@ import bf5.betting.service.PlayerService;
 import bf5.betting.service.StatisticService;
 import bf5.betting.util.DateTimeUtil;
 import bf5.betting.util.JsonUtil;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author duynguyen
@@ -37,14 +42,16 @@ public class StatisticServiceImpl implements StatisticService {
       List<PlayerAssetHistory> assetHistories) {
     TreeMap<String, List<PlayerAssetHistory>> mapAssetByDate = new TreeMap<>();
     assetHistories.stream()
-        .sorted(Comparator.comparingLong(o -> o.getRawPaymentTime().getTime()))
-        .forEach(ele -> {
-          String date = DateTimeUtil.timestampMsToSystemDateString(ele.getRawPaymentTime());
-          if (!mapAssetByDate.containsKey(date)) {
-            mapAssetByDate.put(date, new ArrayList<>());
-          }
-          mapAssetByDate.get(date).add(ele);
-        });
+                  .sorted(Comparator.comparingLong(o -> o.getRawPaymentTime()
+                                                         .getTime()))
+                  .forEach(ele -> {
+                    String date = DateTimeUtil.timestampMsToSystemDateString(ele.getRawPaymentTime());
+                    if (!mapAssetByDate.containsKey(date)) {
+                      mapAssetByDate.put(date, new ArrayList<>());
+                    }
+                    mapAssetByDate.get(date)
+                                  .add(ele);
+                  });
     return mapAssetByDate;
   }
 
@@ -56,23 +63,29 @@ public class StatisticServiceImpl implements StatisticService {
     subListByAction.add(new ArrayList<>());
 
     while (current < assetHistoriesInDate.size()) {
-      if (assetHistoriesInDate.get(current).getAction() == PaymentAction.CASHOUT ||
-          assetHistoriesInDate.get(current).getAction() == PaymentAction.DEPOSIT) {
-        if (subListByAction.get(subListIndex).size() > 0) {
+      if (assetHistoriesInDate.get(current)
+                              .getAction() == PaymentAction.CASHOUT ||
+          assetHistoriesInDate.get(current)
+                              .getAction() == PaymentAction.DEPOSIT) {
+        if (subListByAction.get(subListIndex)
+                           .size() > 0) {
           subListByAction.add(new ArrayList<>());
           subListIndex++;
         }
-        subListByAction.get(subListIndex).add(assetHistoriesInDate.get(current));
+        subListByAction.get(subListIndex)
+                       .add(assetHistoriesInDate.get(current));
         subListByAction.add(new ArrayList<>());
         subListIndex++;
       } else {
-        subListByAction.get(subListIndex).add(assetHistoriesInDate.get(current));
+        subListByAction.get(subListIndex)
+                       .add(assetHistoriesInDate.get(current));
       }
       current++;
     }
 
     // Remove last sublist if empty (as we added new sublist even it's last element)
-    if (subListByAction.get(subListIndex).isEmpty()) {
+    if (subListByAction.get(subListIndex)
+                       .isEmpty()) {
       subListByAction.remove(subListIndex);
     }
     return subListByAction;
@@ -86,12 +99,14 @@ public class StatisticServiceImpl implements StatisticService {
           PlayerAssetHistory lastChangeInDateGroup = assetChangeInDateGroup.get(
               assetChangeInDateGroup.size() - 1);
           return BetHistoryStatisticResponse.AssetByDate.builder()
-              .paymentTime(lastChangeInDateGroup.getPaymentTime())
-              .action(getAssetByDateAction(assetChangeInDateGroup))
-              .assetBefore(assetChangeInDateGroup.get(0).getAssetBefore())
-              .assetAfter(lastChangeInDateGroup.getAssetAfter())
-              .build();
-        }).collect(Collectors.toList());
+                                                        .paymentTime(lastChangeInDateGroup.getPaymentTime())
+                                                        .action(getAssetByDateAction(assetChangeInDateGroup))
+                                                        .assetBefore(assetChangeInDateGroup.get(0)
+                                                                                           .getAssetBefore())
+                                                        .assetAfter(lastChangeInDateGroup.getAssetAfter())
+                                                        .build();
+        })
+        .collect(Collectors.toList());
   }
 
   private static PaymentAction getAssetByDateAction(
@@ -102,7 +117,8 @@ public class StatisticServiceImpl implements StatisticService {
         lastChangeInDateGroup.getAction() == PaymentAction.DEPOSIT) {
       return lastChangeInDateGroup.getAction();
     }
-    long assetBefore = assetChangeInDateGroup.get(0).getAssetBefore();
+    long assetBefore = assetChangeInDateGroup.get(0)
+                                             .getAssetBefore();
     long assetAfter = lastChangeInDateGroup.getAssetAfter();
     return (assetBefore <= assetAfter) ? PaymentAction.BET_WIN : PaymentAction.BET_LOST;
   }
@@ -147,17 +163,20 @@ public class StatisticServiceImpl implements StatisticService {
   public void runStatisticForDateRange(String startDateStr, String endDateStr) {
     Map<String, PlayerAssetHistory> nearestAssetHistories = this.assetHistoryService.getNearestAssetHistoryForPlayers(
         startDateStr);
-    Set<String> playerIds = this.playerService.getAllPlayer().keySet();
+    Set<String> playerIds = this.playerService.getAllPlayer()
+                                              .keySet();
     Map<String, Long> playerAssetMap = new HashMap<>();
 
     playerIds.forEach(playerId -> {
       if (nearestAssetHistories.containsKey(playerId)) {
-        playerAssetMap.put(playerId, nearestAssetHistories.get(playerId).getAssetAfter());
+        playerAssetMap.put(playerId, nearestAssetHistories.get(playerId)
+                                                          .getAssetAfter());
       } else {
         log.warn("\nCan not find nearest asset history for player {} on date {}", playerId,
-            startDateStr);
+                 startDateStr);
         playerAssetMap.put(playerId,
-            statisticConfig.getPlayerBaseAsset().getOrDefault(playerId, 0L));
+                           statisticConfig.getPlayerBaseAsset()
+                                          .getOrDefault(playerId, 0L));
       }
     });
 
@@ -165,27 +184,32 @@ public class StatisticServiceImpl implements StatisticService {
       List<PlayerAssetHistory> assetHistories = this.assetHistoryService.getByPlayerIdAndDateRange(
           playerId, startDateStr, endDateStr);
       List<BetHistory> betHistories = this.betHistoryService.getByPlayerIdAndDateRange(playerId,
-              startDateStr, endDateStr)
-          .stream()
-          .filter(
-              bet -> bet.getResult() != BetResult.NOT_FINISHED && bet.getResult() != BetResult.DRAW)
-          .sorted(Comparator.comparingLong(o -> o.getResultSettledTime().getTime()))
-          .collect(Collectors.toList());
+                                                                                       startDateStr, endDateStr)
+                                                            .stream()
+                                                            .filter(
+                                                                bet -> bet.getResult() != BetResult.NOT_FINISHED
+                                                                    && bet.getResult() != BetResult.DRAW)
+                                                            .sorted(
+                                                                Comparator.comparingLong(o -> o.getResultSettledTime()
+                                                                                               .getTime()))
+                                                            .collect(Collectors.toList());
 
       for (BetHistory bet : betHistories) {
         PlayerAssetHistory assetHistory = PlayerAssetHistory.builder()
-            .playerId(bet.getPlayerId())
-            .betId(bet.getBetId())
-            .paymentTime(bet.getResultSettledTime())
-            .action(bet.getActualProfit() > 0 ? PaymentAction.BET_WIN : PaymentAction.BET_LOST)
-            .amount(bet.getActualProfit())
-            .assetBefore(0)
-            .assetAfter(0)
-            .build();
+                                                            .playerId(bet.getPlayerId())
+                                                            .betId(bet.getBetId())
+                                                            .paymentTime(bet.getResultSettledTime())
+                                                            .action(bet.getActualProfit() > 0 ? PaymentAction.BET_WIN
+                                                                        : PaymentAction.BET_LOST)
+                                                            .amount(bet.getActualProfit())
+                                                            .assetBefore(0)
+                                                            .assetAfter(0)
+                                                            .build();
         assetHistories.add(assetHistory);
       }
 
-      assetHistories.sort(Comparator.comparingLong(o -> o.getRawPaymentTime().getTime()));
+      assetHistories.sort(Comparator.comparingLong(o -> o.getRawPaymentTime()
+                                                         .getTime()));
 
       for (int i = 0; i < assetHistories.size(); i++) {
         PlayerAssetHistory current = assetHistories.get(i);
@@ -195,14 +219,15 @@ public class StatisticServiceImpl implements StatisticService {
             current.setAssetBefore(playerAssetMap.get(playerId));
             current.setAssetAfter(current.getAssetBefore() + current.getAmount());
           } else {
-            current.setAssetBefore(assetHistories.get(i - 1).getAssetAfter());
+            current.setAssetBefore(assetHistories.get(i - 1)
+                                                 .getAssetAfter());
             current.setAssetAfter(current.getAssetBefore() + current.getAmount());
           }
         }
       }
 
       log.info("Process inserting batch asset histories: {}",
-          JsonUtil.toJsonString(assetHistories));
+               JsonUtil.toJsonString(assetHistories));
       this.assetHistoryService.insertBatch(assetHistories);
     });
   }

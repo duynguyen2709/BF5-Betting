@@ -6,15 +6,18 @@ import bf5.betting.entity.jpa.Player;
 import bf5.betting.repository.PlayerRepository;
 import bf5.betting.service.PlayerService;
 import bf5.betting.util.JsonUtil;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.PostConstruct;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @author duynguyen
@@ -30,8 +33,8 @@ public class PlayerServiceImpl implements PlayerService {
   @PostConstruct
   void init() {
     this.playerCacheMap = playerRepository.findAll()
-        .stream()
-        .collect(Collectors.toMap(Player::getPlayerId, Function.identity()));
+                                          .stream()
+                                          .collect(Collectors.toMap(Player::getPlayerId, Function.identity()));
 
     log.info("Load PlayerCache Done: {}", JsonUtil.toJsonString(this.playerCacheMap));
   }
@@ -90,6 +93,7 @@ public class PlayerServiceImpl implements PlayerService {
 
   @Override
   public String getPlayerNameById(String id) {
-    return this.playerCacheMap.get(id).getPlayerName();
+    return this.playerCacheMap.get(id)
+                              .getPlayerName();
   }
 }

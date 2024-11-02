@@ -26,7 +26,8 @@ public class TryCatchWrapAspect {
       return joinPoint.proceed();
     } catch (Throwable ex) {
       String error = String.format("Method: %s\nArgs = %s\nException: %s",
-          joinPoint.getSignature(), JsonUtil.toJsonString(joinPoint.getArgs()), ex.getMessage());
+                                   joinPoint.getSignature(), JsonUtil.toJsonString(joinPoint.getArgs()),
+                                   ex.getMessage());
       log.error(error);
       telegramNotiService.sendExceptionAlert(error);
       throw ex;

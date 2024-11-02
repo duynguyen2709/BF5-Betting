@@ -11,14 +11,14 @@ public class SubsetUtil {
 
   public static <T> List<List<T>> generateAllSubsets(List<T> elements) {
     return generateSubsets(elements).stream()
-        .filter(subset -> subset.size() > 0)
-        .collect(Collectors.toList());
+                                    .filter(subset -> subset.size() > 0)
+                                    .collect(Collectors.toList());
   }
 
   public static <T> List<List<T>> generateSubsetOfSize(List<T> elements, int K) {
     return generateSubsets(elements).stream()
-        .filter(subset -> subset.size() == K)
-        .collect(Collectors.toList());
+                                    .filter(subset -> subset.size() == K)
+                                    .collect(Collectors.toList());
   }
 
   private static <T> List<List<T>> generateSubsets(List<T> elements) {

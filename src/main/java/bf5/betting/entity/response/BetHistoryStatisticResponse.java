@@ -3,13 +3,12 @@ package bf5.betting.entity.response;
 import bf5.betting.constant.PaymentAction;
 import bf5.betting.entity.jpa.BetHistory;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.io.Serializable;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.util.List;
 
 /**
  * @author duynguyen

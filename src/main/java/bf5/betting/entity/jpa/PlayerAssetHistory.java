@@ -3,13 +3,16 @@ package bf5.betting.entity.jpa;
 import bf5.betting.constant.PaymentAction;
 import bf5.betting.util.DateTimeUtil;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.sql.Timestamp;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.*;
-import java.sql.Timestamp;
 
 /**
  * @author duynguyen

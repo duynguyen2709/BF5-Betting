@@ -1,10 +1,9 @@
 package bf5.betting.constant;
 
 import bf5.betting.exception.EntityNotFoundException;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.stream.Stream;
 
 /**
  * @author duynguyen
@@ -21,11 +20,11 @@ public enum BetType {
 
   public static BetType fromRawValue(String type) {
     return Stream.of(BetType.values())
-        .filter(c -> c.typeTitle.equals(type))
-        .findFirst()
-        .orElseThrow(() -> EntityNotFoundException.builder()
-            .clazz(BetType.class)
-            .id(type)
-            .build());
+                 .filter(c -> c.typeTitle.equals(type))
+                 .findFirst()
+                 .orElseThrow(() -> EntityNotFoundException.builder()
+                                                           .clazz(BetType.class)
+                                                           .id(type)
+                                                           .build());
   }
 }
