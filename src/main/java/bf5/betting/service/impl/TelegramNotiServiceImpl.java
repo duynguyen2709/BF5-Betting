@@ -48,7 +48,7 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
     }
     String telegramId = player.getTelegramId();
     if (StringUtils.isBlank(telegramId)) {
-      log.warn("TelegramID for user {} is empty", player.getPlayerName());
+      log.warn("TelegramID for user {} ({}) is empty", player.getPlayerName(), userId);
       return;
     }
 
@@ -86,7 +86,7 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
     StringBuilder content = new StringBuilder();
     content.append(String.format("*✅ Đã thêm %s phiếu cược mới*", betHistoryList.size()))
            .append("\n")
-           .append("-----------------------------------------------")
+           .append("---------------------------------------------")
            .append("\n");
 
     for (Map.Entry<String, List<BetHistory>> entry : mapBetByType.entrySet()) {
@@ -153,7 +153,7 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
       content.append(
                  String.format("*✅ Đã cập nhật kết quả cho %s phiếu cược*", betHistoryList.size()))
              .append("\n")
-             .append("-----------------------------------------------")
+             .append("---------------------------------------------")
              .append("\n");
 
       content.append("{{playerName}}")
@@ -185,13 +185,9 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
                    .append(formatVnBetEvent(detail))
                    .append(
                        !isAccumulatorBet ? String.format("  || %s `%,d VNĐ`",
-                                                         entry.getValue()
-                                                              .get(0)
-                                                              .getResult()
-                                                              .getVnDescriptionText(),
-                                                         Math.abs(entry.getValue()
-                                                                       .get(0)
-                                                                       .getActualProfit())) : "")
+                                                         betHistory.getResult()
+                                                                   .getVnDescriptionText(),
+                                                         Math.abs(betHistory.getActualProfit())) : "")
                    .append("\n");
           }
         }

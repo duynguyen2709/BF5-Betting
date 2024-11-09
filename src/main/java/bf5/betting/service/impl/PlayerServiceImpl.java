@@ -15,6 +15,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author duynguyen
  **/
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Log4j2
 public class PlayerServiceImpl implements PlayerService {
 
@@ -49,7 +50,7 @@ public class PlayerServiceImpl implements PlayerService {
   @Transactional
   public Player updatePlayerData(Player player) {
     Player newPlayer = this.playerRepository.save(player);
-    this.playerCacheMap.put(player.getPlayerId(), newPlayer);
+    this.playerCacheMap.put(player.getPlayerId(), player);
     return newPlayer;
   }
 

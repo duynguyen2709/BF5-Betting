@@ -257,7 +257,8 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
 
       } catch (TelegramApiException e) {
-        log.error(e);
+        String detailMessage = StringUtils.substringBefore(e.getMessage(), "; nested exception is");
+        log.error("[TelegramBot] Error happened: {}", detailMessage);
       }
     }
   }
