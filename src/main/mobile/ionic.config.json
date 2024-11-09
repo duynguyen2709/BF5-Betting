@@ -1,0 +1,8 @@
+{
+  "name": "DLSK Betting",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite",
+  "id": "644f16d1"
+}
