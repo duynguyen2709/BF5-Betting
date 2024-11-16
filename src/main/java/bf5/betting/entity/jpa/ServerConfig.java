@@ -1,13 +1,11 @@
 package bf5.betting.entity.jpa;
 
-import bf5.betting.constant.ServerConfigKey;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -19,12 +17,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Entity(name = "ServerConfig")
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Builder
 public class ServerConfig {
 
   @Id
-  @Column(name = "configKey", nullable = false, columnDefinition = "VARCHAR")
-  @Enumerated(EnumType.STRING)
-  private ServerConfigKey configKey;
+  private String configKey;
 
   @Column
   private String configValue;

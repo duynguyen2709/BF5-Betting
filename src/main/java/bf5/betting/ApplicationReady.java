@@ -1,5 +1,6 @@
 //package bf5.betting;
 //
+//import bf5.betting.service.ServerConfigService;
 //import java.util.ArrayList;
 //import java.util.Collection;
 //import java.util.List;
@@ -11,16 +12,19 @@
 //import org.springframework.core.env.ConfigurableEnvironment;
 //import org.springframework.core.env.MapPropertySource;
 //import org.springframework.stereotype.Component;
+////
 //
-/// **
-// * @author duynguyen
-// */
+///// **
+//// * @author duynguyen
+//// */
 //@AllArgsConstructor
 //@Log4j2
 //@Component
 //public class ApplicationReady {
 //
 //  private final ConfigurableEnvironment configurableEnvironment;
+//
+//  private final ServerConfigService serverConfigService;
 //
 //  @EventListener(ApplicationReadyEvent.class)
 //  public void init() {

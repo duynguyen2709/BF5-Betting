@@ -151,7 +151,8 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
     for (Map.Entry<String, Map<String, List<BetHistory>>> playerEntry : mapBetOfPlayerByType.entrySet()) {
       StringBuilder content = new StringBuilder();
       content.append(
-                 String.format("*✅ Đã cập nhật kết quả cho %s phiếu cược*", betHistoryList.size()))
+                 String.format("*✅ Đã cập nhật kết quả %s phiếu cược*", playerEntry.getValue()
+                                                                                   .size()))
              .append("\n")
              .append("---------------------------------------------")
              .append("\n");
@@ -168,7 +169,7 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
                .append("*")
                .append(":")
                .append(
-                   isAccumulatorBet ? String.format(" %s `%,d VNĐ`",
+                   isAccumulatorBet ? String.format(" %s `%,d đ`",
                                                     entry.getValue()
                                                          .get(0)
                                                          .getResult()
@@ -184,7 +185,7 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
                    .append(isAccumulatorBet ? getTeamFaceToFace(detail) + ": " : "")
                    .append(formatVnBetEvent(detail))
                    .append(
-                       !isAccumulatorBet ? String.format("  || %s `%,d VNĐ`",
+                       !isAccumulatorBet ? String.format("  || %s `%,d đ`",
                                                          betHistory.getResult()
                                                                    .getVnDescriptionText(),
                                                          Math.abs(betHistory.getActualProfit())) : "")

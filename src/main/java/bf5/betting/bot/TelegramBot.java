@@ -40,9 +40,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-/**
- * @author duynguyen
- **/
+/// **
+// * @author duynguyen
+// **/
 @Component
 @Log4j2
 public class TelegramBot extends TelegramLongPollingBot {
@@ -101,7 +101,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         betHistoryList.forEach(e -> e.setPlayerId(playerId));
         betHistoryService.insertBetInBatch(betHistoryList);
         betHistoryCache.invalidate(RECENT_BETS_CACHE_KEY);
-        resultMessage = String.format("*Đã thêm %s phiếu cược cho %s thành công*",
+        resultMessage = String.format("*Đã thêm %s phiếu cược cho %s* ✅",
                                       betHistoryList.size(), player.getPlayerName());
       } catch (Exception e) {
         log.error(e);
@@ -296,9 +296,9 @@ public class TelegramBot extends TelegramLongPollingBot {
              .append("*")
              .append(":")
              .append(
-                 isAccumulatorBet ? String.format(" `%,d VNĐ`", entry.getValue()
-                                                                     .get(0)
-                                                                     .getBetAmount())
+                 isAccumulatorBet ? String.format(" `%,d đ`", entry.getValue()
+                                                                   .get(0)
+                                                                   .getBetAmount())
                      : "")
              .append("\n");
 
@@ -308,10 +308,9 @@ public class TelegramBot extends TelegramLongPollingBot {
                  .append(isAccumulatorBet ? getTeamFaceToFace(detail) + ": " : "")
                  .append(formatVnBetEvent(detail))
                  .append(
-                     !isAccumulatorBet ? String.format("  ||  `%,d VNĐ`",
-                                                       entry.getValue()
-                                                            .get(0)
-                                                            .getBetAmount()) : "")
+                     !isAccumulatorBet ? String.format("  ||  `%,d đ`",
+                                                       betHistory
+                                                           .getBetAmount()) : "")
                  .append("\n");
         }
       }
