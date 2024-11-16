@@ -1,10 +1,11 @@
 package bf5.betting.service.impl;
 
 import bf5.betting.annotation.TryCatchWrap;
-import bf5.betting.constant.ServerConfigKey;
+import bf5.betting.entity.jpa.ServerConfig;
 import bf5.betting.repository.ServerConfigRepository;
 import bf5.betting.service.ServerConfigService;
-import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -21,12 +22,18 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ServerConfigServiceImpl implements ServerConfigService {
 
+  enum ServerConfigKey {
+    AUTO_UPDATER_INTERVAL_MINUTES,
+    BET_HISTORY_API_URL,
+    LAST_ACTIVE_SESSION_TOKEN,
+  }
+
   private final ServerConfigRepository serverConfigRepo;
-  private EnumMap<ServerConfigKey, String> serverConfigMap;
+  private Map<String, String> serverConfigMap;
 
   @PostConstruct
   private void init() {
-    serverConfigMap = new EnumMap<>(ServerConfigKey.class);
+    serverConfigMap = new HashMap<>();
     serverConfigRepo.findAll()
                     .forEach(serverConfig -> {
                       serverConfigMap.put(serverConfig.getConfigKey(), serverConfig.getConfigValue());
@@ -41,28 +48,30 @@ public class ServerConfigServiceImpl implements ServerConfigService {
 
   @Override
   public String getLastActiveToken() {
-    return serverConfigMap.get(ServerConfigKey.LAST_ACTIVE_SESSION_TOKEN);
+    return serverConfigMap.get(ServerConfigKey.LAST_ACTIVE_SESSION_TOKEN.name());
   }
 
   @Override
-  @Async
   @TryCatchWrap
+  @Async
   public void setLastActiveToken(String newToken) {
-    serverConfigMap.put(ServerConfigKey.LAST_ACTIVE_SESSION_TOKEN, newToken);
+    serverConfigMap.put(ServerConfigKey.LAST_ACTIVE_SESSION_TOKEN.name(), newToken);
     log.info("Set new active session token to {}", newToken);
 
-    var tokenEntity = this.serverConfigRepo.getReferenceById(ServerConfigKey.LAST_ACTIVE_SESSION_TOKEN);
-    tokenEntity.setConfigValue(newToken);
+    ServerConfig tokenEntity = ServerConfig.builder()
+                                           .configKey(ServerConfigKey.LAST_ACTIVE_SESSION_TOKEN.name())
+                                           .configValue(newToken)
+                                           .build();
     this.serverConfigRepo.save(tokenEntity);
   }
 
   @Override
   public int getAutoUpdaterIntervalMinutes() {
-    return Integer.parseInt(this.serverConfigMap.get(ServerConfigKey.AUTO_UPDATER_INTERVAL_MINUTES));
+    return Integer.parseInt(this.serverConfigMap.get(ServerConfigKey.AUTO_UPDATER_INTERVAL_MINUTES.name()));
   }
 
   @Override
   public String getBetHistoryApiUrl() {
-    return this.serverConfigMap.get(ServerConfigKey.BET_HISTORY_API_URL);
+    return this.serverConfigMap.get(ServerConfigKey.BET_HISTORY_API_URL.name());
   }
 }
