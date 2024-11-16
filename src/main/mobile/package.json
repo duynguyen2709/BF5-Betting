@@ -11,7 +11,8 @@
     "lint:fix": "eslint . --fix",
     "prettier": "prettier --check \"src/**/(*.tsx|*.ts|*.css|*.scss)\"",
     "prettier:fix": "prettier --write \"src/**/(*.tsx|*.ts|*.css|*.scss)\"",
-    "format": "prettier --write \"src/**/(*.tsx|*.ts|*.css|*.scss)\" && eslint . --fix"
+    "format": "prettier --write \"src/**/(*.tsx|*.ts|*.css|*.scss)\" && eslint . --fix",
+    "run-ios": "tsc && vite build && npx cap sync && npx cap run ios"
   },
   "dependencies": {
     "@capacitor/app": "6.0.1",

@@ -1,11 +1,21 @@
 import MessageListItem from '../components/MessageListItem'
-import { useState } from 'react'
-import { getMessages, Message } from '../data/messages'
-import { IonContent, IonHeader, IonList, IonPage, IonRefresher, IonRefresherContent, IonTitle, IonToolbar, useIonViewWillEnter } from '@ionic/react'
+import React, { useState } from 'react'
+import { IonButton, IonDatetime, IonDatetimeButton, IonModal } from '@ionic/react'
+import { getMessages, Message } from '@/data/messages'
+import {
+  IonContent,
+  IonHeader,
+  IonList,
+  IonPage,
+  IonRefresher,
+  IonRefresherContent,
+  IonTitle,
+  IonToolbar,
+  useIonViewWillEnter
+} from '@ionic/react'
 import './Home.css'
 
 const Home: React.FC = () => {
-
   const [messages, setMessages] = useState<Message[]>([])
 
   useIonViewWillEnter(() => {
@@ -20,27 +30,37 @@ const Home: React.FC = () => {
   }
 
   return (
-    <IonPage id="home-page">
-      <IonHeader>
+    <IonPage id='home-page'>
+      <IonHeader translucent>
         <IonToolbar>
-          <IonTitle>Inbox</IonTitle>
+          <IonTitle>Dashboard</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonRefresher slot="fixed" onIonRefresh={refresh}>
+        <IonRefresher slot='fixed' onIonRefresh={refresh}>
           <IonRefresherContent></IonRefresherContent>
         </IonRefresher>
 
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">
-              Inbox
-            </IonTitle>
-          </IonToolbar>
-        </IonHeader>
+        <IonDatetimeButton datetime='datetime'></IonDatetimeButton>
+
+        <IonModal keepContentsMounted={true}>
+          <IonDatetime id='datetime'></IonDatetime>
+        </IonModal>
+
+        <IonButton>Default</IonButton>
+        <IonButton color='secondary'>Secondary</IonButton>
+        <IonButton color='tertiary'>Tertiary</IonButton>
+        <IonButton color='success'>Success</IonButton>
+        <IonButton color='warning'>Warning</IonButton>
+        <IonButton color='danger'>Danger</IonButton>
+        <IonButton color='light'>Light</IonButton>
+        <IonButton color='medium'>Medium</IonButton>
+        <IonButton color='dark'>Dark</IonButton>
 
         <IonList>
-          {messages.map(m => <MessageListItem key={m.id} message={m} />)}
+          {messages.map((m) => (
+            <MessageListItem key={m.id} message={m} />
+          ))}
         </IonList>
       </IonContent>
     </IonPage>
