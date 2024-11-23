@@ -15,6 +15,7 @@ import bf5.betting.service.PlayerService;
 import bf5.betting.service.RawBetService;
 import bf5.betting.service.ServerConfigService;
 import bf5.betting.util.DateTimeUtil;
+import bf5.betting.util.RequestUtil;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.ArrayList;
@@ -257,8 +258,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         }
 
       } catch (TelegramApiException e) {
-        String detailMessage = StringUtils.substringBefore(e.getMessage(), "; nested exception is");
-        log.error("[TelegramBot] Error happened: {}", detailMessage);
+        log.error("[TelegramBot] Error happened: {}", RequestUtil.getDetailedMessage(e));
       }
     }
   }
@@ -296,9 +296,9 @@ public class TelegramBot extends TelegramLongPollingBot {
              .append("*")
              .append(":")
              .append(
-                 isAccumulatorBet ? String.format(" `%,d đ`", entry.getValue()
-                                                                   .get(0)
-                                                                   .getBetAmount())
+                 isAccumulatorBet ? String.format(" `%,dđ`", entry.getValue()
+                                                                  .get(0)
+                                                                  .getBetAmount())
                      : "")
              .append("\n");
 
@@ -308,7 +308,7 @@ public class TelegramBot extends TelegramLongPollingBot {
                  .append(isAccumulatorBet ? getTeamFaceToFace(detail) + ": " : "")
                  .append(formatVnBetEvent(detail))
                  .append(
-                     !isAccumulatorBet ? String.format("  ||  `%,d đ`",
+                     !isAccumulatorBet ? String.format("  ||  `%,dđ`",
                                                        betHistory
                                                            .getBetAmount()) : "")
                  .append("\n");
