@@ -17,14 +17,17 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.HttpResponseException;
-import org.apache.hc.client5.http.fluent.Request;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.core5.http.ContentType;
+import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.springframework.stereotype.Service;
 
 /**
@@ -37,6 +40,7 @@ public class RawBetServiceImpl implements RawBetService {
 
   private final RawBetEntityConverter entityConverter;
   private final ServerConfigService serverConfigService;
+  private final CloseableHttpClient httpClient;
 
   private final Cache<String, List<GetRawBetResponse.RawBetEntity>> cache = Caffeine.newBuilder()
                                                                                     .expireAfterWrite(35,
@@ -140,50 +144,51 @@ public class RawBetServiceImpl implements RawBetService {
   private List<GetRawBetResponse.RawBetEntity> getFromApi(String sessionToken, long startTime,
       long endTime) throws IOException {
     GetRawBetRequest request = GetRawBetRequest.build(startTime, endTime);
-    Request httpRequest = Request.post(this.serverConfigService.getBetHistoryApiUrl())
-                                 .bodyString(JsonUtil.toJsonString(request), ContentType.APPLICATION_JSON)
-                                 .setHeader("cookie", String.format(
-                                     "is_rtl=1; lng=en; flaglng=en; typeBetNames=full; tzo=7; _ym_uid=1676720947661580605; "
-                                         +
-                                         "_ym_d=1676720947; _ga=GA1.2.1833299673.1676720948; che_g=88625477-5a54-3a01-df02-80dd5369756a; "
-                                         +
-                                         "sh.session=c308fd5b-66a9-4459-a57c-dce520bbc59f; pushfree_status=canceled; _gid=GA1.2.1300401392.1678891508; "
-                                         +
-                                         "fast_coupon=true; bettingView=1; right_side=right; v3frm=1; auid=Z6x1DGQVLYysdFTZA3DLAg==; completed_user_settings=true; "
-                                         +
-                                         "game_cols_count=2; dnb=1; _ym_isad=1; _ym_visorc=b; coefview=0; ggru=188; _grant_1679167615=ml13107; SESSION=%s; ua=39234719; "
-                                         +
-                                         "uhash=34ef190e01e2825148c499a80691148f; cur=VND; disallow_sport=; visit=4-4969002a8e5b53d75664aae7b87f4eac; "
-                                         +
-                                         "_glhf=1679167708; v3fr=1; _gat_gtag_UA_131019888_1=1", sessionToken))
-                                 .setHeader("authority", "1x88.net")
-                                 .setHeader("origin", "https://1x88.net")
-                                 .setHeader("referer", "https://1x88.net/office/history")
-                                 .setHeader("x-requested-with", "XMLHttpRequest")
-                                 .setHeader("sec-ch-ua",
-                                            "\"Google Chrome\";v=\"111\", \"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"111\"")
-                                 .setHeader("sec-ch-ua-mobile", "?0")
-                                 .setHeader("sec-ch-ua-platform", "macOS")
-                                 .setHeader("sec-fetch-dest", "empty")
-                                 .setHeader("sec-fetch-mode", "cors")
-                                 .setHeader("sec-fetch-site", "same-origin")
-                                 .setHeader("user-agent",
-                                            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
 
-//        long now = System.currentTimeMillis();
-    String rawResponse = httpRequest.execute()
-                                    .returnContent()
-                                    .asString();
+    HttpPost httpPost = new HttpPost(this.serverConfigService.getBetHistoryApiUrl());
+    StringEntity entity = new StringEntity(Objects.requireNonNull(JsonUtil.toJsonString(request)),
+                                           ContentType.APPLICATION_JSON);
+    httpPost.setEntity(entity);
 
-//        log.info("Receive raw response from 1xBet: {}, total query time: {}ms", rawResponse, (System.currentTimeMillis() - now));
+    httpPost.setHeader("cookie", String.format(
+        "is_rtl=1; lng=en; flaglng=en; typeBetNames=full; tzo=7; _ym_uid=1676720947661580605; " +
+            "_ym_d=1676720947; _ga=GA1.2.1833299673.1676720948; che_g=88625477-5a54-3a01-df02-80dd5369756a; " +
+            "sh.session=c308fd5b-66a9-4459-a57c-dce520bbc59f; pushfree_status=canceled; _gid=GA1.2.1300401392.1678891508; "
+            +
+            "fast_coupon=true; bettingView=1; right_side=right; v3frm=1; auid=Z6x1DGQVLYysdFTZA3DLAg==; completed_user_settings=true; "
+            +
+            "game_cols_count=2; dnb=1; _ym_isad=1; _ym_visorc=b; coefview=0; ggru=188; _grant_1679167615=ml13107; SESSION=%s; ua=39234719; "
+            +
+            "uhash=34ef190e01e2825148c499a80691148f; cur=VND; disallow_sport=; visit=4-4969002a8e5b53d75664aae7b87f4eac; "
+            +
+            "_glhf=1679167708; v3fr=1; _gat_gtag_UA_131019888_1=1", sessionToken));
+
+    httpPost.setHeader("authority", "1x88.net");
+    httpPost.setHeader("origin", "https://1x88.net");
+    httpPost.setHeader("referer", "https://1x88.net/office/history");
+    httpPost.setHeader("x-requested-with", "XMLHttpRequest");
+    httpPost.setHeader("sec-ch-ua", "\"Google Chrome\";v=\"111\", \"Not(A:Brand\";v=\"8\", \"Chromium\";v=\"111\"");
+    httpPost.setHeader("sec-ch-ua-mobile", "?0");
+    httpPost.setHeader("sec-ch-ua-platform", "macOS");
+    httpPost.setHeader("sec-fetch-dest", "empty");
+    httpPost.setHeader("sec-fetch-mode", "cors");
+    httpPost.setHeader("sec-fetch-site", "same-origin");
+    httpPost.setHeader("user-agent",
+                       "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/111.0.0.0 Safari/537.36");
+
+    GetRawBetResponse response = JsonUtil.fromJsonResponse(httpClient.execute(httpPost)
+                                                                     .getEntity()
+                                                                     .getContent(), GetRawBetResponse.class);
+
+//    log.info("Receive raw response from 1xBet: {}, total query time: {}ms", JsonUtil.toJsonString(response),
+//             (System.currentTimeMillis() - now));
 
     // If we can get here then current token is still active, or else it has already thrown exception
-    if (!this.serverConfigService.getLastActiveToken()
-                                 .equals(sessionToken)) {
+    if (response != null && !this.serverConfigService.getLastActiveToken()
+                                                     .equals(sessionToken)) {
       this.serverConfigService.setLastActiveToken(sessionToken);
     }
 
-    GetRawBetResponse response = JsonUtil.fromJsonString(rawResponse, GetRawBetResponse.class);
     return response.getData()
                    .getBets();
   }
