@@ -1,10 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
 import { API_URL } from '@/common/Constant'
-import { sendPostRequest } from '@/api/fetchClient'
+import { sendPost } from '@/api/fetchClient'
+import { BaseApiResponse } from '@/types/api'
 
 export const useUnlockHome = () => {
-  return useMutation({
+  return useMutation<BaseApiResponse<string>, Error, string>({
     mutationKey: [API_URL.Unlock],
-    mutationFn: (key) => sendPostRequest(API_URL.Unlock, { key })
+    mutationFn: (key: string) => sendPost(API_URL.Unlock, { key }),
   })
 }

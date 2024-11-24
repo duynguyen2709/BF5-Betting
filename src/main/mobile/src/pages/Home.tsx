@@ -1,67 +1,29 @@
-import MessageListItem from '../components/MessageListItem'
-import React, { useState } from 'react'
-import { IonButton, IonDatetime, IonDatetimeButton, IonModal } from '@ionic/react'
-import { getMessages, Message } from '@/data/messages'
-import {
-  IonContent,
-  IonHeader,
-  IonList,
-  IonPage,
-  IonRefresher,
-  IonRefresherContent,
-  IonTitle,
-  IonToolbar,
-  useIonViewWillEnter
-} from '@ionic/react'
+import React, { useEffect, useState } from 'react'
+import { IonContent, IonPage } from '@ionic/react'
 import './Home.css'
+import UserMainPage from '@/pages/UserMainPage'
+import ionicStorage from '@/store/ionicStorage'
+import { UNLOCK_DATA_KEY } from '@/common/Constant'
+import UnlockPage from '@/pages/UnlockPage'
 
 const Home: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [unlockedUserId, setUnlockedUserId] = useState<string | null>(null)
 
-  useIonViewWillEnter(() => {
-    const msgs = getMessages()
-    setMessages(msgs)
-  })
+  useEffect(() => {
+    ;(async () => {
+      const userId = await ionicStorage.get(UNLOCK_DATA_KEY)
+      setUnlockedUserId(userId)
+    })()
+  }, [])
 
-  const refresh = (e: CustomEvent) => {
-    setTimeout(() => {
-      e.detail.complete()
-    }, 3000)
+  const handleUnlock = async (userId: string) => {
+    await ionicStorage.set(UNLOCK_DATA_KEY, userId)
+    setUnlockedUserId(userId)
   }
-
   return (
     <IonPage id='home-page'>
-      <IonHeader translucent>
-        <IonToolbar>
-          <IonTitle>Dashboard</IonTitle>
-        </IonToolbar>
-      </IonHeader>
       <IonContent fullscreen>
-        <IonRefresher slot='fixed' onIonRefresh={refresh}>
-          <IonRefresherContent></IonRefresherContent>
-        </IonRefresher>
-
-        <IonDatetimeButton datetime='datetime'></IonDatetimeButton>
-
-        <IonModal keepContentsMounted={true}>
-          <IonDatetime id='datetime'></IonDatetime>
-        </IonModal>
-
-        <IonButton>Default</IonButton>
-        <IonButton color='secondary'>Secondary</IonButton>
-        <IonButton color='tertiary'>Tertiary</IonButton>
-        <IonButton color='success'>Success</IonButton>
-        <IonButton color='warning'>Warning</IonButton>
-        <IonButton color='danger'>Danger</IonButton>
-        <IonButton color='light'>Light</IonButton>
-        <IonButton color='medium'>Medium</IonButton>
-        <IonButton color='dark'>Dark</IonButton>
-
-        <IonList>
-          {messages.map((m) => (
-            <MessageListItem key={m.id} message={m} />
-          ))}
-        </IonList>
+        {unlockedUserId ? <UserMainPage /> : <UnlockPage onUnlockSuccess={handleUnlock} />}
       </IonContent>
     </IonPage>
   )

@@ -22,9 +22,9 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       staleTime: API_STALE_TIME,
-      gcTime: API_STALE_TIME
-    }
-  }
+      gcTime: API_STALE_TIME,
+    },
+  },
 })
 
 const App: React.FC = () => (

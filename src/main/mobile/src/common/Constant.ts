@@ -1,11 +1,12 @@
 export const API_STALE_TIME = 15 * 60 * 1000
+export const UNLOCK_DATA_KEY = 'UNLOCKED_USER_ID'
 
 export const API_URL = {
   BetHistory: '/bets',
   RawBet: '/bets/raw',
   Players: '/players',
   Statistics: '/statistics',
-  Unlock: '/unlock'
+  Unlock: '/unlock',
 }
 
 export const MESSAGE = {
@@ -17,5 +18,5 @@ export const MESSAGE = {
   UpdateBetSuccess: 'Cập nhật cược thành công',
   RunStatisticSuccess: 'Chạy thống kê thành công',
   AddPaymentHistorySuccess: 'Thêm dữ liệu thanh toán thành công',
-  StartDateMustBeBeforeOrEqualError: 'Ngày bắt đầu phải trước hoặc bằng ngày kết thúc'
+  StartDateMustBeBeforeOrEqualError: 'Ngày bắt đầu phải trước hoặc bằng ngày kết thúc',
 }

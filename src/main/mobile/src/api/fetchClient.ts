@@ -1,16 +1,21 @@
 import { message } from 'antd'
-import { MESSAGE } from '@/common/Constant'
+import { MESSAGE, UNLOCK_DATA_KEY } from '@/common/Constant'
+import { BaseApiResponse } from '@/types/api'
+import ionicStorage from '@/store/ionicStorage'
 
 const baseUrl = import.meta.env.VITE_API_URL
 
-const fetchClient = async (url: string, options: RequestInit = {}) => {
+const fetchClient = async <T>(url: string, options: RequestInit = {}): Promise<BaseApiResponse<T>> => {
+  const userId = await ionicStorage.get(UNLOCK_DATA_KEY)
   const headers = {
     'Content-Type': 'application/json',
-    ...options.headers
+    ...options.headers,
+    ...(userId ? { 'X-User-Id': userId } : {}),
   }
+
   const fetchOptions: RequestInit = {
     ...options,
-    headers
+    headers,
   }
 
   const response = await fetch(`${baseUrl}${url}`, fetchOptions)
@@ -26,19 +31,21 @@ const fetchClient = async (url: string, options: RequestInit = {}) => {
     }
     throw new Error(errorData.message || MESSAGE.DefaultErrorMessage)
   }
-
-  const data = await response.json()
-  if (data && data.data) {
-    return data.data
-  }
-  return data
+  return (await response.json()) as BaseApiResponse<T>
 }
 
-export const sendPostRequest = (url: string, payload: any, options: RequestInit = {}) => {
-  return fetchClient(url, {
+export const sendPost = <T>(url: string, payload: any, options: RequestInit = {}) => {
+  return fetchClient<T>(url, {
     method: 'POST',
-    body: payload,
-    ...options
+    body: JSON.stringify(payload),
+    ...options,
+  })
+}
+
+export const sendGet = <T>(url: string, options: RequestInit = {}) => {
+  return fetchClient<T>(url, {
+    method: 'GET',
+    ...options,
   })
 }
 
