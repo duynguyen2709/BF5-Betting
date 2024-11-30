@@ -11,12 +11,14 @@ import bf5.betting.entity.jpa.Player;
 import bf5.betting.entity.request.TelegramMessageRequest;
 import bf5.betting.service.PlayerService;
 import bf5.betting.service.TelegramNotiService;
+import bf5.betting.util.DateTimeUtil;
 import bf5.betting.util.RequestUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -35,11 +37,16 @@ import org.springframework.web.client.RestTemplate;
 @Log4j2
 public class TelegramNotiServiceImpl implements TelegramNotiService {
 
-  private static final String RATIO_TEXT = "Tỉ lệ";
   private static final String API_URL = "https://api.telegram.org/bot6784881463:AAGc5VmQNw_BEazOuTTV7DYpPFefMb_Ieks/sendMessage";
   private final PlayerService playerService;
   private final RestTemplate httpClient;
   private final RetryTemplate retryTemplate;
+
+  @PostConstruct
+  void announceStart() {
+    this.sendNotification(ADMIN_USER_ID,
+                          String.format("\uD83D\uDD0B *Service đã khởi chạy lúc:* `%s` ", DateTimeUtil.now()));
+  }
 
   @TryCatchWrap
   @SneakyThrows
@@ -113,9 +120,9 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
              .append("*")
              .append(":")
              .append(
-                 isAccumulatorBet ? String.format(" `%,d đ` || %s: %.2f", entry.getValue()
-                                                                               .get(0)
-                                                                               .getBetAmount(), RATIO_TEXT,
+                 isAccumulatorBet ? String.format(" `%,d đ` || Tỉ lệ: %.2f", entry.getValue()
+                                                                                  .get(0)
+                                                                                  .getBetAmount(),
                                                   entry.getValue()
                                                        .get(0)
                                                        .getRatio())
@@ -128,8 +135,8 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
                  .append(isAccumulatorBet ? getTeamFaceToFace(detail) + ": " : "")
                  .append(formatVnBetEvent(detail))
                  .append(
-                     !isAccumulatorBet ? String.format("  ||  `%,dđ` || %s: %.2f",
-                                                       betHistory.getBetAmount(), RATIO_TEXT, betHistory.getRatio())
+                     !isAccumulatorBet ? String.format("  ||  `%,dđ` || Tỉ lệ: %.2f",
+                                                       betHistory.getBetAmount(), betHistory.getRatio())
                          : "")
                  .append("\n");
         }

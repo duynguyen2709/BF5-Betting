@@ -1,11 +1,13 @@
+version: '3.8'
+
 services:
   betting_db:
     image: mysql
     restart: unless-stopped
     environment:
-      - MYSQL_ROOT_PASSWORD=XxeblIl0&C&zcG@t
-      - MYSQL_DATABASE=Bf5Betting
-      - TZ=Asia/Ho_Chi_Minh
+      - MYSQL_ROOT_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - TZ=${TZ}
     ports:
       - "3308:3306"
     volumes:
@@ -20,11 +22,11 @@ services:
     image: duyna5/bf5-betting
     restart: on-failure
     environment:
-      - TZ=Asia/Ho_Chi_Minh
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=XxeblIl0&C&zcG@t
+      - TZ=${TZ}
+      - MYSQL_USERNAME=${MYSQL_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - MYSQL_HOST=betting_db:3306
-      - MYSQL_DATABASE=Bf5Betting
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
     ports:
       - "8080:8080"
     volumes:
