@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,16 @@ public class JsonUtil {
       return mapper.writeValueAsString(obj);
     } catch (Exception e) {
       log.error(String.format("[toJsonString] obj=%s ex", obj), e);
+      return null;
+    }
+  }
+
+  public static <T> T fromJsonResponse(InputStream stream, Class<T> clazz) {
+    try {
+      return mapper.readValue(stream, clazz);
+    } catch (Exception e) {
+      log.error(String.format("[fromJsonResponse] raw=%s, class=%s ex", stream, clazz.getSimpleName()),
+                e);
       return null;
     }
   }

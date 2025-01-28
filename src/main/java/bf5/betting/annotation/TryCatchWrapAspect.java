@@ -2,7 +2,9 @@ package bf5.betting.annotation;
 
 import bf5.betting.service.TelegramNotiService;
 import bf5.betting.util.JsonUtil;
+import bf5.betting.util.RequestUtil;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -25,11 +27,12 @@ public class TryCatchWrapAspect {
     try {
       return joinPoint.proceed();
     } catch (Throwable ex) {
-      String error = String.format("Method: %s\nArgs = %s\nException: %s",
-                                   joinPoint.getSignature(), JsonUtil.toJsonString(joinPoint.getArgs()),
-                                   ex.getMessage());
-      log.error(error);
-      telegramNotiService.sendExceptionAlert(error);
+      String shortError = String.format("- Method: %s\n- Args = %s\n- Exception: %s",
+                                        joinPoint.getSignature(), JsonUtil.toJsonString(joinPoint.getArgs()),
+                                        ex.getMessage());
+      log.error("Exception Happened\nSummary: {}\nDetail Error Message: {}", shortError,
+                RequestUtil.getDetailedMessage(ex));
+      telegramNotiService.sendExceptionAlert(shortError);
       throw ex;
     }
   }

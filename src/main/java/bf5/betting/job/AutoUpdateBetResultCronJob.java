@@ -9,7 +9,10 @@ import bf5.betting.service.RawBetService;
 import bf5.betting.service.ServerConfigService;
 import bf5.betting.service.TelegramNotiService;
 import bf5.betting.util.DateTimeUtil;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -34,6 +37,11 @@ public class AutoUpdateBetResultCronJob {
   private final TelegramNotiService telegramNotiService;
   private final ServerConfigService serverConfigService;
 
+  private final Cache<Long, Boolean> processedBetCache = Caffeine.newBuilder()
+                                                                 .expireAfterWrite(2,
+                                                                                   TimeUnit.DAYS)
+                                                                 .build();
+
   @PostConstruct
   void scheduleJob() {
     ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -53,7 +61,9 @@ public class AutoUpdateBetResultCronJob {
       // Get list raw bets that finished
       List<BetHistory> rawBetsReadyForUpdate = rawBetService.getListBetForAutoUpdater()
                                                             .stream()
-                                                            .filter(bet -> bet.getResult() != BetResult.NOT_FINISHED)
+                                                            .filter(bet -> bet.getResult() != BetResult.NOT_FINISHED
+                                                                && Objects.isNull(processedBetCache.getIfPresent(
+                                                                bet.getBetId())))
                                                             .collect(Collectors.toList());
       if (rawBetsReadyForUpdate.isEmpty()) {
         log.info("List raw bets ready for update is empty => Skipped this run");
@@ -67,6 +77,10 @@ public class AutoUpdateBetResultCronJob {
       }
 
       this.betHistoryService.updateBatchBetResultFromRaw(toBeUpdatedBetHistories);
+
+      toBeUpdatedBetHistories.forEach(betHistory -> {
+        processedBetCache.put(betHistory.getBetId(), true);
+      });
     } catch (UncheckedHttpResponseException tokenExpiredEx) {
       telegramNotiService.sendExceptionAlert("Token Expired at " + DateTimeUtil.now());
       throw tokenExpiredEx;

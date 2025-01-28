@@ -1,30 +1,33 @@
 package bf5.betting.service.impl;
 
+import static bf5.betting.constant.Constant.ADMIN_USER_ID;
 import static bf5.betting.util.BetHistoryUtil.formatVnBetEvent;
 
 import bf5.betting.annotation.TryCatchWrap;
 import bf5.betting.constant.BetType;
-import bf5.betting.constant.Constant;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.BetMatchDetail;
 import bf5.betting.entity.jpa.Player;
 import bf5.betting.entity.request.TelegramMessageRequest;
 import bf5.betting.service.PlayerService;
 import bf5.betting.service.TelegramNotiService;
-import bf5.betting.util.JsonUtil;
+import bf5.betting.util.DateTimeUtil;
+import bf5.betting.util.RequestUtil;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.client5.http.fluent.Request;
-import org.apache.hc.core5.http.ContentType;
+import org.springframework.retry.support.RetryTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * @author duynguyen
@@ -36,6 +39,14 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
 
   private static final String API_URL = "https://api.telegram.org/bot6784881463:AAGc5VmQNw_BEazOuTTV7DYpPFefMb_Ieks/sendMessage";
   private final PlayerService playerService;
+  private final RestTemplate httpClient;
+  private final RetryTemplate retryTemplate;
+
+  @PostConstruct
+  void announceStart() {
+    this.sendNotification(ADMIN_USER_ID,
+                          String.format("\uD83D\uDD0B *Service đã khởi chạy lúc:* `%s` ", DateTimeUtil.now()));
+  }
 
   @TryCatchWrap
   @SneakyThrows
@@ -48,18 +59,30 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
     }
     String telegramId = player.getTelegramId();
     if (StringUtils.isBlank(telegramId)) {
-      log.warn("TelegramID for user {} is empty", player.getPlayerName());
+      log.warn("TelegramID for user {} ({}) is empty", player.getPlayerName(), userId);
       return;
     }
 
     TelegramMessageRequest request = TelegramMessageRequest.build(telegramId, text);
-    Request httpRequest = Request.post(API_URL)
-                                 .bodyString(JsonUtil.toJsonString(request), ContentType.APPLICATION_JSON);
-
-    String rawResponse = httpRequest.execute()
-                                    .returnContent()
-                                    .asString();
-    log.info("[{}] Send Telegram message result: {}", player.getPlayerName(), rawResponse);
+    retryTemplate.execute(retryContext -> {
+      try {
+        return httpClient.postForObject(API_URL, request, Object.class);
+      } catch (HttpStatusCodeException ex) {
+        if (ex.getStatusCode()
+              .is4xxClientError()) {
+          log.error("[TelegramNoti] Skipping retry due to 4xx client error: {}", RequestUtil.getDetailedMessage(ex));
+          return null;
+        } else {
+          log.warn("[TelegramNoti] Retry request #{}, last exception: {}", retryContext.getRetryCount(),
+                   RequestUtil.getDetailedMessage(ex));
+          throw ex;
+        }
+      }
+    }, retryContext -> {
+      log.error("[TelegramNoti] All retry attempts failed: {}",
+                RequestUtil.getDetailedMessage(retryContext.getLastThrowable()));
+      return null;
+    });
   }
 
   @Override
@@ -86,7 +109,7 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
     StringBuilder content = new StringBuilder();
     content.append(String.format("*✅ Đã thêm %s phiếu cược mới*", betHistoryList.size()))
            .append("\n")
-           .append("-----------------------------------------------")
+           .append("---------------------------------------------")
            .append("\n");
 
     for (Map.Entry<String, List<BetHistory>> entry : mapBetByType.entrySet()) {
@@ -97,9 +120,12 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
              .append("*")
              .append(":")
              .append(
-                 isAccumulatorBet ? String.format(" `%,d VNĐ`", entry.getValue()
-                                                                     .get(0)
-                                                                     .getBetAmount())
+                 isAccumulatorBet ? String.format(" `%,d đ` || Tỉ lệ: %.2f", entry.getValue()
+                                                                                  .get(0)
+                                                                                  .getBetAmount(),
+                                                  entry.getValue()
+                                                       .get(0)
+                                                       .getRatio())
                      : "")
              .append("\n");
 
@@ -109,14 +135,21 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
                  .append(isAccumulatorBet ? getTeamFaceToFace(detail) + ": " : "")
                  .append(formatVnBetEvent(detail))
                  .append(
-                     !isAccumulatorBet ? String.format("  ||  `%,d VNĐ`",
-                                                       betHistory.getBetAmount()) : "")
+                     !isAccumulatorBet ? String.format("  ||  `%,dđ` || Tỉ lệ: %.2f",
+                                                       betHistory.getBetAmount(), betHistory.getRatio())
+                         : "")
                  .append("\n");
         }
       }
       content.append("\n");
     }
     sendNotification(userId, content.toString());
+
+    if (!userId.equals(ADMIN_USER_ID)) {
+      String newContent = String.format("%s\n=================================\n%s",
+                                        playerService.getPlayerNameById(userId), content);
+      sendNotification(ADMIN_USER_ID, newContent);
+    }
   }
 
   @Override
@@ -151,9 +184,10 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
     for (Map.Entry<String, Map<String, List<BetHistory>>> playerEntry : mapBetOfPlayerByType.entrySet()) {
       StringBuilder content = new StringBuilder();
       content.append(
-                 String.format("*✅ Đã cập nhật kết quả cho %s phiếu cược*", betHistoryList.size()))
+                 String.format("*✅ Đã cập nhật kết quả %s phiếu cược*", playerEntry.getValue()
+                                                                                   .size()))
              .append("\n")
-             .append("-----------------------------------------------")
+             .append("---------------------------------------------")
              .append("\n");
 
       content.append("{{playerName}}")
@@ -168,7 +202,11 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
                .append("*")
                .append(":")
                .append(
-                   isAccumulatorBet ? String.format(" %s `%,d VNĐ`",
+                   isAccumulatorBet ? String.format("%s %s  `%,dđ`",
+                                                    entry.getValue()
+                                                         .get(0)
+                                                         .getResult()
+                                                         .getSymbol(),
                                                     entry.getValue()
                                                          .get(0)
                                                          .getResult()
@@ -184,14 +222,12 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
                    .append(isAccumulatorBet ? getTeamFaceToFace(detail) + ": " : "")
                    .append(formatVnBetEvent(detail))
                    .append(
-                       !isAccumulatorBet ? String.format("  || %s `%,d VNĐ`",
-                                                         entry.getValue()
-                                                              .get(0)
-                                                              .getResult()
-                                                              .getVnDescriptionText(),
-                                                         Math.abs(entry.getValue()
-                                                                       .get(0)
-                                                                       .getActualProfit())) : "")
+                       !isAccumulatorBet ? String.format("  || %s %s  `%,dđ`",
+                                                         betHistory.getResult()
+                                                                   .getSymbol(),
+                                                         betHistory.getResult()
+                                                                   .getVnDescriptionText(),
+                                                         Math.abs(betHistory.getActualProfit())) : "")
                    .append("\n");
           }
         }
@@ -200,10 +236,10 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
 
       String playerId = playerEntry.getKey();
       // Send to admin
-      this.sendNotification(Constant.ADMIN_USER_ID, content.toString()
-                                                           .replace("{{playerName}}", String.format("         *%s*",
-                                                                                                    playerService.getPlayerNameById(
-                                                                                                        playerId))));
+      this.sendNotification(ADMIN_USER_ID, content.toString()
+                                                  .replace("{{playerName}}", String.format("                  *%s*",
+                                                                                           playerService.getPlayerNameById(
+                                                                                               playerId))));
       // Send to player
       this.sendNotification(playerId, content.toString()
                                              .replace("{{playerName}}", ""));
@@ -213,7 +249,7 @@ public class TelegramNotiServiceImpl implements TelegramNotiService {
   @Override
   @Async
   public void sendExceptionAlert(String error) {
-    this.sendNotification(Constant.ADMIN_USER_ID, String.format("❗ *Đã xảy ra lỗi hệ thống* ❗\n%s", error));
+    this.sendNotification(ADMIN_USER_ID, String.format("❗ *Đã xảy ra lỗi hệ thống* ❗\n%s", error));
   }
 
   private String getTeamFaceToFace(BetMatchDetail detail) {

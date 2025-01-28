@@ -36,3 +36,7 @@ build/
 /src/main/webapp/build
 
 **/.DS_Store
+
+**/node_modules/
+
+slim.report.json

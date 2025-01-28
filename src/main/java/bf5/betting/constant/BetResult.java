@@ -46,6 +46,20 @@ public enum BetResult {
     }
   }
 
+  public String getSymbol() {
+    switch (this) {
+      case LOST:
+      case HALF_LOST:
+        return "\uD83D\uDD3B";
+      case WIN:
+      case HALF_WIN:
+        return "\uD83D\uDFE2";
+      case DRAW:
+        return "\uD83D\uDD38";
+    }
+    return "";
+  }
+
   public String getVnDescriptionText() {
     switch (this) {
       case NOT_FINISHED:

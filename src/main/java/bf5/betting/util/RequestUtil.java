@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpHeaders;
 
 /**
@@ -31,7 +32,7 @@ public class RequestUtil {
   public static String getRequestIpAddress(HttpServletRequest request) {
     for (String header : IP_HEADER_CANDIDATES) {
       String ipList = request.getHeader(header);
-      if (ipList != null && ipList.length() != 0 && !"unknown".equalsIgnoreCase(ipList)) {
+      if (ipList != null && !ipList.isEmpty() && !"unknown".equalsIgnoreCase(ipList)) {
         return ipList.split(",")[0];
       }
     }
@@ -52,5 +53,9 @@ public class RequestUtil {
 
     // TODO: Write this log to file or database
     log.info("\nNew User Action Recorded: {}\n", JsonUtil.toJsonString(payload));
+  }
+
+  public static String getDetailedMessage(Throwable ex) {
+    return StringUtils.substringBefore(ex.getMessage(), "; nested exception is");
   }
 }
