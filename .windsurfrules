@@ -1,0 +1,36 @@
+1. My frontend build system is Vite  
+2. Use QueryClient and QueryClientProvider at the root of your app  
+3. Implement custom hooks for queries and mutations  
+4. Utilize query keys for effective caching  
+5. Use prefetching for improved performance  
+6. Implement proper error and loading states  
+7. Use TypeScript for type safety with React Query  
+8. Use stale-while-revalidate strategy for data freshness  
+9. Implement optimistic updates for mutations  
+10. Use query invalidation for data refetching  
+11. Follow React Query naming conventions for consistency  
+12. Write concise, maintainable, and technically accurate TypeScript code  
+13. Use functional and declarative programming patterns  
+14. Avoid classes and favor functional components   
+15. Favor named exports for functions  
+16. Use TypeScript for all frontend code  
+17. Prefer interfaces over types for extendability
+18. Use function keyword for pure functions to benefit from hoisting  
+19. Wrap asynchronous components in Suspense with a fallback UI  
+20. Use dynamic loading for non-critical components  
+21. Optimize images using WebP format and include size data  
+22. Implement lazy loading for images and non-critical components  
+23. Apply an optimized chunking strategy during the Vite build process  
+24. Implement code splitting to generate smaller bundle sizes  
+25. Review code for performance, readability, and best practices  
+26. Ensure all components and functions are optimized for maintainability  
+27. Check for unnecessary re-renders and optimize them  
+28. Use .tsx extension for files with JSX  
+29. Implement strict TypeScript checks  
+30. Use type inference where possible  
+31. Follow React and TypeScript best practices and naming conventions  
+32. Use antd for UI components  
+33. Use React Router for routing  
+34. Use React Query for data fetching and caching
+35. Use Zustand for state management
+36. Use raw nested css instead of scss or less
