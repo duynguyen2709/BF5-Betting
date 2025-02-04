@@ -1,6 +1,29 @@
 #!/bin/bash
 
-echo "################ Start deploying backend ################"
+
+echo "################ Start building FRONTEND ################"
+
+cd src/main/webapp-v2
+if [ $? -ne 0 ]; then
+  echo "Failed to change directory to src/main/webapp-v2"
+  exit 1
+fi
+
+# Run npm build
+npm run build
+if [ $? -ne 0 ]; then
+  echo "npm run build failed"
+  exit 1
+fi
+
+# Navigate back to the root directory
+cd ../../..
+if [ $? -ne 0 ]; then
+  echo "Failed to change directory to project root"
+  exit 1
+fi
+
+echo "################ Start building BACKEND ################"
 
 # Build java code
 mvn clean package
@@ -59,4 +82,4 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 
-echo "################ Deployed backend successfully ################"
+echo "################ DEPLOYED SUCCESSFULLY ################"
