@@ -1,0 +1,14 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 24px;
+}
+
+@media screen and (max-width: 428px) {
+  .container {
+    min-height: 300px;
+    padding: 16px;
+  }
+}

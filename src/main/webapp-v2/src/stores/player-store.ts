@@ -1,19 +1,18 @@
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { PlayerState } from './types';
+import { create } from 'zustand'
+import { fetchPlayers } from '@/api/player'
+import { Player } from '@/models'
 
-export const usePlayerStore = create<PlayerState>()(
-  devtools((set) => ({
-    players: [],
-    selectedPlayer: undefined,
-    playerAssetHistory: [],
-    isLoading: false,
-    error: undefined,
-    setPlayers: (players) => set({ players }),
-    setSelectedPlayer: (selectedPlayer) => set({ selectedPlayer }),
-    setPlayerAssetHistory: (playerAssetHistory) => set({ playerAssetHistory }),
-    setLoading: (isLoading) => set({ isLoading }),
-    setError: (error) => set({ error }),
-    clearError: () => set({ error: undefined }),
-  }))
-);
+interface PlayerState {
+  players: Record<string, Player>
+  fetch: () => Promise<void>
+}
+
+export const usePlayerStore = create<PlayerState>((set) => ({
+  players: {},
+  fetch: async () => {
+    const playersData = await fetchPlayers()
+    set({ players: playersData })
+  }
+}))
+
+export default usePlayerStore

@@ -10,15 +10,22 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  css: {
+    modules: {
+      localsConvention: 'camelCase',
+      generateScopedName: '[name]__[local]__[hash:base64:5]',
+    },
+  },
   build: {
-    target: 'esnext',
+    target: 'es2015',
     minify: 'terser',
-    sourcemap: true,
+    cssMinify: true,
     rollupOptions: {
       output: {
         manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'antd-vendor': ['antd'],
+          'react-vendor': ['react', 'react-dom'],
+          'antd-vendor': ['antd', '@ant-design/icons', '@ant-design/plots'],
+          'date-vendor': ['date-fns', 'dayjs'],
           'query-vendor': ['@tanstack/react-query'],
         },
       },
@@ -26,6 +33,11 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
   },
 });

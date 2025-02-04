@@ -1,0 +1,24 @@
+.card {
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.card :global(.ant-card-head) {
+  padding: 12px 16px;
+  background-color: #fafafa;
+}
+
+.card :global(.ant-card-body) {
+  padding: 12px;
+}
+
+.chartContainer {
+  padding: 16px;
+  background-color: #fafafa;
+}
+
+@media screen and (max-width: 428px) {
+  .chartContainer {
+    padding: 12px;
+  }
+}

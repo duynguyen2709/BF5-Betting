@@ -1,27 +1,50 @@
-import { PaymentAction } from "./enums";
+import { PaymentAction } from './enums'
 
 export interface Player {
-  playerId: string;
-  playerName: string;
-  totalProfit: number;
-  isActive: boolean;
-  createdTime: Date;
-  lastModifiedTime: Date;
+  playerId: string
+  playerName: string
+  avatarUrl: string
+  totalProfit: number
+  telegramId: string
 }
 
 export interface PlayerAssetHistory {
-  id: number;
-  playerId: string;
-  assetBefore: number;
-  assetAfter: number;
-  paymentTime: Date;
-  action: PaymentAction;
-  betId?: number;
+  id: number
+  playerId: string
+  betId?: number
+  paymentTime: string
+  action: PaymentAction
+  paymentMethod: string
+  amount: number
+  assetBefore: number
+  assetAfter: number
+  updatedAt: string
+}
+
+export interface PlayerFilter {
+  name?: string
+  minAsset?: number
+  maxAsset?: number
+  startDate?: string
+  endDate?: string
 }
 
 export interface AddPlayerAssetHistoryRequest {
-  playerId: string;
-  amount: number;
-  action: PaymentAction;
-  paymentTime?: string;
+  playerId: string
+  amount: number
+  action: PaymentAction
+  paymentTime?: string
+}
+
+export interface PlayerStatistics {
+  playerId: string
+  playerName: string
+  totalBets: number
+  totalStake: number
+  totalProfit: number
+  winRate: number
+  assetByDateList: Array<{
+    date: string
+    asset: number
+  }>
 }

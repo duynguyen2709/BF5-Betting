@@ -1,0 +1,18 @@
+.form {
+  width: 100%;
+}
+
+.formItem {
+  margin-bottom: 0;
+}
+
+@media screen and (max-width: 428px) {
+  .formItem {
+    margin-bottom: 16px;
+  }
+
+  .formItem :global(.ant-picker),
+  .formItem :global(.ant-select) {
+    width: 100% !important;
+  }
+}

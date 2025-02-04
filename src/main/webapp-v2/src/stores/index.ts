@@ -1,6 +1,4 @@
-export * from './types';
-export * from './auth-store';
-export * from './bet-store';
-export * from './player-store';
-export * from './ui-store';
-export * from './counter-store';
+export { default as useBetStore } from './bet-store'
+export { default as usePlayerStore } from './player-store'
+
+export type * from './types'

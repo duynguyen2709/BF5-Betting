@@ -1,17 +1,13 @@
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
-import { BetState } from './types';
+import { create } from 'zustand'
+import type { BetStore } from './types'
 
-export const useBetStore = create<BetState>()(
-  devtools((set) => ({
-    recentBets: [],
-    selectedBet: undefined,
-    isLoading: false,
-    error: undefined,
-    setRecentBets: (recentBets) => set({ recentBets }),
-    setSelectedBet: (selectedBet) => set({ selectedBet }),
-    setLoading: (isLoading) => set({ isLoading }),
-    setError: (error) => set({ error }),
-    clearError: () => set({ error: undefined }),
-  }))
-);
+const useBetStore = create<BetStore>((set) => ({
+  recentBets: [],
+  selectedBet: null,
+
+  setRecentBets: (bets) => set({ recentBets: bets }),
+  setSelectedBet: (bet) => set({ selectedBet: bet }),
+  clearBets: () => set({ recentBets: [], selectedBet: null })
+}))
+
+export default useBetStore

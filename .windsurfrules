@@ -34,3 +34,4 @@
 34. Use React Query for data fetching and caching
 35. Use Zustand for state management
 36. Use raw nested css instead of scss or less
+37. Use bracket notation for css module classes instead of dot notation

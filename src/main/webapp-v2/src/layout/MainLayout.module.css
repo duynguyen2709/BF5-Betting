@@ -1,0 +1,9 @@
+.main-layout {
+  .main-header {
+    padding: 0 1.5rem;
+  }
+
+  .main-content {
+    padding: 1rem 0.5rem 0.5rem;
+  }
+}
