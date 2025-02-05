@@ -1,8 +1,7 @@
-import { Layout } from 'antd'
-import React, { useEffect } from 'react'
-import styles from './MainLayout.module.css'
-import { usePlayerStore } from '@/stores/player-store'
 import logo from '@/assets/logo.png'
+import { Layout } from 'antd'
+import React from 'react'
+import styles from './MainLayout.module.css'
 
 const { Header, Content } = Layout
 
@@ -11,11 +10,6 @@ interface MainLayoutProps {
 }
 
 function MainLayout({ children }: MainLayoutProps) {
-const playerFetch = usePlayerStore((state) => state.fetch)
-  useEffect(() => {
-    playerFetch()
-  }, [playerFetch])
-  
   return (
     <Layout className={styles['main-layout']}>
       <Header className={styles['main-header']}>

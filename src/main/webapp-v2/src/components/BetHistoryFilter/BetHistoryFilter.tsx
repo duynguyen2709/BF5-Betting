@@ -1,5 +1,5 @@
 import { useMediaQuery } from '@/hooks/useMediaQuery'
-import { usePlayerStore } from '@/stores'
+import { usePlayerQuery } from '@/hooks/usePlayerQuery'
 import { Button, DatePicker, Form, Select, Space } from 'antd'
 import type { Dayjs } from 'dayjs'
 import styles from './BetHistoryFilter.module.css'
@@ -17,7 +17,7 @@ interface FilterValues {
 }
 
 function BetHistoryFilter({ onFilter, loading }: BetHistoryFilterProps) {
-  const players = usePlayerStore((state) => state.players)
+  const { players } = usePlayerQuery()
   const [form] = Form.useForm<FilterValues>()
   const isMobile = useMediaQuery('(max-width: 428px)')
 
@@ -49,11 +49,13 @@ function BetHistoryFilter({ onFilter, loading }: BetHistoryFilterProps) {
           allowClear
           style={{ width: isMobile ? '100%' : 200 }}
           size={isMobile ? 'middle' : 'large'}
-          options={Object.values(players || {}).map((player) => ({
-            label: player.playerName,
-            value: player.playerId
-          }))}
-        />
+        >
+          {Object.entries(players).map(([id, player]) => (
+            <Select.Option key={id} value={id}>
+              {player.playerName}
+            </Select.Option>
+          ))}
+        </Select>
       </Form.Item>
 
       <Form.Item className={styles['formItem']}>

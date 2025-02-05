@@ -1,14 +1,14 @@
+import ErrorBoundary from '@/components/ErrorBoundary';
+import MainPageWrapper from '@/pages/MainPageWrapper';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ConfigProvider, Spin } from 'antd';
 import "antd/dist/reset.css";
-import { RouterProvider, createBrowserRouter } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { ConfigProvider } from 'antd'
-import viVN from 'antd/locale/vi_VN'
-import { lazy, Suspense } from 'react'
-import ErrorBoundary from '@/components/ErrorBoundary'
-import MainPageWrapper from '@/pages/MainPageWrapper'
-import { Spin } from 'antd'
-import MainLayout from './layout/MainLayout'
+import viVN from 'antd/locale/vi_VN';
+import { lazy, Suspense } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import MainLayout from './layout/MainLayout';
 import colorPalette from "./utils/colorPalette";
+import { usePlayerQuery } from './hooks/usePlayerQuery';
 
 const NotFound = lazy(() => import('@/pages/NotFoundPage/NotFound'))
 
@@ -18,12 +18,16 @@ const withSuspense = (Component: React.ComponentType) => (
   </Suspense>
 )
 
+const DEFAULT_STALE_TIME = 3 * 60 * 1000;
+const DEFAULT_GC_TIME = 5 * 60 * 1000;
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000
+      staleTime: DEFAULT_STALE_TIME,
+      gcTime: DEFAULT_GC_TIME
     }
   }
 })
@@ -39,7 +43,12 @@ const router = createBrowserRouter([
   }
 ])
 
-function App(): JSX.Element {
+const AppInitializer = () => {
+  usePlayerQuery()
+  return null
+}
+
+function App(): JSX.Element {  
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -60,6 +69,7 @@ function App(): JSX.Element {
             }
           }}
         >
+          <AppInitializer />
           <MainLayout>
           <RouterProvider router={router} />
           </MainLayout>

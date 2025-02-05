@@ -29,7 +29,7 @@ function UnlockPage({ onUnlock }: UnlockPageProps) {
     }
     form.setFieldsValue({ key: text })
   }
-  
+
 
   const handleSubmitForm = async (values: UnlockFormValues) => {
     await form.validateFields();
