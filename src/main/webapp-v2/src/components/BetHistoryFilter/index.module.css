@@ -1,15 +1,15 @@
 .bet-history-filter-form {
   width: 100%;
   padding: 0 1rem 1rem;
-}
 
-.bet-history-filter-form :global(.ant-select-selector),
-.bet-history-filter-form :global(.ant-select-selection-search-input) {
-  height: 3rem;
-}
+  :global(.ant-select-selector),
+  :global(.ant-select-selection-search-input) {
+    height: 3rem;
+  }
 
-.bet-history-filter-form :global(.ant-form-item) {
-  margin-bottom: 0.5rem;
+  :global(.ant-form-item) {
+    margin-bottom: 0.5rem;
+  }
 }
 
 .button-submit-filter,

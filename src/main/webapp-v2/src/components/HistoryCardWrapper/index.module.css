@@ -1,9 +1,11 @@
-.card-bet-wrapper :global(.ant-card-body) {
-  padding: 0 0.5rem 0.5rem;
-}
+.card-bet-wrapper {
+  :global(.ant-card-body) {
+    padding: 0 0.5rem 0.5rem;
+  }
 
-.card-bet-wrapper :global(.ant-tabs-nav-wrap) {
-  padding-left: 0.5rem;
+  :global(.ant-tabs-nav-wrap) {
+    padding-left: 0.5rem;
+  }
 }
 
 .card-bet-empty {

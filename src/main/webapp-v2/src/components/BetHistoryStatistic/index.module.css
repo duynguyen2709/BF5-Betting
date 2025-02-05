@@ -1,15 +1,16 @@
 .bet-history-statistic-wrapper {
   padding: 0 0.5rem 0.5rem;
+
+  :global(.ant-divider) {
+    margin: 0.5rem 0;
+  }
+
+  :global(.ant-tag) {
+    margin: 0;
+  }
 }
+
 
 .statistic-detail-text {
   margin-bottom: 0.25rem;
-}
-
-.bet-history-statistic-wrapper :global(.ant-divider) {
-  margin: 0.5rem 0;
-}
-
-.bet-history-statistic-wrapper :global(.ant-tag) {
-  margin: 0;
 }

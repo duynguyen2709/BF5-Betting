@@ -90,26 +90,32 @@ export const BetHistoryFilter: React.FC<BetHistoryFilterProps> = ({ onSubmitFilt
           </Select>
         </Form.Item>
         <Form.Item name='startDate' label='Thời Gian:'>
-          <DatePicker
-            format={dateFormat}
-            disabledDate={disabledDate}
-            allowClear={false}
-            placeholder='Ngày bắt đầu'
-            style={{
-              width: '100%'
-            }}
-          />
-        </Form.Item>
-        <Form.Item name='endDate'>
-          <DatePicker
-            format={dateFormat}
-            disabledDate={disabledDate}
-            allowClear={false}
-            placeholder='Ngày kết thúc'
-            style={{
-              width: '100%'
-            }}
-          />
+          <Row gutter={8}>
+            <Col span={12}>
+              <DatePicker
+                format={dateFormat}
+                disabledDate={disabledDate}
+                allowClear={false}
+                placeholder='Ngày bắt đầu'
+                style={{
+                  width: '100%'
+                }}
+              />
+            </Col>
+            <Col span={12}>
+              <Form.Item name='endDate' noStyle>
+                <DatePicker
+                  format={dateFormat}
+                  disabledDate={disabledDate}
+                  allowClear={false}
+                  placeholder='Ngày kết thúc'
+                  style={{
+                    width: '100%'
+                  }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form.Item>
         <Form.Item>
           <Row>
@@ -126,16 +132,11 @@ export const BetHistoryFilter: React.FC<BetHistoryFilterProps> = ({ onSubmitFilt
             </Col>
             <Col span={12}>
               <Button
-                type='primary'
+                color="cyan" 
+                variant="solid"
                 className={styles['button-submit-statistic']}
                 style={{
-                  float: 'right',
-                  ...(playerId
-                    ? {
-                        borderColor: '#52c41a',
-                        background: '#389e0d'
-                      }
-                    : {})
+                  float: 'right'
                 }}
                 onClick={handleSubmitStatistic}
                 icon={<BarChartOutlined style={{ fontSize: '16px' }} />}

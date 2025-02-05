@@ -31,8 +31,9 @@
       box-sizing: border-box;
     }
 
-    .ant-statistic-content {
+    :global(.ant-statistic-content) {
       font-size: 18px;
+      letter-spacing: 0.05rem;
     }
   }
 }

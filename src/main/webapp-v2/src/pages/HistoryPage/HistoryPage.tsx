@@ -1,6 +1,6 @@
 import { DownCircleTwoTone, RightCircleTwoTone } from '@ant-design/icons'
 import { Badge, Collapse } from 'antd'
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { exportComponentAsJPEG } from 'react-component-export-image'
 
 import styles from './HistoryPage.module.css'
@@ -12,11 +12,11 @@ import { BetHistoryFilter } from '@/components/BetHistoryFilter'
 import { CenterLoadingSpinner } from '@/components/CenterLoadingSpinner'
 import { HistoryCardWrapper } from '@/components/HistoryCardWrapper'
 import { PlayerRecentBetsCollapsibleCard } from '@/components/PlayerRecentBetsCollapsibleCard'
-import { PlayerStatisticCard } from '@/components/PlayerStatisticCard'
 import { RecentUnfinishedBets } from '@/components/RecentUnfinishedBets'
 import { QueryHistoryAction } from '@/constants'
 import { usePlayerQuery } from '@/hooks'
 import { useRecentBetsQuery } from '@/hooks/useRecentBetsQuery'
+import PlayerStatisticCard from '@/components/PlayerStatisticCard'
 
 const { Panel } = Collapse
 
@@ -55,6 +55,11 @@ export default function HistoryPage() {
   const playersWithSortedProfit = sortPlayerByProfitDesc(players)
 
   const { playerRecentBets, isLoading: recentBetLoading } = useRecentBetsQuery()
+
+  useEffect(() => {
+    console.log('playerRecentBets', playerRecentBets)
+  }, [playerRecentBets])
+  
 
   const handleSubmitFilter = useCallback((fieldsValue: HistoryFilterFormValues, queryMode: string) => {
     setLoading(true)
@@ -117,12 +122,11 @@ export default function HistoryPage() {
             expandIconPosition='end'
             expandIcon={(panelProps) => {
               const Icon = panelProps.isActive ? DownCircleTwoTone : RightCircleTwoTone
-              return <Icon style={{ fontSize: '20px' }} twoToneColor='#52c41a' />
+              return <Icon className={styles['collapsible-arrow-icon']} twoToneColor='#52c41a' />
             }}
           >
             {playersWithSortedProfit.map((player) => {
-              const hasBets = (playerRecentBets[player.playerId] || []).length > 0 || false
-
+              const hasBets = (playerRecentBets[player.playerId] || []).length > 0
               return (
                 <Panel
                   showArrow={hasBets}

@@ -1,5 +1,5 @@
 .card-player-statistic {
-  .ant-card-body {
+  :global(.ant-card-body) {
     padding: 0;
     font-size: 12px;
   }
@@ -14,7 +14,7 @@
   }
 
   .row-bet-summary {
-    .ant-statistic {
+    :global(.ant-statistic) {
       margin-bottom: 1rem;
       display: flex;
       flex-direction: column;
@@ -27,6 +27,7 @@
 
       .ant-statistic-content {
         font-size: 18px;
+        letter-spacing: 0.05rem;
       }
     }
   }

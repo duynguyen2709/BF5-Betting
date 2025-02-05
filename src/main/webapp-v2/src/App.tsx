@@ -1,6 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ConfigProvider, Spin } from 'antd'
-import 'antd/dist/reset.css'
 import viVN from 'antd/locale/vi_VN'
 import React, { lazy, Suspense } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
@@ -64,8 +63,7 @@ function App(): React.JSX.Element {
               colorPrimary: colorPalette.primary.main,
               colorPrimaryHover: colorPalette.primary.light,
               colorPrimaryActive: colorPalette.primary.dark,
-              borderRadius: 8,
-              colorBgContainer: colorPalette.background.default,
+              borderRadius: 6,
               colorSuccess: colorPalette.semantic.success.main,
               colorWarning: colorPalette.semantic.warning.main,
               colorError: colorPalette.semantic.error.main,

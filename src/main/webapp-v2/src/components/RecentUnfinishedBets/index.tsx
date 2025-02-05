@@ -10,15 +10,16 @@ interface RecentUnfinishedBetsProps {
 }
 
 export const RecentUnfinishedBets: React.FC<RecentUnfinishedBetsProps> = ({ data }) => {
+  console.log('data', data)
   if (!data.length) {
     return null
   }
-
-  const betHistoriesByGroup = groupBetHistoriesByType(data) || {}
+  const betHistoriesByGroup = groupBetHistoriesByType(data) || []
+  console.log('betHistoriesByGroup', betHistoriesByGroup)
   return (
     <>
-      {Object.entries(betHistoriesByGroup).map(([type, bets]) => (
-        <BetHistoryCard key={type} data={bets as any} type={type} />
+      {betHistoriesByGroup.map((ele) => (
+        <BetHistoryCard key={ele.type} data={ele.data as any} type={ele.type} />
       ))}
     </>
   )
