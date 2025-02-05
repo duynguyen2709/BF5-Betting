@@ -1,0 +1,13 @@
+.row-chart-win-rate-by-team {
+  padding: 0 1rem;
+}
+
+.label-team-select {
+  display: flex;
+  align-items: center;
+}
+
+.label-team-select p {
+  margin: 0;
+  font-weight: 500;
+}

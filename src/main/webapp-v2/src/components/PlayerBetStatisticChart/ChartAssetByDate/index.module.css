@@ -1,0 +1,17 @@
+.row-cashout-legend {
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.red-circle-cashout-legend {
+  background-color: #fff;
+  border: 2px solid red;
+  border-radius: 50%;
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.text-cashout {
+  margin-left: 0.25rem;
+  font-weight: 500;
+}

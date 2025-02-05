@@ -4,7 +4,7 @@
 
 .unlockForm :global(.ant-form-item-explain-error) {
   margin: 12px 0;
-} 
+}
 
 .unlockForm {
   .formError {
@@ -12,7 +12,6 @@
     color: #ef4444;
   }
 }
-  
 
 .container {
   display: flex;

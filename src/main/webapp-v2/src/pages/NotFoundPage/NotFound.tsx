@@ -1,5 +1,6 @@
 import { Button, Result } from 'antd'
 import { useNavigate } from 'react-router-dom'
+
 import { ROUTES } from '@/constants'
 
 function NotFound() {

@@ -31,28 +31,6 @@ export const API_ENDPOINTS = {
   }
 } as const
 
-export const THEME = {
-  LIGHT: 'light',
-  DARK: 'dark'
-} as const
-
-export const RAW_BET_STATUS = {
-  NEW: 'NEW',
-  INSERTED: 'INSERTED',
-  RESULT_READY: 'RESULT_READY_TO_BE_UPDATED',
-  SETTLED: 'SETTLED'
-} as const
-
-export const BET_STATUS = {
-  PENDING: 'PENDING',
-  COMPLETED: 'COMPLETED'
-} as const
-
-export const BET_RESULT = {
-  WIN: 'WIN',
-  LOSE: 'LOSE'
-} as const
-
 export const MESSAGES = {
   LOGIN_FAILED: 'Đăng nhập thất bại',
   LOGIN_SUCCESS: 'Đăng nhập thành công',
@@ -66,7 +44,8 @@ export const MESSAGES = {
   ADD_PAYMENT_SUCCESS: 'Thêm dữ liệu thanh toán thành công',
   DATE_RANGE_ERROR: 'Ngày bắt đầu phải trước hoặc bằng ngày kết thúc',
   UNAUTHORIZED: 'Bạn không có quyền truy cập. Vui lòng đăng nhập.',
-  NOT_FOUND: 'Không tìm thấy trang yêu cầu.'
+  NOT_FOUND: 'Không tìm thấy trang yêu cầu.',
+  START_DATE_MUST_BE_BEFORE_OR_EQUAL_ERROR: 'Ngày bắt đầu phải trước hoặc bằng ngày kết thúc'
 } as const
 
 export const QUERY_KEYS = {
@@ -79,15 +58,16 @@ export const QUERY_KEYS = {
 } as const
 
 export const API_URL = {
-  BetHistory: '/bets',
-  RawBet: '/bets/raw',
-  Statistics: '/statistics',
-  Players: '/players',
-  Unlock: '/unlock'
+  BET_HISTORY: '/bets',
+  RAW_BET: '/bets/raw',
+  STATISTICS: '/statistics',
+  PLAYERS: '/players',
+  UNLOCK: '/unlock'
 } as const
 
 export const STORAGE_KEYS = {
   UNLOCK_DATA: 'unlock_data',
+  IS_ADMIN: 'is_admin'
 } as const
 
 export const ROUTES = {
@@ -96,5 +76,34 @@ export const ROUTES = {
   },
   Admin: {
     path: '/admin'
+  }
+} as const
+
+export const ADMIN_USER_ID = '100002362515754'
+
+export const BET_RESULT = {
+  Win: {
+    result: 'WIN',
+    text: 'Thắng'
+  },
+  HalfWin: {
+    result: 'HALF_WIN',
+    text: 'Thắng Nửa Tiền'
+  },
+  Lost: {
+    result: 'LOST',
+    text: 'Thua'
+  },
+  HalfLost: {
+    result: 'HALF_LOST',
+    text: 'Thua Nửa Tiền'
+  },
+  Draw: {
+    result: 'DRAW',
+    text: 'Hoà'
+  },
+  Unfinished: {
+    result: 'NOT_FINISHED',
+    text: 'Chưa Hoàn Tất'
   }
 } as const

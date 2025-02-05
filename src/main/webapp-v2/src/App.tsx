@@ -1,14 +1,15 @@
-import ErrorBoundary from '@/components/ErrorBoundary';
-import MainPageWrapper from '@/pages/MainPageWrapper';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ConfigProvider, Spin } from 'antd';
-import "antd/dist/reset.css";
-import viVN from 'antd/locale/vi_VN';
-import { lazy, Suspense } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import MainLayout from './layout/MainLayout';
-import colorPalette from "./utils/colorPalette";
-import { usePlayerQuery } from './hooks/usePlayerQuery';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { ConfigProvider, Spin } from 'antd'
+import 'antd/dist/reset.css'
+import viVN from 'antd/locale/vi_VN'
+import React, { lazy, Suspense } from 'react'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+
+import ErrorBoundary from '@/components/ErrorBoundary'
+import { usePlayerQuery } from '@/hooks/usePlayerQuery'
+import MainLayout from '@/layout/MainLayout'
+import MainPageWrapper from '@/pages/MainPageWrapper'
+import colorPalette from '@/utils/colorPalette'
 
 const NotFound = lazy(() => import('@/pages/NotFoundPage/NotFound'))
 
@@ -18,13 +19,17 @@ const withSuspense = (Component: React.ComponentType) => (
   </Suspense>
 )
 
-const DEFAULT_STALE_TIME = 3 * 60 * 1000;
-const DEFAULT_GC_TIME = 5 * 60 * 1000;
+const DEFAULT_STALE_TIME = 3 * 60 * 1000
+const DEFAULT_GC_TIME = 5 * 60 * 1000
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: 1,
+      retry: 2,
+      retryDelay: (attempt: number) => {
+        const delay = [2000, 4000][attempt - 1] || 2000
+        return delay
+      },
       refetchOnWindowFocus: false,
       staleTime: DEFAULT_STALE_TIME,
       gcTime: DEFAULT_GC_TIME
@@ -43,12 +48,12 @@ const router = createBrowserRouter([
   }
 ])
 
-const AppInitializer = () => {
+function AppInitializer() {
   usePlayerQuery()
   return null
 }
 
-function App(): JSX.Element {  
+function App(): React.JSX.Element {
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -57,21 +62,20 @@ function App(): JSX.Element {
           theme={{
             token: {
               colorPrimary: colorPalette.primary.main,
-          colorPrimaryHover: colorPalette.primary.light,
-          colorPrimaryActive: colorPalette.primary.dark,
-          borderRadius: 8,
-          colorBgContainer: colorPalette.background.default,
-          colorSuccess: colorPalette.semantic.success.main,
-          colorWarning: colorPalette.semantic.warning.main,
-          colorError: colorPalette.semantic.error.main,
-          colorInfo: colorPalette.semantic.info.main,
-        
+              colorPrimaryHover: colorPalette.primary.light,
+              colorPrimaryActive: colorPalette.primary.dark,
+              borderRadius: 8,
+              colorBgContainer: colorPalette.background.default,
+              colorSuccess: colorPalette.semantic.success.main,
+              colorWarning: colorPalette.semantic.warning.main,
+              colorError: colorPalette.semantic.error.main,
+              colorInfo: colorPalette.semantic.info.main
             }
           }}
         >
           <AppInitializer />
           <MainLayout>
-          <RouterProvider router={router} />
+            <RouterProvider router={router} />
           </MainLayout>
         </ConfigProvider>
       </QueryClientProvider>

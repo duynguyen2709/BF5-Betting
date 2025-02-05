@@ -1,0 +1,21 @@
+.cardBetHistoryAccumulator {
+  margin: 0 0.5rem;
+  border-color: #d7d7d7;
+}
+
+.cardBetHistoryAccumulator :global(.ant-card-head) {
+  padding: 0.5rem 1rem 0.5rem;
+  font-size: 14px;
+}
+
+.cardBetHistoryAccumulator :global(.ant-card-head-title) {
+  padding: 0;
+}
+
+.cardBetHistoryAccumulator :global(.ant-card-body) :global(.ant-tag) {
+  margin: 0;
+}
+
+.betHistoryDetailText {
+  margin-bottom: 0.25rem;
+}

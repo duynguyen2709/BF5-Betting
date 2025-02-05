@@ -1,4 +1,4 @@
-import { BetResult, BetType, PaymentAction } from './enums'
+import type { BetResult, BetType, PaymentAction } from '@/constants'
 
 export interface TeamData {
   teamId: string
@@ -16,10 +16,12 @@ export interface BetMatchDetail {
   secondTeam: string
   tournamentName: string
   event: string
-  firstHalfOnly: boolean
-  score: string
+  firstHalfOnly?: boolean
+  score?: string
   ratio: number
   result: BetResult
+  firstTeamLogoUrl?: string
+  secondTeamLogoUrl?: string
 }
 
 export interface BetHistory {
@@ -32,8 +34,9 @@ export interface BetHistory {
   ratio: number
   potentialProfit: number
   result: BetResult
-  actualProfit: number
-  matchDetail: BetMatchDetail
+  actualProfit?: number
+  events: BetMatchDetail[]
+  rawStatus?: string
 }
 
 export interface BetStatistics {
@@ -41,17 +44,18 @@ export interface BetStatistics {
   totalStake: number
   totalProfit: number
   winRate: number
-  assetByDateList: Array<{
+  assetByDateList: {
     date: string
     asset: number
-  }>
+  }[]
+  date: string
+  asset: number
 }
 
-export interface BetFilter {
-  playerId?: string
+export interface BetHistoryFilterRequest {
+  playerId: string
   startDate?: string
   endDate?: string
-  status?: 'PENDING' | 'COMPLETED'
 }
 
 export interface BetHistoryUpdateRequest {

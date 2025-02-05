@@ -1,0 +1,51 @@
+.card-bet-wrapper :global(.ant-card-body) {
+  padding: 0 0.5rem 0.5rem;
+}
+
+.card-bet-wrapper :global(.ant-tabs-nav-wrap) {
+  padding-left: 0.5rem;
+}
+
+.card-bet-empty {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.list-player-asset-wrapper {
+  margin: 0 1rem;
+}
+
+.list-player-asset-wrapper :global(.ant-collapse-header) {
+  padding-bottom: 1rem;
+  padding-top: 1rem;
+}
+
+.list-player-asset-wrapper :global(.ant-collapse-content) {
+  background: #e9f5ff;
+}
+
+.list-player-asset-wrapper :global(.ant-collapse-content-box) {
+  padding: 0 !important;
+}
+
+.list-player-asset-wrapper :global(.card-bet-history-wrapper) {
+  padding: 0;
+}
+
+.list-player-asset-wrapper :global(.card-bet-history),
+.list-player-asset-wrapper :global(.bet-history-tournament-name),
+.list-player-asset-wrapper :global(.bet-history-match-time),
+.list-player-asset-wrapper :global(.bet-history-detail-text),
+.list-player-asset-wrapper :global(.team-name),
+.list-player-asset-wrapper :global(.ant-tag) {
+  font-size: 11px !important;
+}
+
+.list-player-asset-wrapper :global(.bet-history-tournament-name),
+.list-player-asset-wrapper :global(.bet-history-match-time) {
+  letter-spacing: -0.03rem;
+}
+
+.list-player-asset-wrapper :global(.team-logo) {
+  width: 1.6rem;
+}

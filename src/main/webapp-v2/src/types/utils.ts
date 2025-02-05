@@ -1,3 +1,5 @@
+import type React from 'react'
+
 // Generic Types
 export type Nullable<T> = T | null
 export type Optional<T> = T | undefined
@@ -13,7 +15,7 @@ export type SyncFunction<T = void> = () => T
 export type SyncFunctionWithParams<P, T = void> = (params: P) => T
 
 // React Types
-export type ReactChildren = {
+export interface ReactChildren {
   children: React.ReactNode
 }
 
@@ -31,13 +33,13 @@ export type FormTouched<T> = {
 }
 
 // API Types
-export type ApiError = {
+export interface ApiError {
   code: string
   message: string
   details?: Record<string, unknown>
 }
 
-export type ApiResponse<T> = {
+export interface ApiResponse<T> {
   data: T
   error?: ApiError
 }
@@ -63,7 +65,7 @@ export type LoadingState = 'idle' | 'loading' | 'success' | 'error'
 
 // Theme Types
 export type Theme = 'light' | 'dark'
-export type ColorScheme = {
+export interface ColorScheme {
   primary: string
   secondary: string
   success: string

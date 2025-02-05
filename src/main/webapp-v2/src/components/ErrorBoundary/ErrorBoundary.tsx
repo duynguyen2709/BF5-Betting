@@ -1,5 +1,6 @@
-import React from 'react'
 import { Result, Button } from 'antd'
+import React from 'react'
+
 import styles from './ErrorBoundary.module.css'
 
 interface Props {

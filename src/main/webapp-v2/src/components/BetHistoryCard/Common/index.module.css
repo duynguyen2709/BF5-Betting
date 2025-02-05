@@ -1,0 +1,34 @@
+.betHistoryDetailText {
+  margin: 0;
+}
+
+.betHistoryTournamentName {
+  margin: 0;
+  font-weight: 500;
+}
+
+.betHistoryMatchTime {
+  margin: 0;
+  font-weight: 500;
+}
+
+.teamData {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.teamLogo {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.teamName {
+  margin: 0;
+}
+
+.teamDataDivider {
+  margin: 0;
+  text-align: center;
+}

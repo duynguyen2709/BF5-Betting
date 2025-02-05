@@ -1,7 +1,9 @@
-import { STORAGE_KEYS } from '@/constants'
 import { useState } from 'react'
-import HistoryPage from './HistoryPage/HistoryPage'
-import UnlockPage from './UnlockPage/UnlockPage'
+
+import HistoryPage from './HistoryPage'
+import UnlockPage from './UnlockPage'
+
+import { STORAGE_KEYS } from '@/constants'
 
 function MainPageWrapper() {
   const [unlockedUserId, setUnlockedUserId] = useState<string | null>(localStorage.getItem(STORAGE_KEYS.UNLOCK_DATA))

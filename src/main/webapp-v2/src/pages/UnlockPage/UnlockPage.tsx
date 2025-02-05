@@ -1,8 +1,10 @@
-import { useUnlock } from '@/api/auth'
-import { MESSAGES } from '@/constants'
 import { Button, Form, Input, message } from 'antd'
-import styles from './UnlockPage.module.css'
 import { useEffect, useState } from 'react'
+
+import styles from './UnlockPage.module.css'
+
+import { MESSAGES } from '@/constants'
+import { useUnlock } from '@/hooks'
 
 interface UnlockPageProps {
   onUnlock: (userId: string) => void
@@ -12,7 +14,7 @@ interface UnlockFormValues {
   key: string
 }
 
-function UnlockPage({ onUnlock }: UnlockPageProps) {
+export default function UnlockPage({ onUnlock }: UnlockPageProps) {
   const [form] = Form.useForm<UnlockFormValues>()
   const [errorMessage, setErrorMessage] = useState('')
   const { mutateAsync: unlock, isPending, error } = useUnlock()
@@ -30,24 +32,23 @@ function UnlockPage({ onUnlock }: UnlockPageProps) {
     form.setFieldsValue({ key: text })
   }
 
-
   const handleSubmitForm = async (values: UnlockFormValues) => {
-    await form.validateFields();
+    await form.validateFields()
     const userId = await unlock(values)
-      if (!userId || typeof userId === 'object') {
-        message.error(MESSAGES.LOGIN_FAILED)
-        return
-      }
-      message.success(MESSAGES.LOGIN_SUCCESS)
-      onUnlock(userId)
+    if (!userId || typeof userId === 'object') {
+      message.error(MESSAGES.LOGIN_FAILED)
+      return
+    }
+    message.success(MESSAGES.LOGIN_SUCCESS)
+    onUnlock(userId)
   }
 
   return (
     <div className={styles['unlockFormContainer']}>
-      <Form<UnlockFormValues> 
-        layout='vertical' 
-        form={form} 
-        size='large' 
+      <Form<UnlockFormValues>
+        layout='vertical'
+        form={form}
+        size='large'
         onFinish={handleSubmitForm}
         className={styles['unlockForm']}
       >
@@ -64,19 +65,10 @@ function UnlockPage({ onUnlock }: UnlockPageProps) {
           <Input.Password onChange={(e) => handleChangePassword(e.target.value)} />
         </Form.Item>
 
-        {errorMessage && (
-          <div className={styles['formError']}>
-            {errorMessage}
-          </div>
-        )}
+        {errorMessage && <div className={styles['formError']}>{errorMessage}</div>}
 
         <Form.Item>
-          <Button 
-            type='primary' 
-            htmlType='submit' 
-            loading={isPending} 
-            block
-          >
+          <Button type='primary' htmlType='submit' loading={isPending} block>
             Đăng nhập
           </Button>
         </Form.Item>
@@ -84,5 +76,3 @@ function UnlockPage({ onUnlock }: UnlockPageProps) {
     </div>
   )
 }
-
-export default UnlockPage

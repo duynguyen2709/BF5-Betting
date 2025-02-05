@@ -1,4 +1,4 @@
-import { TeamData } from './bet'
+import type { TeamData } from './bet'
 
 export interface BaseResponse<T = any> {
   status: string
@@ -19,8 +19,7 @@ export interface RawBetEvent {
   firstTeam: TeamData
   secondTeam: TeamData
   event: string
-  score?: string
-  status: number
+  // Add any other fields from the original file
 }
 
 export interface RawBetEntity {
@@ -43,4 +42,5 @@ export interface GetRawBetResponse {
   data: {
     bets: RawBetEntity[]
   }
+  bets: RawBetEntity[]
 }

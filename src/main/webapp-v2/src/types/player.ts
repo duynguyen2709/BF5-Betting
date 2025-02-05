@@ -1,4 +1,4 @@
-import { PaymentAction } from './enums'
+import type { PaymentAction } from '@/constants'
 
 export interface Player {
   playerId: string
@@ -43,8 +43,10 @@ export interface PlayerStatistics {
   totalStake: number
   totalProfit: number
   winRate: number
-  assetByDateList: Array<{
+  assetByDateList: {
     date: string
     asset: number
-  }>
+  }[]
+  date: string
+  asset: number
 }
