@@ -74,7 +74,7 @@ export const QUERY_KEYS = {
   RECENT_BETS: 'recent-bets',
   PLAYERS: 'players',
   PLAYER_STATISTICS: 'player-statistics',
-  BET_HISTORY: 'betHistory',
+  BET_HISTORY: 'bet-histories',
   STATISTICS: 'statistics'
 } as const
 

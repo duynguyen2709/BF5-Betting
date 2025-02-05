@@ -4,7 +4,7 @@
 4. Utilize query keys for effective caching  
 5. Use prefetching for improved performance  
 6. Implement proper error and loading states  
-7. Use TypeScript for type safety with React Query  
+7. Use TypeScript for type safety with @tanstack/react-query
 8. Use stale-while-revalidate strategy for data freshness  
 9. Implement optimistic updates for mutations  
 10. Use query invalidation for data refetching  
@@ -31,11 +31,14 @@
 31. Follow React and TypeScript best practices and naming conventions  
 32. Use antd for UI components  
 33. Use React Router for routing  
-34. Use React Query for data fetching and caching
-35. Use Zustand for state management
-36. Use raw nested css instead of scss or less
-37. Use bracket notation for css module classes instead of dot notation
-38. Use react-query version 5 from @tanstack/react-query
-39. Use React version 18 and matching dependencies
-40. Inline export default for function components declaring
-41. Do not config staleTime and gcTime for queries as we did it at the init stage
+34. Use React Query for data fetching and caching and centralize state management
+35. Use raw nested css instead of scss or less (as css modules)
+36. Use bracket notation for css module classes instead of dot notation
+37. Use react-query version 5 from @tanstack/react-query
+38. Use React version 18 and matching dependencies
+39. Inline export default for function components declaring
+40. Do not config staleTime and gcTime for queries as we did it at the init stage
+41. Number or string variables should be extract as common constants
+42. Use React.FC for functional components and define prop types explicitly.
+43. Add appropriate TypeScript types for all components, props, states, and functions.
+44. Ensure there are no "any" types unless necessary
