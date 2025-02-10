@@ -1,4 +1,4 @@
-import type { BetHistory, BetMatchDetail } from '@/types'
+import type { BetHistory, BetMatchDetail, GroupedBetHistory, MatchKey } from '@/types'
 
 import { BetGroupTypeKey, BetResult, BetType } from '@/constants/enums'
 
@@ -43,11 +43,11 @@ export function filterBetResult(betHistoryList: BetHistory[], resultToFilter: { 
 }
 
 export function isSingleBet(bet: BetHistoriesPossibleTypes): boolean {
-  return bet.betType === BetType.SINGLE
+  return !!bet && 'betType' in bet && bet.betType === BetType.SINGLE
 }
 
-export function isAccumulatorBet(bet: BetHistory): boolean {
-  return bet.betType !== BetType.SINGLE
+export function isAccumulatorBet(bet: BetHistoriesPossibleTypes): boolean {
+  return !!bet && 'betType' in bet && bet.betType !== BetType.SINGLE
 }
 
 export function isAllUnfinishedBets(betHistory: BetHistory[]): boolean {
@@ -111,11 +111,6 @@ export function groupBetHistoriesByDate(betHistories: BetHistoriesPossibleTypes)
   )
 }
 
-type MatchKey = `${string}_${string}_${string}_${string}_${string}`
-interface GroupedBetHistory {
-  type: BetGroupTypeKey
-  data: BetHistory | BetHistory[]
-}
 export function groupBetHistoriesByType(betHistories: BetHistoriesPossibleTypes): GroupedBetHistory[] | null {
   if (!betHistories || !(betHistories instanceof Array) || betHistories.length === 0) {
     return null
@@ -136,7 +131,7 @@ export function groupBetHistoriesByType(betHistories: BetHistoriesPossibleTypes)
     }
 
     const { matchTime, firstTeam, secondTeam, tournamentName } = bet.events[0]!
-    const matchKey = `${bet.playerId}_${matchTime}_${firstTeam}_${secondTeam}_${tournamentName}`
+    const matchKey = `${bet.playerId}_${matchTime}_${firstTeam}_${secondTeam}_${tournamentName}` as MatchKey
     const existingBets = tempMap.get(matchKey) ?? []
     tempMap.set(matchKey, [...existingBets, bet])
   }
@@ -158,13 +153,13 @@ export function groupBetHistoriesByType(betHistories: BetHistoriesPossibleTypes)
 }
 
 export function getDistinctTeamName(betHistoryList: BetHistory[]): string[] {
-  const teamNames = new Set<string>()
-
-  betHistoryList.forEach((bet) => {
-    const event = bet.events[0]!
-    teamNames.add(event.firstTeam)
-    teamNames.add(event.secondTeam)
-  })
-
-  return Array.from(teamNames)
+  return Array.from(
+    new Set(
+      betHistoryList
+        .map(bet => bet.events[0])
+        .filter((event): event is BetMatchDetail => !!event)
+        .flatMap(({ firstTeam, secondTeam }) => [firstTeam, secondTeam])
+        .filter((team): team is string => !!team)
+    )
+  )
 }

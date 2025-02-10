@@ -1,6 +1,5 @@
 export { ChartTitle } from './ChartTitle'
-export { ChartAssetByDate } from './ChartAssetByDate'
 export { ChartTopWinRateByTeam } from './ChartTopWinRateByTeam'
 export { ChartTopWinRateByTournament } from './ChartTopWinRateByTournament'
-export { ChartWinRateByDate } from './ChartWinRateByDate'
 export { ChartWinRateByTeam } from './ChartWinRateByTeam'
+export { ChartCombinedStats } from './ChartCombinedStats'

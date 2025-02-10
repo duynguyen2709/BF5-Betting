@@ -1,57 +1,54 @@
-import { Card, Empty, Tabs } from 'antd'
-import React from 'react'
+import { Card, Empty, Tabs } from 'antd';
+import React, { useState } from 'react';
 
-import styles from './index.module.css'
+import styles from './index.module.css';
 
-import type { BetHistory } from '@/types'
-import type { HistoryFilterParams } from '@/types/history'
+import type { BetHistory, BetHistoryFilterRequest, GroupedBetHistory, TabKeys } from '@/types';
 
-import { BetHistoryStatistic } from '@/components/BetHistoryStatistic'
-import { HistoryCardMetadata } from '@/components/HistoryCardMetadata'
-import { MESSAGES } from '@/constants/common'
-import { usePlayerQuery } from '@/hooks'
-import { groupBetHistoriesByType } from '@/utils/betHistory'
-import BetHistoryCard from '../BetHistoryCard'
+import { BetHistoryStatistic } from '@/components/BetHistoryStatistic';
+import { HistoryCardMetadata } from '@/components/HistoryCardMetadata';
+import { MESSAGES } from '@/constants/common';
+import { usePlayerQuery } from '@/hooks';
+import { groupBetHistoriesByType } from '@/utils/betHistory';
+import BetHistoryCard from '../BetHistoryCard';
+import { BetGroupTypeKey } from '@/constants';
 
-interface TabKey {
-  label: string
-  key: string
-}
-
-const TAB_KEYS: Record<string, TabKey> = {
+const TAB_KEYS: TabKeys = {
   History: {
     label: 'Danh Sách Cược',
-    key: 'history'
+    key: 'history',
   },
   Statistic: {
     label: 'Tổng Hợp',
-    key: 'summary'
-  }
-}
+    key: 'summary',
+  },
+};
 
 interface HistoryCardWrapperProps {
-  data: BetHistory[]
-  historyFilterParams: HistoryFilterParams
-  historyActiveTab: string
-  onChangeHistoryActiveTab: (key: string) => void
-  cardRef: React.RefObject<HTMLDivElement>
+  data: BetHistory[];
+  historyFilterParams: BetHistoryFilterRequest;
 }
 
 export const HistoryCardWrapper: React.FC<HistoryCardWrapperProps> = ({
   data,
   historyFilterParams,
-  historyActiveTab,
-  onChangeHistoryActiveTab,
-  cardRef
 }) => {
-  const { players } = usePlayerQuery()
+  const [historyActiveTab, setHistoryActiveTab] = useState(TAB_KEYS.History.key);
+  const { players } = usePlayerQuery();
+  if (!data) {
+    return null;
+  }
 
-  const isHistoryListNotEmpty = data && data.length > 0
-  const isHistoryFetchedButEmpty = data !== undefined && data.length === 0
-  const betHistoriesByGroup = groupBetHistoriesByType(data) || {}
+  const isHistoryListNotEmpty = !!data?.length;
+  const isHistoryFetchedButEmpty = data !== undefined && data.length === 0;
+  const betHistoriesByGroup = groupBetHistoriesByType(data) || [];
+
+  const handleChangeTab = (key: string) => {
+    setHistoryActiveTab(key);
+  };
 
   return (
-    <Card ref={cardRef} className={styles['card-bet-wrapper']}>
+    <Card className={styles['card-bet-wrapper']}>
       <HistoryCardMetadata
         players={players}
         data={historyFilterParams}
@@ -63,23 +60,28 @@ export const HistoryCardWrapper: React.FC<HistoryCardWrapperProps> = ({
       {isHistoryListNotEmpty && (
         <Tabs
           activeKey={historyActiveTab}
-          onChange={onChangeHistoryActiveTab}
+          onChange={handleChangeTab}
           items={[
             {
               key: TAB_KEYS['History']!.key,
-              label: TAB_KEYS['History']!.label,
-              children: Object.entries(betHistoriesByGroup).map(([type, bets]) => (
-                <BetHistoryCard key={type} data={bets as any} type={type} isHistoryViewMode />
-              ))
+              label: <h4>{TAB_KEYS['History']!.label}</h4>,
+              children: betHistoriesByGroup.map((ele: GroupedBetHistory, index: number) => (
+                <BetHistoryCard
+                  key={`${ele.type}-${index}`}
+                  data={ele.data}
+                  type={ele.type as BetGroupTypeKey}
+                  isHistoryViewMode
+                />
+              )),
             },
             {
               key: TAB_KEYS['Statistic']!.key,
-              label: TAB_KEYS['Statistic']!.label,
-              children: <BetHistoryStatistic data={data} />
-            }
+              label: <h4>{TAB_KEYS['Statistic']!.label}</h4>,
+              children: <BetHistoryStatistic data={data} />,
+            },
           ]}
         />
       )}
     </Card>
-  )
-}
+  );
+};

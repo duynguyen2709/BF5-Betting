@@ -3,7 +3,7 @@
     padding: 0;
     font-size: 12px;
   }
-
+  
   .ant-card-meta-description {
     font-size: 14px;
   }
@@ -41,5 +41,10 @@
       font-size: 14px;
       margin-top: 0.25rem;
     }
+  }
+
+  .tab-bar :global(.ant-tabs-tab-active) {
+    border: 1px solid #4cd693 !important;
+    background: #96ebca4d !important;
   }
 }

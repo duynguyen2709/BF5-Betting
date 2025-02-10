@@ -35,18 +35,3 @@ export interface AddPlayerAssetHistoryRequest {
   action: PaymentAction
   paymentTime?: string
 }
-
-export interface PlayerStatistics {
-  playerId: string
-  playerName: string
-  totalBets: number
-  totalStake: number
-  totalProfit: number
-  winRate: number
-  assetByDateList: {
-    date: string
-    asset: number
-  }[]
-  date: string
-  asset: number
-}

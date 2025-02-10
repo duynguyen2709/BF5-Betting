@@ -1,5 +1,6 @@
 .row-chart-win-rate-by-team {
   padding: 0 1rem;
+  min-height: 360px;
 }
 
 .label-team-select {

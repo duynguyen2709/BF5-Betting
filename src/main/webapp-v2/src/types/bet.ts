@@ -39,19 +39,6 @@ export interface BetHistory {
   rawStatus?: string
 }
 
-export interface BetStatistics {
-  totalBets: number
-  totalStake: number
-  totalProfit: number
-  winRate: number
-  assetByDateList: {
-    date: string
-    asset: number
-  }[]
-  date: string
-  asset: number
-}
-
 export interface BetHistoryFilterRequest {
   playerId: string
   startDate?: string
@@ -63,19 +50,4 @@ export interface BetHistoryUpdateRequest {
   score: string
   result: BetResult
   actualProfit?: number
-}
-
-export interface BetHistoryStatistic {
-  playerId: string
-  startDate: string
-  endDate: string
-  assetByDateList: AssetByDate[]
-  betHistoryList: BetHistory[]
-}
-
-export interface AssetByDate {
-  paymentTime: string
-  assetBefore: number
-  assetAfter: number
-  action: PaymentAction
 }

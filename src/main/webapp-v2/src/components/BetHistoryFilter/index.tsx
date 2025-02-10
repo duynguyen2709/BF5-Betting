@@ -1,83 +1,84 @@
-import { BarChartOutlined, DownloadOutlined, ProfileOutlined } from '@ant-design/icons'
-import { Button, Col, DatePicker, Form, message, Row, Select } from 'antd'
-import dayjs from 'dayjs'
-import React, { useCallback } from 'react'
+import { BarChartOutlined, ProfileOutlined } from '@ant-design/icons';
+import { Button, Col, DatePicker, Form, message, Row, Select } from 'antd';
+import dayjs from 'dayjs';
+import React from 'react';
 
-import styles from './index.module.css'
+import styles from './index.module.css';
 
-import type { HistoryFilterFormValues } from '@/types/history'
+import type { HistoryFilterFormValues } from '@/types/history';
 
-import { QueryHistoryAction } from '@/constants'
-import { MESSAGES, STORAGE_KEYS } from '@/constants/common'
-import { usePlayerQuery } from '@/hooks'
+import { QueryHistoryAction } from '@/constants';
+import { MESSAGES } from '@/constants/common';
+import { usePlayerQuery } from '@/hooks';
 
-const dateFormat = 'DD/MM/YYYY'
+const { Option } = Select;
 
-const { Option } = Select
+const dateFormat = 'DD/MM/YYYY';
 
 interface BetHistoryFilterProps {
-  onSubmitFilter: (values: HistoryFilterFormValues, mode: string) => void
-  onClickExport: () => void
+  onSubmitFilter: (values: HistoryFilterFormValues, action: QueryHistoryAction) => void;
+  initialValues?: HistoryFilterFormValues;
 }
 
-export const BetHistoryFilter: React.FC<BetHistoryFilterProps> = ({ onSubmitFilter, onClickExport }) => {
-  const disabledDate = (current: dayjs.Dayjs) => current && current >= dayjs().endOf('day')
+const disabledDate = (current: dayjs.Dayjs) => current && current >= dayjs().endOf('day');
 
-  const [form] = Form.useForm<HistoryFilterFormValues>()
-  const { players } = usePlayerQuery()
-  const playerList = Object.values(players)
-  const isAdmin = !!localStorage.getItem(STORAGE_KEYS.IS_ADMIN)
+export const BetHistoryFilter: React.FC<BetHistoryFilterProps> = ({
+  onSubmitFilter,
+  initialValues,
+}) => {
+  const [form] = Form.useForm<HistoryFilterFormValues>();
+  const { players } = usePlayerQuery();
+  const playerList = Object.values(players);
+  const playerId = Form.useWatch('playerId', form);
 
-  const handleSubmitViewHistory = useCallback(
-    (values: HistoryFilterFormValues, mode: QueryHistoryAction = QueryHistoryAction.VIEW) => {
-      const { startDate, endDate } = values
-      if (startDate.isAfter(endDate)) {
-        message.error(MESSAGES.START_DATE_MUST_BE_BEFORE_OR_EQUAL_ERROR, 4)
-        return
-      }
-      onSubmitFilter(values, mode)
-    },
-    [onSubmitFilter]
-  )
+  const handleSubmitViewHistory = (
+    values: HistoryFilterFormValues,
+    viewAction: QueryHistoryAction = QueryHistoryAction.VIEW
+  ) => {
+    const { startDate, endDate } = values;
+    if (startDate.isAfter(endDate)) {
+      message.error(MESSAGES.START_DATE_MUST_BE_BEFORE_OR_EQUAL_ERROR, 4);
+      return;
+    }
+    onSubmitFilter(values, viewAction);
+  };
 
-  const handleSubmitStatistic = useCallback(() => {
-    handleSubmitViewHistory(form.getFieldsValue(), QueryHistoryAction.STATISTIC)
-  }, [form, handleSubmitViewHistory])
-
-  const playerId = Form.useWatch('playerId', form)
+  const handleSubmitStatistic = () =>
+    handleSubmitViewHistory(form.getFieldsValue(), QueryHistoryAction.STATISTIC);
 
   return (
     <Form
       form={form}
-      layout='vertical'
+      layout="vertical"
       onFinish={handleSubmitViewHistory}
       className={styles['bet-history-filter-form']}
       initialValues={{
         startDate: dayjs().subtract(1, 'day'),
-        endDate: dayjs()
+        endDate: dayjs(),
+        ...initialValues,
       }}
     >
       <Col
         lg={{
-          span: 8
+          span: 8,
         }}
         md={{
-          span: 8
+          span: 8,
         }}
       >
         <Form.Item
-          name='playerId'
-          label='Chọn Tên:'
+          name="playerId"
+          label="Chọn Tên:"
           rules={[
             {
               required: true,
-              message: 'Vui lòng chọn tên'
-            }
+              message: 'Vui lòng chọn tên',
+            },
           ]}
         >
           <Select
             style={{
-              width: '100%'
+              width: '100%',
             }}
             allowClear={false}
             loading={playerList.length === 0}
@@ -89,28 +90,35 @@ export const BetHistoryFilter: React.FC<BetHistoryFilterProps> = ({ onSubmitFilt
             ))}
           </Select>
         </Form.Item>
-        <Form.Item name='startDate' label='Thời Gian:'>
+        <Form.Item>
+          <div style={{ marginBottom: '8px' }}>
+            <span>
+              <span style={{ color: '#ef4444', fontSize: '11px' }}>*</span> Thời Gian:
+            </span>
+          </div>
           <Row gutter={8}>
             <Col span={12}>
-              <DatePicker
-                format={dateFormat}
-                disabledDate={disabledDate}
-                allowClear={false}
-                placeholder='Ngày bắt đầu'
-                style={{
-                  width: '100%'
-                }}
-              />
-            </Col>
-            <Col span={12}>
-              <Form.Item name='endDate' noStyle>
+              <Form.Item name="startDate" noStyle>
                 <DatePicker
                   format={dateFormat}
                   disabledDate={disabledDate}
                   allowClear={false}
-                  placeholder='Ngày kết thúc'
+                  placeholder="Ngày bắt đầu"
                   style={{
-                    width: '100%'
+                    width: '100%',
+                  }}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="endDate" noStyle>
+                <DatePicker
+                  format={dateFormat}
+                  disabledDate={disabledDate}
+                  allowClear={false}
+                  placeholder="Ngày kết thúc"
+                  style={{
+                    width: '100%',
                   }}
                 />
               </Form.Item>
@@ -121,8 +129,8 @@ export const BetHistoryFilter: React.FC<BetHistoryFilterProps> = ({ onSubmitFilt
           <Row>
             <Col span={12}>
               <Button
-                type='primary'
-                htmlType='submit'
+                type="primary"
+                htmlType="submit"
                 className={styles['button-submit-filter']}
                 icon={<ProfileOutlined style={{ fontSize: '16px' }} />}
                 disabled={!playerId}
@@ -132,11 +140,11 @@ export const BetHistoryFilter: React.FC<BetHistoryFilterProps> = ({ onSubmitFilt
             </Col>
             <Col span={12}>
               <Button
-                color="cyan" 
+                color="cyan"
                 variant="solid"
                 className={styles['button-submit-statistic']}
                 style={{
-                  float: 'right'
+                  float: 'right',
                 }}
                 onClick={handleSubmitStatistic}
                 icon={<BarChartOutlined style={{ fontSize: '16px' }} />}
@@ -147,20 +155,7 @@ export const BetHistoryFilter: React.FC<BetHistoryFilterProps> = ({ onSubmitFilt
             </Col>
           </Row>
         </Form.Item>
-        {isAdmin && (
-          <Form.Item>
-            <Button
-              type='primary'
-              className={styles['button-export']}
-              onClick={onClickExport}
-              icon={<DownloadOutlined style={{ fontSize: '16px' }} />}
-              disabled={!playerId}
-            >
-              Xuất Ảnh
-            </Button>
-          </Form.Item>
-        )}
       </Col>
     </Form>
-  )
-}
+  );
+};

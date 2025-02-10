@@ -46,7 +46,7 @@ axiosClient.interceptors.response.use(
   }
 )
 
-export const apiGet = async <T>(url: string, params?: object): Promise<T> => axiosClient.get<T, T>(url, { params })
+export const apiGet = async <T>(url: string, params?: object): Promise<T> => axiosClient.get<T, T>(url, { ...params })
 
 export const apiPost = async <T, D = any>(url: string, data?: D): Promise<T> => axiosClient.post<T, T, D>(url, data)
 

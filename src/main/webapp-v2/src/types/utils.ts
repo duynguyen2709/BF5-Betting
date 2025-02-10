@@ -1,4 +1,6 @@
+import { BetGroupTypeKey } from '@/constants'
 import type React from 'react'
+import { BetHistory } from './bet'
 
 // Generic Types
 export type Nullable<T> = T | null
@@ -72,4 +74,10 @@ export interface ColorScheme {
   warning: string
   error: string
   info: string
+}
+
+export type MatchKey = `${string}_${string}_${string}_${string}_${string}`
+export interface GroupedBetHistory {
+  type: BetGroupTypeKey
+  data: BetHistory | BetHistory[]
 }

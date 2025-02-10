@@ -25,10 +25,11 @@ export const useRecentBetHistoryQuery = () =>
     queryFn: fetchRecentBetHistory
   })
 
-export const useBetHistoryQuery = (params: BetHistoryFilterRequest) =>
+export const useBetHistoryWithFilterQuery = (params: BetHistoryFilterRequest, enabled: boolean = true) =>
   useQuery({
     queryKey: [QUERY_KEYS.BET_HISTORY, params],
-    queryFn: () => fetchBetHistoryWithFilter(params)
+    queryFn: () => fetchBetHistoryWithFilter(params),
+    enabled: enabled && !!params.playerId
   })
 
 export const useInsertBetHistoryMutation = () => {

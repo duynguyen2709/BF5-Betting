@@ -28,6 +28,9 @@ export const API_ENDPOINTS = {
   PLAYER: {
     LIST: '/api/players',
     STATISTICS: (id: string) => `/api/players/${id}/statistics`
+  },
+  STATISTICS: {
+    DETAIL: `/api/statistics/detail`,
   }
 } as const
 
@@ -80,6 +83,7 @@ export const ROUTES = {
 } as const
 
 export const ADMIN_USER_ID = '100002362515754'
+
 
 export const BET_RESULT = {
   Win: {

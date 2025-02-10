@@ -1,11 +1,5 @@
 import type { Dayjs } from 'dayjs'
 
-export interface HistoryFilterParams {
-  playerId: string
-  startDate: string | null
-  endDate: string | null
-}
-
 export interface HistoryFilterFormValues {
   playerId: string
   startDate: Dayjs
