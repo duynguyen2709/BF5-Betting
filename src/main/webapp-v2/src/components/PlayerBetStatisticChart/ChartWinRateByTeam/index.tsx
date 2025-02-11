@@ -1,8 +1,7 @@
 import { Col, Row, Select } from 'antd';
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import Chart from 'react-apexcharts';
 
-import { ChartTitle } from '../ChartTitle';
 import styles from './index.module.css';
 
 import type { BetHistory } from '@/types';
@@ -40,12 +39,9 @@ function calculateWinRateOfSingleTeam(betHistoryList: BetHistory[], team: string
   return { winRate, totalWin, totalLost, totalDraw, totalUnfinished };
 }
 
-interface ChartWinRateByTeamProps {
+export const ChartWinRateByTeam: React.FC<{
   data: BetHistory[];
-  title: string;
-}
-
-export const ChartWinRateByTeam: React.FC<ChartWinRateByTeamProps> = ({ data, title }) => {
+}> = ({ data }) => {
   const [selectedTeam, setSelectedTeam] = useState('');
   const [winRate, setWinRate] = useState<WinRate>({
     winRate: 0,
@@ -193,33 +189,30 @@ export const ChartWinRateByTeam: React.FC<ChartWinRateByTeamProps> = ({ data, ti
   }, [selectedTeam, winRate]);
 
   return (
-    <>
-      <ChartTitle text={title} />
-      <div className={styles['row-chart-win-rate-by-team']}>
-        <Row
-          style={{ width: '100%', height: '40px', alignItems: 'center', marginBottom: '1.5rem' }}
-          justify="space-between"
-        >
-          <Col span={6} className={styles['label-team-select']}>
-            <p>Chọn Đội:</p>
-          </Col>
-          <Col span={18}>
-            <Select
-              showSearch
-              placeholder="Chọn đội"
-              value={selectedTeam}
-              onChange={onChangeTeam}
-              style={{ width: '100%' }}
-              options={teams.map((team) => ({ value: team, label: team }))}
-              onSelect={handleBlur}
-              onBlur={handleBlur}
-            />
-          </Col>
-        </Row>
-        {selectedTeam && (
-          <Chart options={chartData.options} series={chartData.series} type="bar" height={296} />
-        )}
-      </div>
-    </>
+    <div className={styles['row-chart-win-rate-by-team']}>
+      <Row
+        style={{ width: '100%', height: '40px', alignItems: 'center', marginBottom: '1.5rem' }}
+        justify="space-between"
+      >
+        <Col span={6} className={styles['label-team-select']}>
+          <p>Chọn Đội:</p>
+        </Col>
+        <Col span={18}>
+          <Select
+            showSearch
+            placeholder="Chọn đội"
+            value={selectedTeam}
+            onChange={onChangeTeam}
+            style={{ width: '100%' }}
+            options={teams.map((team) => ({ value: team, label: team }))}
+            onSelect={handleBlur}
+            onBlur={handleBlur}
+          />
+        </Col>
+      </Row>
+      {selectedTeam && (
+        <Chart options={chartData.options} series={chartData.series} type="bar" height={296} />
+      )}
+    </div>
   );
 };

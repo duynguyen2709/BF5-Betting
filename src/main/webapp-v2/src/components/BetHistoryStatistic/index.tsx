@@ -41,6 +41,11 @@ const StatisticDetailRow: React.FC<StatisticDetailRowProps> = ({ left, right }) 
   </Row>
 );
 
+const formatPercentage = (value: number, total: number): string => {
+  const percentage = (value * 100) / total;
+  return `${value} (${parseFloat(percentage.toFixed(1))}%)`;
+};
+
 function calculateProfit(data: BetHistory[]): React.ReactNode {
   const sum = data.map((bet) => bet.actualProfit ?? 0).reduce((prev, next) => prev + next, 0);
 
@@ -71,27 +76,15 @@ export const BetHistoryStatistic: React.FC<BetHistoryStatisticProps> = ({ data }
       <StatisticDetailRow left="Tổng Số Cược:" right={totalBets.toLocaleString()} />
       <StatisticDetailRow
         left="Thắng:"
-        right={
-          <span style={{ color: '#00b96b' }}>
-            {`${totalWin} (${((totalWin * 100) / totalBets).toFixed(1)}%)`}
-          </span>
-        }
+        right={<span style={{ color: '#00b96b' }}>{formatPercentage(totalWin, totalBets)}</span>}
       />
       <StatisticDetailRow
         left="Hoà:"
-        right={
-          <span style={{ color: '#8c8c8c' }}>
-            {`${totalDraw} (${((totalDraw * 100) / totalBets).toFixed(1)}%)`}
-          </span>
-        }
+        right={<span style={{ color: '#8c8c8c' }}>{formatPercentage(totalDraw, totalBets)}</span>}
       />
       <StatisticDetailRow
         left="Thua:"
-        right={
-          <span style={{ color: '#ff4d4f' }}>
-            {`${totalLost} (${((totalLost * 100) / totalBets).toFixed(1)}%)`}
-          </span>
-        }
+        right={<span style={{ color: '#ff4d4f' }}>{formatPercentage(totalLost, totalBets)}</span>}
       />
       <StatisticDetailRow left="Chưa Có KQ:" right={`${totalUnfinished}`} />
       <Divider />

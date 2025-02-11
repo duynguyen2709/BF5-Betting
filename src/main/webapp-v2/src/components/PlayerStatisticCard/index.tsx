@@ -4,6 +4,7 @@ import React from 'react';
 import { HistoryCardMetadata } from '../HistoryCardMetadata';
 import {
   ChartCombinedStats,
+  ChartTitle,
   ChartTopWinRateByTeam,
   ChartTopWinRateByTournament,
   ChartWinRateByTeam,
@@ -37,18 +38,21 @@ export const PlayerStatisticCard: React.FC<{
 
     return (
       <>
-        <Divider style={{ margin: '1rem 0' }} />
-        <div style={{ marginBottom: '2rem' }}>
+        <Divider className={styles['divider']} />
+        <div className={styles['statistic-group-container']}>
           <BetStatisticGroup title="Thống Kê Cược" data={betHistoryList} />
         </div>
-        <div style={{ marginBottom: '3rem' }}>
+        <div className={styles['chart-container']}>
           <ChartCombinedStats
             title="Thống Kê Tài Sản và Tỉ Lệ Thắng Theo Ngày"
             assetData={assetByDateList}
             betData={betHistoryList}
           />
         </div>
-        <div style={{ marginBottom: '2rem' }}>
+        <div className={styles['chart-container']}>
+          <div className={styles['chart-title-container']}>
+            <ChartTitle text={'Thống Kê Chi Tiết'} />
+          </div>
           <Tabs
             animated={false}
             defaultActiveKey="tournament"
@@ -57,31 +61,19 @@ export const PlayerStatisticCard: React.FC<{
               {
                 key: 'tournament',
                 label: 'Top 5 Giải',
-                children: (
-                  <ChartTopWinRateByTournament
-                    title="Thống Kê Kết Quả Theo Giải (Top 5)"
-                    data={betHistoryList}
-                  />
-                ),
+                children: <ChartTopWinRateByTournament data={betHistoryList} />,
               },
               {
                 key: 'topTeams',
                 label: 'Top 5 Đội',
                 forceRender: true,
-                children: (
-                  <ChartTopWinRateByTeam
-                    title="Thống Kê Kết Quả Theo Đội (Top 5)"
-                    data={betHistoryList}
-                  />
-                ),
+                children: <ChartTopWinRateByTeam data={betHistoryList} />,
               },
               {
                 key: 'allTeams',
                 label: 'Xem Theo Đội',
                 forceRender: true,
-                children: (
-                  <ChartWinRateByTeam title="Xem Thống Kê Theo Đội" data={betHistoryList} />
-                ),
+                children: <ChartWinRateByTeam data={betHistoryList} />,
               },
             ]}
             className={styles['tab-bar']}

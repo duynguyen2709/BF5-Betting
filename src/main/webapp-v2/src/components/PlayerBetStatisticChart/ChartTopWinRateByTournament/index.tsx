@@ -4,7 +4,6 @@ import { filterBetResult, groupBetHistoriesByTournament } from '@/utils/betHisto
 import { ApexOptions } from 'apexcharts';
 import React from 'react';
 import ReactApexChart from 'react-apexcharts';
-import { ChartTitle } from '../ChartTitle';
 
 interface TournamentWinRate {
   tournament: string;
@@ -12,11 +11,6 @@ interface TournamentWinRate {
   totalWin: number;
   totalLost: number;
   totalBet: number;
-}
-
-interface ChartTopWinRateByTournamentProps {
-  data: BetHistory[];
-  title: string;
 }
 
 function calculateTopWinRateByTournament(
@@ -45,10 +39,9 @@ function calculateTopWinRateByTournament(
   return data.sort((a, b) => b.totalBet - a.totalBet).slice(0, 5);
 }
 
-export const ChartTopWinRateByTournament: React.FC<ChartTopWinRateByTournamentProps> = ({
-  data,
-  title,
-}) => {
+export const ChartTopWinRateByTournament: React.FC<{
+  data: BetHistory[];
+}> = ({ data }) => {
   const topWinRateByTournament = React.useMemo(() => {
     const betGroupByTournament = groupBetHistoriesByTournament(data);
     return calculateTopWinRateByTournament(betGroupByTournament);
@@ -220,15 +213,12 @@ export const ChartTopWinRateByTournament: React.FC<ChartTopWinRateByTournamentPr
   };
 
   return (
-    <>
-      <ChartTitle text={title} />
-      <ReactApexChart
-        options={chartData.options}
-        series={chartData.series}
-        type="line"
-        height={360}
-      />
-    </>
+    <ReactApexChart
+      options={chartData.options}
+      series={chartData.series}
+      type="line"
+      height={360}
+    />
   );
 };
 

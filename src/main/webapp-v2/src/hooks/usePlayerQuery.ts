@@ -1,8 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-
 import { fetchPlayers } from '@/api/player'
 import { QUERY_KEYS } from '@/constants'
-import { Player } from '@/types'
 import { useMemo } from 'react'
 
 export const usePlayerQuery = () => {
@@ -24,7 +22,6 @@ export const usePlayerQuery = () => {
   }
 }
 
-// Helper function to get a specific player by ID
 export const usePlayer = (playerId: string) => {
   const { players, isLoading, error } = usePlayerQuery()
 
@@ -35,16 +32,12 @@ export const usePlayer = (playerId: string) => {
   }
 }
 
-
-function sortPlayerByProfitDesc(players: Record<string, Player>): Player[] {
-  const playerArray = Object.values(players)
-  playerArray.sort((a, b) => b.totalProfit - a.totalProfit)
-  return playerArray
-}
-
-
 export const usePlayersWithSortedProfit = () => {
   const { players } = usePlayerQuery()
-  return useMemo(() => sortPlayerByProfitDesc(players), [players])
+  return useMemo(() => {
+    const playerArray = Object.values(players)
+    playerArray.sort((a, b) => b.totalProfit - a.totalProfit)
+    return playerArray
+  }, [players])
 
 }

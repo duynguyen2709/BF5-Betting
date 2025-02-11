@@ -43,6 +43,26 @@
     }
   }
 
+  .divider {
+    margin: 1rem 0;
+  }
+
+  .statistic-group-container {
+    margin-bottom: 2rem;
+  }
+
+  .chart-container {
+    margin-bottom: 2rem;
+  }
+
+  .chart-title-container {
+    margin-bottom: 1rem;
+  }
+
+  .tab-bar-container {
+    padding: 0 1rem;
+  }
+
   .tab-bar :global(.ant-tabs-tab-active) {
     border: 1px solid #4cd693 !important;
     background: #96ebca4d !important;
