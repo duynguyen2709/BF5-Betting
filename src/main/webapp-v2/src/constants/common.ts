@@ -34,11 +34,11 @@ export const API_ENDPOINTS = {
   PLAYER: {
     LIST: '/api/players',
     DETAIL: (id: string) => `/api/players/${id}`,
-    STATISTICS: '/api/players/statistics',
+    STATISTICS: '/api/players/statistics'
   },
   STATISTICS: {
     DETAIL: '/api/statistics',
-    ASSET: '/api/statistics/asset',
+    ASSET: '/api/statistics/asset'
   }
 } as const
 
@@ -64,7 +64,7 @@ export const QUERY_KEYS = {
   PLAYERS: 'players',
   PLAYER_STATISTICS: 'player-statistics',
   BET_HISTORIES: 'bet-histories',
-  ASSET_HISTORIES: 'asset-histories',
+  ASSET_HISTORIES: 'asset-histories'
 } as const
 
 export const API_URL = {
@@ -78,7 +78,7 @@ export const API_URL = {
 export const STORAGE_KEYS = {
   UNLOCK_DATA: 'unlock_data',
   IS_ADMIN: 'is_admin',
-  RAW_BET_QUERY_TOKEN: 'raw_bet_query_token',
+  RAW_BET_QUERY_TOKEN: 'raw_bet_query_token'
 } as const
 
 export const ROUTES = {
@@ -120,8 +120,8 @@ export const BET_RESULT = {
 } as const
 
 export const RAW_BET_STATUS = {
-  New: "NEW",
-  Inserted: "INSERTED",
-  ResultReadyToBeUpdated: "RESULT_READY_TO_BE_UPDATED",
-  Settled: "SETTLED",
-};
+  New: 'NEW',
+  Inserted: 'INSERTED',
+  ResultReadyToBeUpdated: 'RESULT_READY_TO_BE_UPDATED',
+  Settled: 'SETTLED'
+}

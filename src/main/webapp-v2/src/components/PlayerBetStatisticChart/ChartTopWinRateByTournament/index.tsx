@@ -1,118 +1,121 @@
-import { BET_RESULT } from '@/constants';
-import type { BetHistory } from '@/types';
-import { filterBetResult, groupBetHistoriesByTournament } from '@/utils/betHistory';
-import { ApexOptions } from 'apexcharts';
-import React from 'react';
-import ReactApexChart from 'react-apexcharts';
+import React from 'react'
+import ReactApexChart from 'react-apexcharts'
+
+import type { BetHistory } from '@/types'
+import type { ApexOptions } from 'apexcharts'
+
+import { BET_RESULT } from '@/constants'
+import { filterBetResult, groupBetHistoriesByTournament } from '@/utils/betHistory'
 
 interface TournamentWinRate {
-  tournament: string;
-  winRate: number;
-  totalWin: number;
-  totalLost: number;
-  totalBet: number;
+  tournament: string
+  winRate: number
+  totalWin: number
+  totalLost: number
+  totalBet: number
 }
 
 function calculateTopWinRateByTournament(
   betGroupByTournament: Record<string, BetHistory[]> | null
 ): TournamentWinRate[] {
   if (!betGroupByTournament) {
-    return [];
+    return []
   }
 
-  const data: TournamentWinRate[] = [];
+  const data: TournamentWinRate[] = []
   Object.entries(betGroupByTournament).forEach(([tournament, group]) => {
-    const totalBet = group.length;
-    const totalWin = filterBetResult(group, [BET_RESULT.Win, BET_RESULT.HalfWin]).length;
-    const totalLost = filterBetResult(group, [BET_RESULT.Lost, BET_RESULT.HalfLost]).length;
-    const winRate = Math.round((totalWin / totalBet) * 100);
+    const totalBet = group.length
+    const totalWin = filterBetResult(group, [BET_RESULT.Win, BET_RESULT.HalfWin]).length
+    const totalLost = filterBetResult(group, [BET_RESULT.Lost, BET_RESULT.HalfLost]).length
+    const winRate = Math.round((totalWin / totalBet) * 100)
 
     data.push({
       tournament,
       winRate,
       totalWin,
       totalLost,
-      totalBet,
-    });
-  });
+      totalBet
+    })
+  })
 
-  return data.sort((a, b) => b.totalBet - a.totalBet).slice(0, 5);
+  return data.sort((a, b) => b.totalBet - a.totalBet).slice(0, 5)
 }
 
 export const ChartTopWinRateByTournament: React.FC<{
-  data: BetHistory[];
+  data: BetHistory[]
 }> = ({ data }) => {
   const topWinRateByTournament = React.useMemo(() => {
-    const betGroupByTournament = groupBetHistoriesByTournament(data);
-    return calculateTopWinRateByTournament(betGroupByTournament);
-  }, [data]);
+    const betGroupByTournament = groupBetHistoriesByTournament(data)
+    return calculateTopWinRateByTournament(betGroupByTournament)
+  }, [data])
 
   if (!topWinRateByTournament.length) {
-    return null;
+    return null
   }
 
-  const yMax =
-    Math.max(...topWinRateByTournament.map((item) => Math.max(item.totalWin, item.totalLost))) + 1;
+  const yMax = Math.max(...topWinRateByTournament.map((item) => Math.max(item.totalWin, item.totalLost))) + 1
 
   const chartData = {
     series: [
       {
         name: 'Thắng',
         type: 'column',
-        data: topWinRateByTournament.map((item) => item.totalWin),
+        data: topWinRateByTournament.map((item) => item.totalWin)
       },
       {
         name: 'Thua',
         type: 'column',
-        data: topWinRateByTournament.map((item) => item.totalLost),
+        data: topWinRateByTournament.map((item) => item.totalLost)
       },
       {
         name: 'Tỉ Lệ Thắng',
         type: 'line',
-        data: topWinRateByTournament.map((item) => item.winRate),
-      },
+        data: topWinRateByTournament.map((item) => item.winRate)
+      }
     ],
     options: {
       chart: {
         toolbar: {
-          show: false,
+          show: false
         },
         zoom: {
-          enabled: false,
+          enabled: false
         },
         animations: {
           enabled: true,
-          speed: 200,
+          speed: 200
         },
         parentHeightOffset: 0,
         background: '#ffffff',
         selection: {
-          enabled: false,
+          enabled: false
         },
         type: 'line',
-        stacked: false,
+        stacked: false
       },
       plotOptions: {
         bar: {
           columnWidth: '40%',
-          opacity: 0.8,
-        },
+          opacity: 0.8
+        }
       },
       stroke: {
         width: [0, 0, 3],
-        curve: 'smooth',
+        curve: 'smooth'
       },
       dataLabels: {
         enabled: true,
         enabledOnSeries: [2],
-        formatter: function (val: number, opts) {
-          if (opts.seriesIndex === 2) return `${val}%`;
-          return '';
+        formatter(val: number, opts) {
+          if (opts.seriesIndex === 2) {
+            return `${val}%`
+          }
+          return ''
         },
         style: {
-          fontSize: '12px',
+          fontSize: '12px'
         },
-        offsetY: -10,
+        offsetY: -10
       },
       xaxis: {
         categories: topWinRateByTournament.map((item) => item.tournament.split(' ')),
@@ -120,16 +123,16 @@ export const ChartTopWinRateByTournament: React.FC<{
           style: {
             fontSize: '11px',
             fontWeight: 500,
-            colors: ['#262626'],
+            colors: ['#262626']
           },
           rotate: 0,
           rotateAlways: false,
-          trim: false,
+          trim: false
         },
         axisBorder: {
           show: true,
-          color: '#237804',
-        },
+          color: '#237804'
+        }
       },
       yaxis: [
         {
@@ -140,16 +143,16 @@ export const ChartTopWinRateByTournament: React.FC<{
             formatter: (val: number) => Math.round(val).toString(),
             style: {
               fontSize: '12px',
-              fontWeight: 500,
-            },
-          },
+              fontWeight: 500
+            }
+          }
         },
         {
           seriesName: 'Thua',
           show: false,
           min: 0,
           max: yMax,
-          tickAmount: yMax,
+          tickAmount: yMax
         },
         {
           opposite: true,
@@ -160,18 +163,18 @@ export const ChartTopWinRateByTournament: React.FC<{
             formatter: (val: number) => `${val}%`,
             style: {
               fontSize: '12px',
-              fontWeight: 500,
+              fontWeight: 500
             },
-            offsetX: -25,
-          },
-        },
+            offsetX: -25
+          }
+        }
       ],
       markers: {
         size: 6,
-        strokeWidth: 2,
+        strokeWidth: 2
       },
       tooltip: {
-        enabled: false,
+        enabled: false
       },
       grid: {
         show: true,
@@ -180,14 +183,14 @@ export const ChartTopWinRateByTournament: React.FC<{
         position: 'back',
         xaxis: {
           lines: {
-            show: false,
-          },
+            show: false
+          }
         },
         padding: {
           right: -40,
           left: 10,
-          top: 25,
-        },
+          top: 25
+        }
       },
       colors: ['#00b96b', '#ff4d4f', '#1890ff'],
       legend: {
@@ -200,26 +203,19 @@ export const ChartTopWinRateByTournament: React.FC<{
         fontWeight: 500,
         itemMargin: {
           horizontal: 16,
-          vertical: 0,
+          vertical: 0
         },
         onItemClick: {
-          toggleDataSeries: false,
+          toggleDataSeries: false
         },
         markers: {
-          offsetX: -4,
-        },
-      },
-    } as ApexOptions,
-  };
+          offsetX: -4
+        }
+      }
+    } as ApexOptions
+  }
 
-  return (
-    <ReactApexChart
-      options={chartData.options}
-      series={chartData.series}
-      type="line"
-      height={360}
-    />
-  );
-};
+  return <ReactApexChart options={chartData.options} series={chartData.series} type='line' height={360} />
+}
 
-export default ChartTopWinRateByTournament;
+export default ChartTopWinRateByTournament

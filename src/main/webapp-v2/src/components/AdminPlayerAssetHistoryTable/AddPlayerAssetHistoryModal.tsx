@@ -1,77 +1,74 @@
-import { useAddPaymentHistoryMutation, usePlayerQuery } from '@/hooks';
-import { PaymentAction, PaymentMethod } from '@/constants/enums';
-import { Avatar, Col, InputNumber, Modal, Row, Select } from 'antd';
-import { useState } from 'react';
+import { Avatar, Col, InputNumber, Modal, Row, Select } from 'antd'
+import { useState } from 'react'
+
+import { PaymentAction, PaymentMethod } from '@/constants/enums'
+import { useAddPaymentHistoryMutation, usePlayerQuery } from '@/hooks'
 
 interface AddPlayerAssetHistoryModalProps {
-  isOpen: boolean;
-  onUpdateSuccess: () => void;
-  onClose: () => void;
+  isOpen: boolean
+  onUpdateSuccess: () => void
+  onClose: () => void
 }
 
-const inputNumberParser = (value: string | undefined): number =>
-  Number(value?.replace(/\$\s?|(,*)/g, '') || 0);
+const inputNumberParser = (value: string | undefined): number => Number(value?.replace(/\$\s?|(,*)/g, '') || 0)
 
-const inputNumberFormatter = (value: number | undefined): string =>
-  `${value} đ`.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const inputNumberFormatter = (value: number | undefined): string => `${value} đ`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 
-export function AddPlayerAssetHistoryModal({
-  isOpen,
-  onUpdateSuccess,
-  onClose,
-}: AddPlayerAssetHistoryModalProps) {
-  const { players } = usePlayerQuery();
-  const [selectedPlayer, setSelectedPlayer] = useState<string>();
-  const [playerAsset, setPlayerAsset] = useState<number>(0);
-  const [amount, setAmount] = useState<number>(0);
-  const [action, setAction] = useState<PaymentAction>(PaymentAction.DEPOSIT);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.MOMO);
+export function AddPlayerAssetHistoryModal({ isOpen, onUpdateSuccess, onClose }: AddPlayerAssetHistoryModalProps) {
+  const { players } = usePlayerQuery()
+  const [selectedPlayer, setSelectedPlayer] = useState<string>()
+  const [playerAsset, setPlayerAsset] = useState<number>(0)
+  const [amount, setAmount] = useState<number>(0)
+  const [action, setAction] = useState<PaymentAction>(PaymentAction.DEPOSIT)
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.MOMO)
 
-  const { mutate: addPaymentHistory, isPending } = useAddPaymentHistoryMutation();
+  const { mutate: addPaymentHistory, isPending } = useAddPaymentHistoryMutation()
 
   const handleConfirmAdd = () => {
-    if (!selectedPlayer) return;
+    if (!selectedPlayer) {
+      return
+    }
 
     addPaymentHistory(
       {
         playerId: selectedPlayer,
         action,
         paymentMethod,
-        amount,
+        amount
       },
       {
         onSuccess: () => {
-          onUpdateSuccess();
-          onClose();
-        },
+          onUpdateSuccess()
+          onClose()
+        }
       }
-    );
-  };
+    )
+  }
 
   const handleChangePlayer = (playerId: string) => {
-    setSelectedPlayer(playerId);
-    const player = players[playerId];
+    setSelectedPlayer(playerId)
+    const player = players[playerId]
     if (player) {
-      setPlayerAsset(player.totalProfit);
-      setAmount(Math.abs(player.totalProfit));
+      setPlayerAsset(player.totalProfit)
+      setAmount(Math.abs(player.totalProfit))
 
       if (player.totalProfit < 0) {
-        setAction(PaymentAction.DEPOSIT);
+        setAction(PaymentAction.DEPOSIT)
       } else {
-        setAction(PaymentAction.CASHOUT);
+        setAction(PaymentAction.CASHOUT)
       }
     }
-  };
+  }
 
   const rowStyle = {
     width: '100%',
     alignItems: 'center',
-    margin: '1rem 0',
-  };
+    margin: '1rem 0'
+  }
 
   return (
     <Modal
-      title="Thêm Dữ Liệu Thanh Toán Mới"
+      title='Thêm Dữ Liệu Thanh Toán Mới'
       destroyOnClose
       centered
       maskClosable={false}
@@ -79,21 +76,16 @@ export function AddPlayerAssetHistoryModal({
       open={isOpen}
       onOk={handleConfirmAdd}
       onCancel={onClose}
-      width="40vw"
+      width='40vw'
       okButtonProps={{
         disabled: !selectedPlayer || amount === 0,
-        loading: isPending,
+        loading: isPending
       }}
     >
       <Row style={rowStyle}>
         <Col span={7}>Người Cược:</Col>
         <Col span={16}>
-          <Select
-            allowClear={false}
-            value={selectedPlayer}
-            onChange={handleChangePlayer}
-            style={{ width: '100%' }}
-          >
+          <Select allowClear={false} value={selectedPlayer} onChange={handleChangePlayer} style={{ width: '100%' }}>
             {Object.values(players).map((player) => (
               <Select.Option key={player.playerId} value={player.playerId}>
                 <Row>
@@ -112,7 +104,7 @@ export function AddPlayerAssetHistoryModal({
             style={{
               width: '100%',
               backgroundColor: '#f7f7f7',
-              color: playerAsset > 0 ? 'green' : playerAsset < 0 ? 'red' : 'black',
+              color: playerAsset > 0 ? 'green' : playerAsset < 0 ? 'red' : 'black'
             }}
             disabled
             value={playerAsset}
@@ -130,8 +122,8 @@ export function AddPlayerAssetHistoryModal({
             onChange={(value: PaymentAction) => setAction(value)}
             style={{ width: '100%' }}
           >
-            <Select.Option value="DEPOSIT">Thanh Toán Nợ / Nạp Tiền</Select.Option>
-            <Select.Option value="CASHOUT">Rút Tiền Lời</Select.Option>
+            <Select.Option value='DEPOSIT'>Thanh Toán Nợ / Nạp Tiền</Select.Option>
+            <Select.Option value='CASHOUT'>Rút Tiền Lời</Select.Option>
           </Select>
         </Col>
       </Row>
@@ -144,8 +136,8 @@ export function AddPlayerAssetHistoryModal({
             onChange={(value: PaymentMethod) => setPaymentMethod(value)}
             style={{ width: '100%' }}
           >
-            <Select.Option value="MOMO">Momo</Select.Option>
-            <Select.Option value="BANK">Ngân Hàng</Select.Option>
+            <Select.Option value='MOMO'>Momo</Select.Option>
+            <Select.Option value='BANK'>Ngân Hàng</Select.Option>
           </Select>
         </Col>
       </Row>
@@ -162,5 +154,5 @@ export function AddPlayerAssetHistoryModal({
         </Col>
       </Row>
     </Modal>
-  );
+  )
 }

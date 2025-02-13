@@ -47,23 +47,25 @@ axiosClient.interceptors.response.use(
 )
 
 function cleanParams(params: object | undefined): object | undefined {
-  if (!params) return undefined;
-  
-  return Object.entries(params).reduce((acc, [key, value]) => {
-    const isEmpty = 
-      value === null || 
-      value === undefined || 
-      value === '' || 
-      (Array.isArray(value) && value.length === 0);
+  if (!params) {
+    return undefined
+  }
 
-    if (!isEmpty) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {} as Record<string, unknown>);
+  return Object.entries(params).reduce(
+    (acc, [key, value]) => {
+      const isEmpty =
+        value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)
+
+      if (!isEmpty) {
+        acc[key] = value
+      }
+      return acc
+    },
+    {} as Record<string, unknown>
+  )
 }
 
-export const apiGet = async <T>(url: string, params?: object): Promise<T> => 
+export const apiGet = async <T>(url: string, params?: object): Promise<T> =>
   axiosClient.get<T, T>(url, { ...cleanParams(params) })
 
 export const apiPost = async <T, D = any>(url: string, data?: D): Promise<T> => axiosClient.post<T, T, D>(url, data)

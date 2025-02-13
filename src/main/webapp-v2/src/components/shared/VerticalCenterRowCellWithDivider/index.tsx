@@ -1,31 +1,32 @@
-import type { ReactNode } from 'react';
-import { Divider, Row } from 'antd';
+import { Divider, Row } from 'antd'
 
-import styles from './styles.module.css';
+import styles from './styles.module.css'
+
+import type { ReactNode } from 'react'
 
 interface VerticalCenterRowCellWithDividerProps {
-  children: ReactNode;
-  arrayLength: number;
-  index: number;
-  margin?: string;
+  children: ReactNode
+  arrayLength: number
+  index: number
+  margin?: string
 }
 
 export function VerticalCenterRowCellWithDivider({
   children,
   arrayLength,
   index,
-  margin = '0.5rem',
+  margin = '0.5rem'
 }: VerticalCenterRowCellWithDividerProps) {
-  const isFirstEle = index === 0 && arrayLength > 0;
-  const isNonLastEle = index < arrayLength - 1;
+  const isFirstEle = index === 0 && arrayLength > 0
+  const isNonLastEle = index < arrayLength - 1
 
-  let style;
+  let style
   if (isFirstEle) {
-    style = { marginBottom: margin };
+    style = { marginBottom: margin }
   } else if (isNonLastEle) {
-    style = { marginBottom: margin, marginTop: margin };
+    style = { marginBottom: margin, marginTop: margin }
   } else {
-    style = { marginTop: margin };
+    style = { marginTop: margin }
   }
 
   return (
@@ -35,5 +36,5 @@ export function VerticalCenterRowCellWithDivider({
       </Row>
       {isNonLastEle && <Divider style={{ margin: 0 }} />}
     </>
-  );
+  )
 }

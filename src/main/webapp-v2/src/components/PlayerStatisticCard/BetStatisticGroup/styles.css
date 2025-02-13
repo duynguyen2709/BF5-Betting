@@ -182,7 +182,7 @@
 
 /* iPhone 12 Pro Max and iPhone 14 Pro Max */
 @media screen and (min-width: 428px) and (max-width: 428px),
-       screen and (min-width: 430px) and (max-width: 430px) {
+  screen and (min-width: 430px) and (max-width: 430px) {
   .bet-statistic-group .statistics-table th,
   .bet-statistic-group .statistics-table td {
     padding: 10px 14px;

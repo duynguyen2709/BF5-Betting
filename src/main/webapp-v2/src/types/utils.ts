@@ -1,6 +1,6 @@
-import { BetGroupTypeKey } from '@/constants'
+import type { BetHistory } from './bet'
+import type { BetGroupTypeKey } from '@/constants'
 import type React from 'react'
-import { BetHistory } from './bet'
 
 // Generic Types
 export type Nullable<T> = T | null

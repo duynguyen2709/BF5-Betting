@@ -1,25 +1,32 @@
-import { fetchRawBetsQuick, fetchRawBetsWithFilter, updateBatchResultsFromRaw, updateBetResultFromRaw } from '@/api/rawBet';
-import { QUERY_KEYS } from '@/constants';
-import { BetHistory } from '@/types/bet';
-import { RawBetFilterRequest } from '@/types/rawBet';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-const QUERY_RAW_BETS_KEY = [QUERY_KEYS.BET_HISTORIES, 'RAW'];
+import type { BetHistory } from '@/types/bet'
+import type { RawBetFilterRequest } from '@/types/rawBet'
+
+import {
+  fetchRawBetsQuick,
+  fetchRawBetsWithFilter,
+  updateBatchResultsFromRaw,
+  updateBetResultFromRaw
+} from '@/api/rawBet'
+import { QUERY_KEYS } from '@/constants'
+
+const QUERY_RAW_BETS_KEY = [QUERY_KEYS.BET_HISTORIES, 'RAW']
 
 export function useRawBetQuery(params: RawBetFilterRequest) {
   return useQuery<BetHistory[]>({
     queryKey: [...QUERY_RAW_BETS_KEY, params],
     queryFn: () => fetchRawBetsWithFilter(params),
-    enabled: false,
-  });
+    enabled: false
+  })
 }
 
 export function useQuickRawBetQuery(sessionToken?: string) {
   return useQuery<BetHistory[]>({
     queryKey: [...QUERY_RAW_BETS_KEY, 'QUICK'],
     queryFn: () => fetchRawBetsQuick(sessionToken),
-    enabled: false,
-  });
+    enabled: false
+  })
 }
 
 export function useUpdateRawBetResultMutation() {

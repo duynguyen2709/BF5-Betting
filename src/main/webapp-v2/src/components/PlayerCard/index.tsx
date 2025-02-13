@@ -1,17 +1,17 @@
-import type { Player } from '@/types/player';
-import { Avatar, Card, Statistic } from 'antd';
+import { Avatar, Card, Statistic } from 'antd'
 
-import styles from './styles.module.css';
+import styles from './styles.module.css'
 
-const { Meta } = Card;
+import type { Player } from '@/types/player'
+
+const { Meta } = Card
 
 interface PlayerCardProps {
-  data: Player;
+  data: Player
 }
 
 export function PlayerCard({ data }: PlayerCardProps) {
-  const valueStyle =
-    data.totalProfit > 0 ? { color: 'green' } : data.totalProfit < 0 ? { color: 'red' } : undefined;
+  const valueStyle = data.totalProfit > 0 ? { color: 'green' } : data.totalProfit < 0 ? { color: 'red' } : undefined
 
   return (
     <Card className={styles['cardPlayer']}>
@@ -23,10 +23,10 @@ export function PlayerCard({ data }: PlayerCardProps) {
             value={data.totalProfit}
             valueStyle={valueStyle}
             prefix={data.totalProfit > 0 ? '+' : undefined}
-            suffix="đ"
+            suffix='đ'
           />
         }
       />
     </Card>
-  );
+  )
 }

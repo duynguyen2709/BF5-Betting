@@ -156,7 +156,7 @@ export function getDistinctTeamName(betHistoryList: BetHistory[]): string[] {
   return Array.from(
     new Set(
       betHistoryList
-        .map(bet => bet.events[0])
+        .map((bet) => bet.events[0])
         .filter((event): event is BetMatchDetail => !!event)
         .flatMap(({ firstTeam, secondTeam }) => [firstTeam, secondTeam])
         .filter((team): team is string => !!team)

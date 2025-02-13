@@ -1,31 +1,33 @@
-import { RAW_BET_STATUS } from '@/constants';
-import { useBatchUpdateRawBetResultsMutation } from '@/hooks/useRawBetQuery';
-import type { BetHistory } from '@/types/bet';
-import { SyncOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
-import { useMemo } from 'react';
+import { SyncOutlined } from '@ant-design/icons'
+import { Button } from 'antd'
+import { useMemo } from 'react'
+
+import type { BetHistory } from '@/types/bet'
+
+import { RAW_BET_STATUS } from '@/constants'
+import { useBatchUpdateRawBetResultsMutation } from '@/hooks/useRawBetQuery'
 
 interface BatchUpdateRawBetButtonProps {
-  data: BetHistory[];
-  onSuccess?: () => void;
+  data: BetHistory[]
+  onSuccess?: () => void
 }
 
 export function BatchUpdateRawBetButton({ data, onSuccess }: BatchUpdateRawBetButtonProps) {
-  const { mutate: updateBatchRawBets, isPending } = useBatchUpdateRawBetResultsMutation();
+  const { mutate: updateBatchRawBets, isPending } = useBatchUpdateRawBetResultsMutation()
   const betListToBeUpdated = useMemo(
     () => data.filter((bet) => bet.rawStatus === RAW_BET_STATUS.ResultReadyToBeUpdated),
     [data]
-  );
+  )
 
   const handleUpdateRawBet = () => {
     updateBatchRawBets(betListToBeUpdated, {
-      onSuccess,
-    });
-  };
+      onSuccess
+    })
+  }
 
   return (
     <Button
-      type="primary"
+      type='primary'
       icon={<SyncOutlined />}
       onClick={handleUpdateRawBet}
       loading={isPending}
@@ -34,5 +36,5 @@ export function BatchUpdateRawBetButton({ data, onSuccess }: BatchUpdateRawBetBu
     >
       Cập Nhật Nhanh
     </Button>
-  );
+  )
 }

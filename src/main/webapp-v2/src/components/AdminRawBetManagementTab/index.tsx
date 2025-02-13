@@ -1,16 +1,17 @@
-import { Form } from 'antd';
-import type { QueryRawBetFormValues } from '@/types/rawBet';
-import { AddBetHistoryModal } from '../AddBetHistoryModal';
-import { CenterLoadingSpinner } from '../CenterLoadingSpinner';
-import { RawBetTable } from './RawBetTable';
-import { ActionBar } from './ActionBar';
-import { useRawBetManagement } from './hooks';
-import type { AdminRawBetManagementTabProps } from './types';
+import { Form } from 'antd'
+import React from 'react'
 
-export function AdminRawBetManagementTab({
-  onSuccessAction,
-}: AdminRawBetManagementTabProps): JSX.Element {
-  const [form] = Form.useForm<QueryRawBetFormValues>();
+import { AddBetHistoryModal } from '../AddBetHistoryModal'
+import { CenterLoadingSpinner } from '../CenterLoadingSpinner'
+import { ActionBar } from './ActionBar'
+import { useRawBetManagement } from './hooks'
+import { RawBetTable } from './RawBetTable'
+
+import type { AdminRawBetManagementTabProps } from './types'
+import type { QueryRawBetFormValues } from '@/types/rawBet'
+
+export function AdminRawBetManagementTab({ onSuccessAction }: AdminRawBetManagementTabProps): React.JSX.Element {
+  const [form] = Form.useForm<QueryRawBetFormValues>()
 
   const {
     modalAddSingleOpen,
@@ -25,8 +26,8 @@ export function AdminRawBetManagementTab({
     handleClickAddSingleBet,
     handleClickAddBatchBet,
     handleCloseSingleModal,
-    handleCloseBatchModal,
-  } = useRawBetManagement(form, onSuccessAction);
+    handleCloseBatchModal
+  } = useRawBetManagement(form, onSuccessAction)
 
   return (
     <>
@@ -69,5 +70,5 @@ export function AdminRawBetManagementTab({
         />
       )}
     </>
-  );
+  )
 }

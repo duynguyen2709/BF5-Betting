@@ -1,8 +1,12 @@
-import { API_URL } from '@/constants/common'
-import type { AssetByDate, BetHistoryFilterRequest, PlayerBetStatistics, StatisticRequest } from '@/types'
 import { apiGet, apiPost } from './apiClient'
 
-export const fetchPlayerStatisticsWithFilter = async (params: BetHistoryFilterRequest): Promise<PlayerBetStatistics> => {
+import type { AssetByDate, BetHistoryFilterRequest, PlayerBetStatistics, StatisticRequest } from '@/types'
+
+import { API_URL } from '@/constants/common'
+
+export const fetchPlayerStatisticsWithFilter = async (
+  params: BetHistoryFilterRequest
+): Promise<PlayerBetStatistics> => {
   const response = await apiGet<PlayerBetStatistics>(`${API_URL.STATISTICS}/detail`, { params })
   return response
 }

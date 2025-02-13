@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
+
 import { fetchPlayers } from '@/api/player'
 import { QUERY_KEYS } from '@/constants'
-import { useMemo } from 'react'
 
 export const usePlayerQuery = () => {
   const {
@@ -39,5 +40,4 @@ export const usePlayersWithSortedProfit = () => {
     playerArray.sort((a, b) => b.totalProfit - a.totalProfit)
     return playerArray
   }, [players])
-
 }

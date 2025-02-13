@@ -4,7 +4,8 @@
   margin-bottom: 0.25rem;
 }
 
-.betHistoryMatchTime, .betHistoryTournamentName  {
+.betHistoryMatchTime,
+.betHistoryTournamentName {
   margin: 0;
   margin-bottom: 0.25rem;
   font-weight: 300;
@@ -18,12 +19,11 @@
   align-items: center;
   justify-content: center;
 
-
-.teamDataDivider {
-  margin: 0 0 0.5rem;
-  line-height: 1;
-  font-size: 1.5rem;
-}
+  .teamDataDivider {
+    margin: 0 0 0.5rem;
+    line-height: 1;
+    font-size: 1.5rem;
+  }
 }
 
 .teamLogo {
@@ -36,10 +36,10 @@
   font-size: 11px;
   font-weight: 700;
   text-align: center;
-    white-space: normal;
-    width: 100%;
-    word-break: break-word;
-    box-sizing: border-box;
+  white-space: normal;
+  width: 100%;
+  word-break: break-word;
+  box-sizing: border-box;
 }
 
 .teamDataDivider {

@@ -1,33 +1,32 @@
-import { Table, Typography } from 'antd';
-import dayjs from 'dayjs';
-import styles from './index.module.css';
+import { Table, Typography } from 'antd'
+import dayjs from 'dayjs'
+import React from 'react'
 
-import type { AssetByDate } from '@/types';
+import styles from './index.module.css'
 
-import { PaymentAction } from '@/constants/enums';
-const { Text } = Typography;
+import type { AssetByDate } from '@/types'
+
+import { PaymentAction } from '@/constants/enums'
+const { Text } = Typography
 
 const COLORS = {
   positive: '#00b96b',
-  negative: '#ff4d4f',
-} as const;
+  negative: '#ff4d4f'
+} as const
 
-export const PaymentHistoryActionTable: React.FC<{ cashoutActions: AssetByDate[] }> = ({
-  cashoutActions,
-}) => {
+export const PaymentHistoryActionTable: React.FC<{ cashoutActions: AssetByDate[] }> = ({ cashoutActions }) => {
   const columns = [
     {
       title: 'Thời Gian',
       dataIndex: 'paymentTime',
       key: 'paymentTime',
-      render: (time: string) => dayjs(time, 'DD/MM HH:mm').format('DD/MM/YYYY HH:mm'),
+      render: (time: string) => dayjs(time, 'DD/MM HH:mm').format('DD/MM/YYYY HH:mm')
     },
     {
       title: 'Loại',
       dataIndex: 'action',
       key: 'action',
-      render: (action: PaymentAction) =>
-        action === PaymentAction.CASHOUT ? 'Rút Tiền' : 'Nạp Tiền',
+      render: (action: PaymentAction) => (action === PaymentAction.CASHOUT ? 'Rút Tiền' : 'Nạp Tiền')
     },
     {
       title: 'Số Tiền',
@@ -35,30 +34,24 @@ export const PaymentHistoryActionTable: React.FC<{ cashoutActions: AssetByDate[]
       key: 'amount',
       align: 'right' as const,
       render: (_: any, record: AssetByDate) => {
-        const amount = record.assetAfter - record.assetBefore;
-        const formattedAmount = Math.abs(amount).toLocaleString();
+        const amount = record.assetAfter - record.assetBefore
+        const formattedAmount = Math.abs(amount).toLocaleString()
         return (
           <Text strong style={{ color: amount > 0 ? COLORS.negative : COLORS.positive }}>
             {amount > 0 ? '-' : '+'}
             {formattedAmount}
           </Text>
-        );
-      },
-    },
-  ];
+        )
+      }
+    }
+  ]
 
   return (
     <div className={styles['cashout-table']}>
       <Text strong className={styles['table-title']}>
         Lịch Sử Thanh Toán
       </Text>
-      <Table
-        size="small"
-        columns={columns}
-        dataSource={cashoutActions}
-        pagination={false}
-        rowKey="paymentTime"
-      />
+      <Table size='small' columns={columns} dataSource={cashoutActions} pagination={false} rowKey='paymentTime' />
     </div>
-  );
-};
+  )
+}

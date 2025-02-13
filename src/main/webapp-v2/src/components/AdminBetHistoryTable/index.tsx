@@ -1,53 +1,54 @@
-import { BetResult, BetType } from '@/constants';
-import type { BetHistory } from '@/types/bet';
-import type { TableProps } from 'antd';
-import { Button, Table } from 'antd';
-import { useState } from 'react';
+import { Button, Table } from 'antd'
+import { useState } from 'react'
 
-import { buildCommonTableColumn } from '../shared/BetHistoryTableColumn';
-import { UpdateBetResultModal } from '../UpdateBetResultModal';
-import styles from './styles.module.css';
-import { usePlayerQuery } from '@/hooks';
+import { buildCommonTableColumn } from '../shared/BetHistoryTableColumn'
+import { UpdateBetResultModal } from '../UpdateBetResultModal'
+import styles from './styles.module.css'
+
+import type { BetHistory } from '@/types/bet'
+import type { TableProps } from 'antd'
+
+import { BetResult, BetType } from '@/constants'
+import { usePlayerQuery } from '@/hooks'
 
 interface AdminBetHistoryTableProps {
-  data: BetHistory[];
-  onUpdateSuccess: () => void;
+  data: BetHistory[]
+  onUpdateSuccess: () => void
 }
 
-const convertBetHistoryRowData = (data: BetHistory[]) => {
-  return data?.map((ele) => {
+const convertBetHistoryRowData = (data: BetHistory[]) =>
+  data?.map((ele) => {
     if (ele.betType === BetType.SINGLE) {
       return {
         ...ele,
-        ...ele.events[0],
-      };
+        ...ele.events[0]
+      }
     }
-    return ele;
-  });
-};
+    return ele
+  })
 
 export function AdminBetHistoryTable({ data, onUpdateSuccess }: AdminBetHistoryTableProps) {
-  const [modalUpdateOpen, setModalUpdateOpen] = useState(false);
-  const [currentUpdateBet, setCurrentUpdateBet] = useState<BetHistory>();
-  const { players } = usePlayerQuery();
+  const [modalUpdateOpen, setModalUpdateOpen] = useState(false)
+  const [currentUpdateBet, setCurrentUpdateBet] = useState<BetHistory>()
+  const { players } = usePlayerQuery()
 
-  const rowData = convertBetHistoryRowData(data);
+  const rowData = convertBetHistoryRowData(data)
 
   const handleCloseModal = () => {
-    setCurrentUpdateBet(undefined);
-    setModalUpdateOpen(false);
-  };
+    setCurrentUpdateBet(undefined)
+    setModalUpdateOpen(false)
+  }
 
   const handleClickUpdateBetResult = (bet: BetHistory) => {
-    setCurrentUpdateBet(bet);
-    setModalUpdateOpen(true);
-  };
+    setCurrentUpdateBet(bet)
+    setModalUpdateOpen(true)
+  }
 
   const handleUpdateSuccess = () => {
-    setCurrentUpdateBet(undefined);
-    setModalUpdateOpen(false);
-    onUpdateSuccess();
-  };
+    setCurrentUpdateBet(undefined)
+    setModalUpdateOpen(false)
+    onUpdateSuccess()
+  }
 
   const columns = [
     {
@@ -55,20 +56,20 @@ export function AdminBetHistoryTable({ data, onUpdateSuccess }: AdminBetHistoryT
       key: 'action',
       width: 120,
       render: (_: any, record: BetHistory) => {
-        const isNotFinished = record.result === BetResult.NOT_FINISHED;
+        const isNotFinished = record.result === BetResult.NOT_FINISHED
         return (
           <>
             {isNotFinished && (
-              <Button type="primary" onClick={() => handleClickUpdateBetResult(record)}>
+              <Button type='primary' onClick={() => handleClickUpdateBetResult(record)}>
                 Cập Nhật
               </Button>
             )}
           </>
-        );
-      },
+        )
+      }
     },
-    ...buildCommonTableColumn(players)!,
-  ];
+    ...buildCommonTableColumn(players)!
+  ]
 
   const tableProps: TableProps<BetHistory> = {
     size: 'middle',
@@ -80,12 +81,12 @@ export function AdminBetHistoryTable({ data, onUpdateSuccess }: AdminBetHistoryT
     pagination: {
       defaultPageSize: 10,
       showSizeChanger: true,
-      showTotal: (total) => `Tổng: ${total} cược`,
+      showTotal: (total) => `Tổng: ${total} cược`
     },
     scroll: {
-      x: 2000,
-    },
-  };
+      x: 2000
+    }
+  }
 
   return (
     <>
@@ -99,5 +100,5 @@ export function AdminBetHistoryTable({ data, onUpdateSuccess }: AdminBetHistoryT
       )}
       <Table {...tableProps} />
     </>
-  );
+  )
 }
