@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ConfigProvider, Spin } from 'antd'
 import viVN from 'antd/locale/vi_VN'
 import React, { lazy, Suspense } from 'react'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createHashRouter, RouterProvider } from 'react-router-dom'
 
 import ErrorBoundary from '@/components/ErrorBoundary'
 import { usePlayerQuery } from '@/hooks/usePlayerQuery'
@@ -37,7 +37,7 @@ const queryClient = new QueryClient({
   }
 })
 
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: '/',
     element: <MainPageWrapper />
