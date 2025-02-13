@@ -29,8 +29,7 @@ export const insertBetHistoryBatch = async (betList: Partial<BetHistory>[]): Pro
   return response
 }
 
-// TODO: uncomment when API is ready
-// export const updateBetResult = async (data: BetResultUpdateRequest): Promise<BetHistory> => {
-//   const response = await apiPut<BetHistory>(`${API_URL.BET_HISTORY}/${data.betId}/result`, data)
-//   return response
-// }
+export const updateBetResult = async (data: BetHistory): Promise<BetHistory> => {
+  const response = await apiPut<BetHistory>(`${API_URL.BET_HISTORY}/${data.betId}/result`, data)
+  return response
+}

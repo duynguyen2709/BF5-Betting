@@ -1,0 +1,12 @@
+.tableBetHistory {
+  margin-top: 1rem;
+}
+
+.tableBetHistory :global(.ant-table-cell) {
+  padding: 4px !important;
+}
+
+.tableBetHistory :global(.ant-table-thead > tr > th) {
+  text-align: center;
+  font-weight: 500;
+}

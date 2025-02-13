@@ -38,3 +38,10 @@ export enum BetGroupTypeKey {
   MultiBetsSameMatch = 'MULTI',
   Accumulator = 'ACCUMULATOR'
 }
+
+export enum PaymentMethod {
+  BANK = 'BANK',
+  MOMO = 'MOMO',
+  CASH = 'CASH',
+  OTHER = 'OTHER'
+}

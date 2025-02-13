@@ -41,9 +41,9 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-/// **
-// * @author duynguyen
-// **/
+/**
+ * @author duynguyen
+ **/
 @Component
 @Log4j2
 public class TelegramBot extends TelegramLongPollingBot {

@@ -27,7 +27,7 @@ const AdminBetHistoryCard = ({ data, isHistoryViewMode = true }: BetHistoryCardP
   return <div className={styles['cardBetHistoryWrapper']}>{card}</div>;
 };
 
-const BetHistoryCard: React.FC<BetHistoryCardProps> = ({
+export const BetHistoryCard: React.FC<BetHistoryCardProps> = ({
   data,
   type,
   isAdminView = false,

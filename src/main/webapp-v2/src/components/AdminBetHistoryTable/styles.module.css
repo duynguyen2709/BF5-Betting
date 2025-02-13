@@ -1,0 +1,28 @@
+.tableBetHistory :global(.ant-table-thead .ant-table-cell) {
+  text-align: center;
+}
+
+.tableBetHistory :global(.team-data) {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.tableBetHistory :global(.team-name) {
+  width: 100%;
+  word-break: break-word;
+  white-space: normal;
+  text-align: center;
+  font-size: 13px;
+}
+
+.tableBetHistory :global(.team-data-divider) {
+  margin: 0 0 0.5rem;
+  line-height: 1;
+}
+
+.tableBetHistory :global(.team-logo) {
+  width: 1rem;
+  margin-bottom: 0.25rem;
+}

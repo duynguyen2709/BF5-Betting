@@ -23,14 +23,22 @@ export const API_ENDPOINTS = {
   BET: {
     LIST: '/api/bets',
     RECENT: '/api/bets/recent',
-    UPDATE: (id: string) => `/api/bets/${id}/result`
+    RAW: '/api/bets/raw',
+    RAW_QUICK: '/api/bets/raw/quick',
+    UPDATE: (id: string) => `/api/bets/${id}/result`,
+    INSERT: '/api/bets/insert',
+    INSERT_BATCH: '/api/bets/insert/batch',
+    UPDATE_RAW: '/api/bets/raw/update',
+    UPDATE_RAW_BATCH: '/api/bets/raw/update/batch'
   },
   PLAYER: {
     LIST: '/api/players',
-    STATISTICS: (id: string) => `/api/players/${id}/statistics`
+    DETAIL: (id: string) => `/api/players/${id}`,
+    STATISTICS: '/api/players/statistics',
   },
   STATISTICS: {
-    DETAIL: `/api/statistics/detail`,
+    DETAIL: '/api/statistics',
+    ASSET: '/api/statistics/asset',
   }
 } as const
 
@@ -48,16 +56,15 @@ export const MESSAGES = {
   DATE_RANGE_ERROR: 'Ngày bắt đầu phải trước hoặc bằng ngày kết thúc',
   UNAUTHORIZED: 'Bạn không có quyền truy cập. Vui lòng đăng nhập.',
   NOT_FOUND: 'Không tìm thấy trang yêu cầu.',
-  START_DATE_MUST_BE_BEFORE_OR_EQUAL_ERROR: 'Ngày bắt đầu phải trước hoặc bằng ngày kết thúc'
+  START_DATE_MUST_BE_BEFORE_OR_EQUAL_ERROR: 'Ngày bắt đầu phải trước hoặc bằng ngày kết thúc',
+  SELECT_ALL_MATCH_RESULTS: '"Vui lòng chọn kết quả cho tất cả trận đấu"'
 } as const
 
 export const QUERY_KEYS = {
-  BETS: 'bets',
-  RECENT_BETS: 'recent-bets',
   PLAYERS: 'players',
   PLAYER_STATISTICS: 'player-statistics',
-  BET_HISTORY: 'bet-histories',
-  STATISTICS: 'statistics'
+  BET_HISTORIES: 'bet-histories',
+  ASSET_HISTORIES: 'asset-histories',
 } as const
 
 export const API_URL = {
@@ -70,7 +77,8 @@ export const API_URL = {
 
 export const STORAGE_KEYS = {
   UNLOCK_DATA: 'unlock_data',
-  IS_ADMIN: 'is_admin'
+  IS_ADMIN: 'is_admin',
+  RAW_BET_QUERY_TOKEN: 'raw_bet_query_token',
 } as const
 
 export const ROUTES = {
@@ -83,7 +91,6 @@ export const ROUTES = {
 } as const
 
 export const ADMIN_USER_ID = '100002362515754'
-
 
 export const BET_RESULT = {
   Win: {
@@ -111,3 +118,10 @@ export const BET_RESULT = {
     text: 'Chưa Hoàn Tất'
   }
 } as const
+
+export const RAW_BET_STATUS = {
+  New: "NEW",
+  Inserted: "INSERTED",
+  ResultReadyToBeUpdated: "RESULT_READY_TO_BE_UPDATED",
+  Settled: "SETTLED",
+};

@@ -1,33 +1,32 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import type { BetHistory, BetHistoryFilterRequest } from '@/types'
 
 import {
   fetchAllBetHistory,
-  fetchRecentBetHistory,
   fetchBetHistoryWithFilter,
+  fetchRecentBetHistory,
   insertBetHistory,
-  insertBetHistoryBatch
-  // updateBetResult
+  insertBetHistoryBatch,
+  updateBetResult
 } from '@/api/betHistory'
 import { QUERY_KEYS } from '@/constants/common'
-import { BetHistoryUpdateRequest } from '@/types'
 
 export const useAllBetHistoryQuery = () =>
   useQuery({
-    queryKey: [QUERY_KEYS.BET_HISTORY, 'all'],
+    queryKey: [QUERY_KEYS.BET_HISTORIES, 'all'],
     queryFn: fetchAllBetHistory
   })
 
 export const useRecentBetHistoryQuery = () =>
   useQuery({
-    queryKey: [QUERY_KEYS.BET_HISTORY, 'recent'],
+    queryKey: [QUERY_KEYS.BET_HISTORIES, 'recent'],
     queryFn: fetchRecentBetHistory
   })
 
 export const useBetHistoryWithFilterQuery = (params: BetHistoryFilterRequest, enabled: boolean = true) =>
   useQuery({
-    queryKey: [QUERY_KEYS.BET_HISTORY, params],
+    queryKey: [QUERY_KEYS.BET_HISTORIES, params],
     queryFn: () => fetchBetHistoryWithFilter(params),
     enabled: enabled && !!params.playerId
   })
@@ -38,7 +37,8 @@ export const useInsertBetHistoryMutation = () => {
   return useMutation({
     mutationFn: (bet: Partial<BetHistory>) => insertBetHistory(bet),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.BET_HISTORY] })
+      console.log('inside onSuccess')
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.BET_HISTORIES] })
     }
   })
 }
@@ -49,19 +49,19 @@ export const useInsertBatchBetHistoryMutation = () => {
   return useMutation({
     mutationFn: (betList: Partial<BetHistory>[]) => insertBetHistoryBatch(betList),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.BET_HISTORY] })
+      console.log('inside onSuccess')
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.BET_HISTORIES] })
     }
   })
 }
 
-// TODO: uncomment when API is ready
-// export const useUpdateBetResultMutation = () => {
-//   const queryClient = useQueryClient()
+export const useUpdateBetResultMutation = () => {
+  const queryClient = useQueryClient()
 
-//   return useMutation({
-//     mutationFn: (data: BetHistoryUpdateRequest) => updateBetResult(data),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.BET_HISTORY] })
-//     }
-//   })
-// }
+  return useMutation({
+    mutationFn: (data: BetHistory) => updateBetResult(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.BET_HISTORIES] })
+    }
+  })
+}

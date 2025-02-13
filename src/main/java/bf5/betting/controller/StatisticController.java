@@ -4,6 +4,7 @@ import bf5.betting.constant.UserAction;
 import bf5.betting.entity.jpa.BetHistory;
 import bf5.betting.entity.jpa.PlayerAssetHistory;
 import bf5.betting.entity.request.AddPlayerAssetHistoryRequest;
+import bf5.betting.entity.request.StatisticByDateRangeRequest;
 import bf5.betting.entity.response.BaseResponse;
 import bf5.betting.entity.response.BetHistoryStatisticResponse;
 import bf5.betting.service.BetHistoryService;
@@ -80,13 +81,11 @@ public class StatisticController {
   }
 
   @PostMapping("")
-  public BaseResponse statisticByDateRange(@RequestParam(name = "startDate") String startDate,
-      @RequestParam(name = "endDate") String endDate,
-      @RequestParam(name = "action") String action) {
-    if ("delete".equalsIgnoreCase(action)) {
-      this.assetHistoryService.deleteByDateRange(startDate, endDate);
-    } else if ("statistic".equalsIgnoreCase(action)) {
-      this.statisticService.runStatisticForDateRange(startDate, endDate);
+  public BaseResponse statisticByDateRange(@RequestBody StatisticByDateRangeRequest request) {
+    if ("delete".equalsIgnoreCase(request.getAction())) {
+      this.assetHistoryService.deleteByDateRange(request.getStartDate(), request.getEndDate());
+    } else if ("statistic".equalsIgnoreCase(request.getAction())) {
+      this.statisticService.runStatisticForDateRange(request.getStartDate(), request.getEndDate());
     }
     return BaseResponse.SUCCESS;
   }

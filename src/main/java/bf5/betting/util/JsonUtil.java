@@ -6,8 +6,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,12 +44,28 @@ public class JsonUtil {
     }
   }
 
+  private static String inputStreamToString(InputStream inputStream) {
+    try {
+      StringBuilder result = new StringBuilder();
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          result.append(line)
+                .append("\n");
+        }
+      }
+      return result.toString();
+    } catch (Exception ex) {
+      log.error("[inputStreamToString]", ex);
+      return null;
+    }
+  }
+
   public static <T> T fromJsonResponse(InputStream stream, Class<T> clazz) {
     try {
       return mapper.readValue(stream, clazz);
     } catch (Exception e) {
-      log.error(String.format("[fromJsonResponse] raw=%s, class=%s ex", stream, clazz.getSimpleName()),
-                e);
+      log.error("[fromJsonResponse] raw={}, class={} ex", inputStreamToString(stream), clazz.getSimpleName(), e);
       return null;
     }
   }
@@ -55,8 +74,7 @@ public class JsonUtil {
     try {
       return mapper.readValue(raw, clazz);
     } catch (Exception e) {
-      log.error(String.format("[fromJsonString] raw=%s, class=%s ex", raw, clazz.getSimpleName()),
-                e);
+      log.error("[fromJsonString] raw={}, class={} ex", raw, clazz.getSimpleName(), e);
       return null;
     }
   }
@@ -68,9 +86,7 @@ public class JsonUtil {
 
       return mapper.readValue(raw, listType);
     } catch (Exception e) {
-      log.error(
-          String.format("[fromJsonStringToList] raw=%s, class=%s ex", raw, clazz.getSimpleName()),
-          e);
+      log.error("[fromJsonStringToList] raw={}, class={} ex", raw, clazz.getSimpleName(), e);
       return null;
     }
   }
@@ -84,8 +100,7 @@ public class JsonUtil {
         }
       });
     } catch (JsonProcessingException e) {
-      log.error(String.format("[fromJsonStringToMap] raw=%s, class=(%s;%s) ex",
-                              raw, key.getSimpleName(), value.getSimpleName()), e);
+      log.error("[fromJsonStringToMap] raw={}, class=({};{}) ex", raw, key.getSimpleName(), value.getSimpleName(), e);
       return null;
     }
   }

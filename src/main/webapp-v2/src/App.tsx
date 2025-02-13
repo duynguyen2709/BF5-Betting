@@ -11,6 +11,7 @@ import MainPageWrapper from '@/pages/MainPageWrapper';
 import colorPalette from '@/utils/colorPalette';
 
 const NotFound = lazy(() => import('@/pages/NotFoundPage/NotFound'));
+const AdminPage = lazy(() => import('@/pages/AdminPage'));
 
 const withSuspense = (Component: React.ComponentType) => (
   <Suspense fallback={<Spin size="large" className="global-spinner" />}>
@@ -40,6 +41,10 @@ const router = createBrowserRouter([
   {
     path: '/',
     element: <MainPageWrapper />,
+  },
+  {
+    path: '/admin',
+    element: withSuspense(AdminPage),
   },
   {
     path: '*',

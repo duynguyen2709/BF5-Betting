@@ -1,4 +1,4 @@
-import type { BetResult, BetType, PaymentAction } from '@/constants'
+import type { BetResult, BetType } from '@/constants'
 
 export interface TeamData {
   teamId: string
@@ -36,18 +36,11 @@ export interface BetHistory {
   result: BetResult
   actualProfit?: number
   events: BetMatchDetail[]
-  rawStatus?: string
+  rawStatus: string
 }
 
 export interface BetHistoryFilterRequest {
   playerId: string
   startDate?: string
   endDate?: string
-}
-
-export interface BetHistoryUpdateRequest {
-  betId: number
-  score: string
-  result: BetResult
-  actualProfit?: number
 }

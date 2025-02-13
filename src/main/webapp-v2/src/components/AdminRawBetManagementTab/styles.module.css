@@ -1,0 +1,7 @@
+.rawBetTable :global(.ant-table-thead .ant-table-cell) {
+  text-align: center;
+}
+
+.rawBetTable :global(.ant-table-tbody .ant-table-cell) {
+  text-align: center;
+}

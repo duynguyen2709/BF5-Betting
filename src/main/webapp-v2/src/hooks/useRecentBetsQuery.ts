@@ -19,7 +19,7 @@ export const useRecentBetsQuery = (): UseRecentBetsQueryResult => {
     error,
     refetch
   } = useQuery({
-    queryKey: [QUERY_KEYS.BET_HISTORY, 'recent'],
+    queryKey: [QUERY_KEYS.BET_HISTORIES, 'recent'],
     queryFn: fetchRecentBetHistory
   })
 
