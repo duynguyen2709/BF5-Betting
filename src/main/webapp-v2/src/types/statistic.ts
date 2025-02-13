@@ -27,10 +27,3 @@ export interface StatisticRequest {
     dateRange: [Dayjs, Dayjs]
     action?: PaymentAction
 }
-
-export interface AddPaymentHistoryRequest {
-    playerId: string
-    action: PaymentAction
-    paymentMethod: PaymentMethod
-    amount: number
-}

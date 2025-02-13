@@ -1,6 +1,6 @@
 import type { QueryRawBetFormValues } from '@/types/rawBet';
 import type { FormInstance } from 'antd';
-import { Button, DatePicker, Form, Input, Space } from 'antd';
+import { Button, DatePicker, Form, Input, Space, Spin } from 'antd';
 import type { RangePickerProps } from 'antd/es/date-picker';
 import dayjs from 'dayjs';
 
@@ -36,14 +36,16 @@ export function QueryRawBetInfoForm({
         <RangePicker format="DD/MM/YYYY" disabledDate={disabledDate} style={{ width: '100%' }} />
       </Form.Item>
       <Form.Item>
-        <Space>
-          <Button type="primary" htmlType="submit" loading={loading}>
-            Lấy Dữ Liệu
-          </Button>
-          <Button ghost type="primary" onClick={onQuickFetch} loading={loading}>
-            Lấy Nhanh
-          </Button>
-        </Space>
+        {!loading && (
+          <Space>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Lấy Dữ Liệu
+            </Button>
+            <Button ghost type="primary" onClick={onQuickFetch} loading={loading}>
+              Lấy Nhanh
+            </Button>
+          </Space>
+        )}
       </Form.Item>
     </Form>
   );
